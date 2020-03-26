@@ -411,10 +411,12 @@ public class PlayerJourneyLog
 		this.routeLog = new List<PlayerRoute>();
 		this.cargoLog = new List<string>();
 		this.otherAttributes = new List<string>();
+
+		// KDTODO: This needs to be done every time we add a new field right now. Needs a rewrite. Search this comment for other spots.
 		this.CSVheader = "Unique_Machine_ID,timestamp,originE,originN,originZ,endE,endN,endZ," +
 			"Water_kg,Provisions_kg,Grain_kg,Wine_kg,Timber_kg,Gold_kg,Silver_kg," +
 			"Copper_kg,Tin_kg,Obsidian_kg,Lead_kg,Livestock_kg,Iron_kg,Bronze_kg,Luxury_kg,Is_Leaving_Port,PortID,PortName," +
-			"CrewMemberIDs,UnityXYZ,Current_Questleg,ShipHP,Clout,PlayerNetwork,DaysStarving,DaysThirsty,Currency,LoanAmount,LoanOriginID,CurrentNavigatorTarget,KnownSettlements,CaptainsLog,upgradeLevel,crewCap,cargoCap\n";
+			"CrewMemberIDs,UnityXYZ,Current_Questleg,ShipHP,Clout,PlayerNetwork,DaysStarving,DaysThirsty,Currency,LoanAmount,LoanOriginID,CurrentNavigatorTarget,KnownSettlements,CaptainsLog,upgradeLevel,crewCap,cargoCap,consented\n";
 	}
 
 	public void AddRoute(PlayerRoute routeToAdd, script_player_controls playerShipVars, string captainsLog) {
@@ -501,9 +503,11 @@ public class PlayerJourneyLog
 		scrubbedLog = scrubbedLog.Replace('\n', '*');
 		CSVstring += "," + scrubbedLog;
 
+		// KDTODO: This needs to be done every time we add a new field right now. Needs a rewrite. Search this comment for other spots.
 		CSVstring += "," + playerShip.upgradeLevel;
 		CSVstring += "," + playerShip.crewCapacity;
 		CSVstring += "," + playerShip.cargo_capicity_kg;
+		CSVstring += "," + playerShip.consented;
 
 		//Add a new row to match the route of all these attributes
 		this.otherAttributes.Add(CSVstring);
@@ -722,6 +726,9 @@ public class Ship : Model
 	public int originSettlement;
 
 	public MainQuestLine mainQuest;
+
+	// for IRB, user gets asked to agree to terms once for each new save game
+	public bool consented;
 
 	// TODO: Reconcile mainQuest and objective concepts. These systems seem like they should be merged
 	private string _objective;

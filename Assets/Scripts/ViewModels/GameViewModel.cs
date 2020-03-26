@@ -92,6 +92,35 @@ public class GameViewModel : Model
 
 	// happens upon clicking the new game button on the title screen
 	public void GUI_startNewGame(Difficulty difficulty) {
+		if(Globals.GameVars.playerShipVariables.ship.consented) {
+			ConsentGiven(difficulty);
+		}
+		else {
+			AskConsent(difficulty);
+		}
+	}
+
+	void AskConsent(Difficulty difficulty) {
+		// on your first run, we need to ask for consent to use your data for IRB
+		Globals.UI.Show<MessageBoxView, MessageBoxViewModel>(new MessageBoxViewModel {
+			Title = "User Agreement",
+			Message = (Resources.Load("consent") as TextAsset).text,
+			OK = new ButtonViewModel {
+				Label = "Accept",
+				OnClick = () => {
+					Globals.UI.Hide<MessageBoxView>();
+					ConsentGiven(difficulty);
+				}
+			},
+			Cancel = new ButtonViewModel {
+				Label = "Decline",
+				OnClick = () => Globals.UI.Hide<MessageBoxView>()
+			}
+		});
+	}
+
+	void ConsentGiven(Difficulty difficulty) {
+
 		GameVars.isTitleScreen = false;
 		GameVars.isStartScreen = true;
 
@@ -114,14 +143,13 @@ public class GameViewModel : Model
 		// TODO: Turned off crew selection because it's too overwhelming. Needs to be reworked.
 		//title_crew_select.SetActive(true);
 		//GUI_SetupStartScreenCrewSelection();
-
 	}
 
 	//-----------------------------------------------------
 	//THIS IS THE SAVE DATA BUTTON
 	public void GUI_saveGame() {
 		GameVars.ShowANotificationMessage("Saved Data File 'player_save_game.txt' To: " + Application.persistentDataPath + "/");
-		GameVars.SaveUserGameData(false);
+		GameVars.SaveUserGameData();
 	}
 
 	//-----------------------------------------------------

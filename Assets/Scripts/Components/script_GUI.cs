@@ -176,13 +176,13 @@ public class script_GUI : MonoBehaviour
 		//  IF WE ARE AT THE TITLE SCREEN OR START SCREEN
 		//=====================================================================================================================================	
 
+		// TODO: Turn this into a state machine or stack. it'd be too easy to end up in 4 different states at once right now.
 		if (!GameVars.runningMainGameGUI) {
 
 			//=====================================================================================================================================
 			// IF WE ARE AT THE TITLE SCREEN
 			if (GameVars.isTitleScreen) {
-
-				Globals.UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
+				EnterTitleScreenState();
 				GameVars.isTitleScreen = false;			// TODO: Make this based on an event rather than this hacky one-time execution style.
 			}
 
@@ -301,6 +301,10 @@ public class script_GUI : MonoBehaviour
 	//  ALL FUNCTIONS
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
+
+	void EnterTitleScreenState() {
+		Globals.UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
+	}
 
 	//=====================================================================================================================================	
 	//  GUI Interaction Functions are the remaining code below. All of these functions control some aspect of the GUI based on state changes

@@ -327,9 +327,9 @@ public class GameVars : MonoBehaviour
 			loadedJourney.cargoLog.Add(CSVcargo);
 
 			//Next add the other attributes string
-			// KDTODO: This needs to update whenever we add a new field right now. Needs a rewrite.
+			// KDTODO: This needs to be done every time we add a new field right now. Needs a rewrite. Search this comment for other spots.
 			string CSVotherAtt = "";
-			for (int i = 23; i < 42; i++) {
+			for (int i = 23; i < 44; i++) {
 				CSVotherAtt += "," + records[i];
 			}
 			loadedJourney.otherAttributes.Add(CSVotherAtt);
@@ -433,11 +433,14 @@ public class GameVars : MonoBehaviour
 		currentCaptainsLog = restoreCommasAndNewLines.Replace('*', '\n');
 		//Debug.Log (currentCaptainsLog);
 
-		// KDTODO: This needs to be done every time we add a new field right now. Needs a rewrite.
+		// KDTODO: This needs to be done every time we add a new field right now. Needs a rewrite. Search this comment for other spots.
 		ship.upgradeLevel = int.Parse(playerVars[40]);
 		ship.crewCapacity = int.Parse(playerVars[41]);
 		ship.cargo_capicity_kg = int.Parse(playerVars[42]);
 		SetShipModel(ship.upgradeLevel);
+
+		// must look like FALSE, or TRUE (not case sensitive though)
+		ship.consented = bool.Parse(playerVars[43]);
 
 		// KDTODO: Once the save game routines are rewritten, need to save the crew available in each city instead of regenerating since this is exploitable
 		// it's just too much hassle to support saving this right now because the save format is limiting
@@ -692,7 +695,7 @@ public class GameVars : MonoBehaviour
 	//====================================================================================================
 	//      DATA SAVING FUNCTIONS
 	//====================================================================================================
-	public void SaveUserGameData(bool isRestart) {
+	public void SaveUserGameData() {
 		string delimitedData = playerShipVariables.journey.ConvertJourneyLogToCSVText();
 		Debug.Log(delimitedData);
 		string filePath = Application.persistentDataPath + "/";
@@ -710,8 +713,7 @@ public class GameVars : MonoBehaviour
 		try {
 			//save a backup before Joanna's edits
 			System.IO.File.WriteAllText(Application.persistentDataPath + "/BACKUP-" + SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv", delimitedData);
-			//Only save the game for loading if it's not a restart--otherwise if the player loads, it will load right where the player restarted the game
-			if (!isRestart) System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileName, delimitedData);
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileName, delimitedData);
 			//TODO Temporary addition for joanna to remove the captains log from the server upload
 			string fileToUpload = RemoveCaptainsLogForJoanna(delimitedData);
 			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileNameServer, fileToUpload);
@@ -905,7 +907,7 @@ public class GameVars : MonoBehaviour
 
 		//Debug.Log ("Quest Seg: " + playerShipVariables.ship.mainQuest.currentQuestSegment);
 		//First we need to save the game that just ended
-		SaveUserGameData(true);
+		SaveUserGameData();
 		//Then we need to re-initialize all the player's variables
 		playerShipVariables.Reset();
 
