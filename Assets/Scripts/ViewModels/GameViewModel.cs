@@ -109,6 +109,7 @@ public class GameViewModel : Model
 				Label = "Accept",
 				OnClick = () => {
 					Globals.UI.Hide<MessageBoxView>();
+					Globals.GameVars.playerShipVariables.ship.consented = true;
 					ConsentGiven(difficulty);
 				}
 			},

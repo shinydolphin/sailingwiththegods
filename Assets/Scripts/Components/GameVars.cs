@@ -714,9 +714,7 @@ public class GameVars : MonoBehaviour
 			//save a backup before Joanna's edits
 			System.IO.File.WriteAllText(Application.persistentDataPath + "/BACKUP-" + SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv", delimitedData);
 			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileName, delimitedData);
-			//TODO Temporary addition for joanna to remove the captains log from the server upload
-			string fileToUpload = RemoveCaptainsLogForJoanna(delimitedData);
-			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileNameServer, fileToUpload);
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileNameServer, delimitedData);
 			Debug.Log(Application.persistentDataPath);
 		}
 		catch (Exception e) {
@@ -800,24 +798,6 @@ public class GameVars : MonoBehaviour
 
 		Debug.Log("Upload successful.");
 		ShowANotificationMessage("File: '" + localFile + "' successfully uploaded to the server!");
-	}
-
-	//TODO: This is an incredibly specific function that won't be needed later
-	public string RemoveCaptainsLogForJoanna(string file) {
-		string[] splitFile = new string[] { "\r\n", "\r", "\n" };
-		string newFile = "";
-		string[] fileByLine = file.Split(splitFile, StringSplitOptions.None);
-
-		//For each line of the save file (the row)
-		for (int row = 0; row < fileByLine.Length; row++) {
-			int index = fileByLine[row].LastIndexOf(",");
-			newFile += fileByLine[row].Substring(0, index) + "\n";
-			//Debug.Log (fileByLine [row]); 
-			//Debug.Log (fileByLine [row].Substring (0, index));
-		}
-
-		return newFile;
-
 	}
 
 	// TODO: Apparently this isn't hooked up anymore. Need to fix this tool so we can adjust current directions in the editor
