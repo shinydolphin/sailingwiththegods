@@ -1,12 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
 using UnityEngine;
-using NaughtyAttributes;
-using System.Collections.Specialized;
 
 /*
  * This file contains data objects that are used in GameVars.loadSaveGame / saveGame to read/write player save data and game state (dynamic data) to/from disk.
@@ -40,14 +35,6 @@ public class GameData
 	// TODO: Still loaded from CSV. Review and load from JSON later.
 	// since this is a reference to the real ship, it's safe to modify from here as well as playerShipVariables.ship
 	public PlayerJourneyLog journey;
-
-	public MyNewDataStructure myData;
-}
-
-[Serializable]
-public class MyNewDataStructure
-{
-	public int KevinTest;
 }
 
 #region Nested Save Data Structures
@@ -84,48 +71,6 @@ public class MainQuestLine
 	public MainQuestLine() {
 		questSegments = new List<QuestSegment>();
 		currentQuestSegment = 0;
-	}
-}
-
-[Serializable]
-public class SerializableObservableCollection<T> : SerializableObservableCollection<T, T>
-{
-	public SerializableObservableCollection() : base(t => t, t => t) { }
-}
-
-[Serializable]
-public class SerializableObservableCollection<T, TSerialized> : ObservableCollection<T>, ISerializationCallbackReceiver 
-{
-	[SerializeField] List<TSerialized> _list = new List<TSerialized>();
-
-	bool _silent = false;
-	Func<T, TSerialized> _serializer;
-	Func<TSerialized, T> _deserializer;
-
-	public SerializableObservableCollection(Func<T, TSerialized> serialize, Func<TSerialized, T> deserialize) {
-		_serializer = serialize;
-		_deserializer = deserialize;
-	}
-
-	protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e) {
-		if (!_silent) {
-			base.OnCollectionChanged(e);
-		}
-	}
-
-	public void OnBeforeSerialize() {
-		_list = this.Select(e => _serializer(e)).ToList();
-	}
-
-	// silently modify the collection on deserialize. deserialize only happens in practice when saving and loading, so no UIs should be open.
-	// this is needed because you may have listeners watching that run unity api functions in response to the event, and this happens in the constructor thread
-	public void OnAfterDeserialize() {
-		_silent = true;
-		this.Clear();
-		foreach (var e in _list) {
-			this.Add(_deserializer(e));
-		}
-		_silent = false;
 	}
 }
 
