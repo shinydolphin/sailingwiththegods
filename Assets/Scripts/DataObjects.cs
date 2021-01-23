@@ -6,7 +6,53 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using UnityEngine;
 using NaughtyAttributes;
+using System.Collections.Specialized;
 
+/*
+ * This file contains data objects that are used in GameVars.loadSaveGame / saveGame to read/write player save data and game state (dynamic data) to/from disk.
+ * It differs from StaticDataObjects, which contains non-changing (static data) read using CSVLoader and never changed in memory.
+ */
+
+// this is the root save data object for the JSON save file
+// to avoid needing to refactor everything at once, some fields are only written to disk, not loaded (loading is still from the CSV). these are marked with:
+// TODO: Still loaded from CSV. Review and load from JSON later.
+[Serializable]
+public class GameData
+{
+	public const int LatestVersion = 1;
+
+	public static GameData New() => new GameData() { 
+		_version = LatestVersion,
+		journey = Globals.GameVars.playerShipVariables.journey,
+		ship = Globals.GameVars.playerShipVariables.ship
+	};
+
+	[SerializeField] int _version;
+	public int Version => _version;
+
+	// TODO: add options menu data here
+	// TODO: add new captain's log data here
+
+	// TODO: Still loaded from CSV. Review and load from JSON later.
+	// since this is a reference to the real ship, it's safe to modify from here as well as playerShipVariables.ship
+	public Ship ship;
+
+	// TODO: Still loaded from CSV. Review and load from JSON later.
+	// since this is a reference to the real ship, it's safe to modify from here as well as playerShipVariables.ship
+	public PlayerJourneyLog journey;
+
+	public MyNewDataStructure myData;
+}
+
+[Serializable]
+public class MyNewDataStructure
+{
+	public int KevinTest;
+}
+
+#region Nested Save Data Structures
+
+[Serializable]
 public class Loan
 {
 	public int amount;
@@ -28,174 +74,69 @@ public class Loan
 	}
 }
 
-public class QuestSegment
-{
-	#region Triggers
-	public abstract class Trigger
-	{
-		public abstract TriggerType Type { get; }
-	}
-
-	public class CityTrigger : Trigger
-	{
-		public override TriggerType Type => TriggerType.City;
-
-		public readonly int DestinationId;
-
-		public CityTrigger(int destinationId) : base() {
-			DestinationId = destinationId;
-		}
-	}
-
-	public class CoordTrigger : Trigger
-	{
-		public override TriggerType Type => TriggerType.Coord;
-
-		public readonly Vector2 LongXLatY;
-
-		public CoordTrigger(Vector2 longXLatY) : base() {
-			LongXLatY = longXLatY;
-		}
-	}
-
-	public class UpgradeShipTrigger : Trigger
-	{
-		public override TriggerType Type => TriggerType.UpgradeShip;
-	}
-
-	public class NoneTrigger : Trigger
-	{
-		public override TriggerType Type => TriggerType.None;
-	}
-
-	public enum TriggerType
-	{
-		None,
-		City,
-		Coord,
-		UpgradeShip
-	}
-	#endregion
-
-	#region Arrival Events
-
-	public abstract class ArrivalEvent
-	{
-		protected QuestSegment Segment { get; private set; }
-		public abstract ArrivalEventType Type { get; }
-		public abstract void Execute(QuestSegment segment);
-	}
-
-	public class MessageArrivalEvent : ArrivalEvent
-	{
-		public override ArrivalEventType Type => ArrivalEventType.Message;
-
-		public override void Execute(QuestSegment segment) {
-
-			Globals.UI.Show<QuestScreen, QuizScreenModel>(new QuizScreenModel(
-				title: QuestSystem.QuestMessageIntro,
-				message: Message,
-				caption: segment.caption,
-				icon: segment.image,
-				choices: new ObservableCollection<ButtonViewModel> {
-					new ButtonViewModel { Label = "OK", OnClick = () => Globals.UI.Hide<QuestScreen>() }
-				}
-			));
-
-			Globals.Quests.CompleteQuestSegment(segment);
-		}
-
-		public readonly string Message;
-
-		public MessageArrivalEvent(string message) {
-			Message = message;
-		}
-	}
-
-	public class QuizArrivalEvent : ArrivalEvent
-	{
-		public override ArrivalEventType Type => ArrivalEventType.Quiz;
-
-		readonly string QuizName;
-
-		public override void Execute(QuestSegment segment) {
-			Quizzes.QuizSystem.StartQuiz(QuizName, () => Globals.Quests.CompleteQuestSegment(segment));
-		}
-
-		public QuizArrivalEvent(string quizName) {
-			QuizName = quizName;
-		}
-	}
-
-	public class NoneArrivalEvent : ArrivalEvent
-	{
-		public override ArrivalEventType Type => ArrivalEventType.None;
-
-		// just immediately start the next quest with no additional popups
-		public override void Execute(QuestSegment segment) {
-			Globals.Quests.CompleteQuestSegment(segment);
-		}
-	}
-
-	public enum ArrivalEventType
-	{
-		None,
-		Message,
-		Quiz
-	}
-
-	#endregion
-
-	public int segmentID;
-	public Trigger trigger;
-	public bool skippable;
-	public string objective;
-	public bool isFinalSegment;
-	public List<int> crewmembersToAdd;
-	public List<int> crewmembersToRemove;
-	public string descriptionOfQuest;
-	public ArrivalEvent arrivalEvent;
-	public List<int> mentionedPlaces;
-	public Sprite image;
-	public string caption;
-
-	public QuestSegment(int segmentID, Trigger trigger, bool skippable, string objective, string descriptionOfQuest, ArrivalEvent arrivalEvent, List<int> crewmembersToAdd, List<int> crewmembersToRemove, bool isFinalSegment, List<int> mentionedPlaces, Sprite image, string caption) {
-		this.segmentID = segmentID;
-		this.trigger = trigger;
-		this.skippable = skippable;
-		this.objective = objective;
-		this.descriptionOfQuest = descriptionOfQuest;
-		this.arrivalEvent = arrivalEvent;
-		this.crewmembersToAdd = crewmembersToAdd;
-		this.crewmembersToRemove = crewmembersToRemove;
-		this.isFinalSegment = isFinalSegment;
-		this.mentionedPlaces = mentionedPlaces;
-		this.image = image;
-		this.caption = caption;
-	}
-}
-
+[Serializable]
 public class MainQuestLine
 {
-
-	public List<QuestSegment> questSegments;
+	// quest segements come from CSV, not serialized to json
+	[NonSerialized] public List<QuestSegment> questSegments;
 	public int currentQuestSegment;
 
 	public MainQuestLine() {
 		questSegments = new List<QuestSegment>();
 		currentQuestSegment = 0;
 	}
-
-
 }
 
+[Serializable]
+public class SerializableObservableCollection<T> : SerializableObservableCollection<T, T>
+{
+	public SerializableObservableCollection() : base(t => t, t => t) { }
+}
+
+[Serializable]
+public class SerializableObservableCollection<T, TSerialized> : ObservableCollection<T>, ISerializationCallbackReceiver 
+{
+	[SerializeField] List<TSerialized> _list = new List<TSerialized>();
+
+	bool _silent = false;
+	Func<T, TSerialized> _serializer;
+	Func<TSerialized, T> _deserializer;
+
+	public SerializableObservableCollection(Func<T, TSerialized> serialize, Func<TSerialized, T> deserialize) {
+		_serializer = serialize;
+		_deserializer = deserialize;
+	}
+
+	protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e) {
+		if (!_silent) {
+			base.OnCollectionChanged(e);
+		}
+	}
+
+	public void OnBeforeSerialize() {
+		_list = this.Select(e => _serializer(e)).ToList();
+	}
+
+	// silently modify the collection on deserialize. deserialize only happens in practice when saving and loading, so no UIs should be open.
+	// this is needed because you may have listeners watching that run unity api functions in response to the event, and this happens in the constructor thread
+	public void OnAfterDeserialize() {
+		_silent = true;
+		this.Clear();
+		foreach (var e in _list) {
+			this.Add(_deserializer(e));
+		}
+		_silent = false;
+	}
+}
+
+[Serializable]
 public class Journal
 {
-
-	public ObservableCollection<int> knownSettlements;
+	[Serializable] public class KnownSettlementList : SerializableObservableCollection<int> { }
+	public KnownSettlementList knownSettlements;
 
 	public Journal() {
-		this.knownSettlements = new ObservableCollection<int>();
+		knownSettlements = new KnownSettlementList();
 	}
 
 	public void AddNewSettlementToLog(int settlementID) {
@@ -216,151 +157,7 @@ public class Journal
 	}
 }
 
-public enum CrewType
-{
-	Sailor = 0,
-	Warrior = 1,
-	Slave = 2,
-	Passenger = 3,
-	Navigator = 4,
-	Guide = 5,
-	Assistant = 6,
-	Royalty = 7,
-	Seer = 8,
-	Lawyer = 9
-}
-
-public class PirateType
-{
-	public int ID;
-	public string name;
-	public int difficulty;
-}
-
-public class CrewMember
-{
-	public int ID;
-	public string name;
-	public int originCity;
-	public int clout;
-	public string backgroundInfo;
-	public bool isKillable;
-	public bool isPartOfMainQuest;
-	public CrewType typeOfCrew;
-	public bool isPirate;
-	public PirateType pirateType;
-
-	public bool isJason => name == "Jason";
-
-	SkillModifiers _changeOnHire;
-	public SkillModifiers changeOnHire { get { if(_changeOnHire == null) InitChangeOnHire(); return _changeOnHire; } }
-
-	SkillModifiers _changeOnFire;
-	public SkillModifiers changeOnFire { get { if (_changeOnFire == null) InitChangeOnFire(); return _changeOnFire; } }
-
-	SkillModifiers _currentContribution;
-	public SkillModifiers currentContribution { get { if (_currentContribution == null) InitCurrentContribution(); return _currentContribution; } }
-
-	//0= sailor  1= warrior  2= slave  3= passenger 4= navigator 5= auger
-	//A sailor is the base class--no benefits/detriments
-	//	--navigators provide maps to different settlements and decrease negative random events
-	//	--warriors make sure encounters with pirates or other raiding activities go better in your favor
-	//	--slaves have zero clout--few benefits--but they never leave the ship unless they die
-	public CrewMember(int ID, string name, int originCity, int clout, CrewType typeOfCrew, string backgroundInfo, bool isKillable, bool isPartOfMainQuest, bool isPirate, PirateType pirateType) {
-		this.ID = ID;
-		this.name = name;
-		this.originCity = originCity;
-		this.clout = clout;
-		this.typeOfCrew = typeOfCrew;
-		this.backgroundInfo = backgroundInfo;
-		this.isKillable = isKillable;
-		this.isPartOfMainQuest = isPartOfMainQuest;
-		this.isPirate = isPirate;
-		this.pirateType = pirateType;
-	}
-
-	//This is a helper class to create a void crewman
-	public CrewMember(int id) {
-		ID = id;
-		_changeOnHire = new SkillModifiers();
-		_changeOnFire = new SkillModifiers();
-		_currentContribution = new SkillModifiers();
-	}
-
-	void InitChangeOnHire() {
-		var gameVars = Globals.GameVars;
-
-		_changeOnHire = new SkillModifiers {
-			CitiesInNetwork = gameVars.Network.GetCrewMemberNetwork(this).Count(s => !gameVars.Network.MyCompleteNetwork.Contains(s)),
-			BattlePercentChance = typeOfCrew == CrewType.Warrior ? 5 : 0,
-			Navigation = typeOfCrew == CrewType.Sailor ? 1 : 0,
-			PositiveEvent = typeOfCrew == CrewType.Guide ? 10 : 0
-		};
-	}
-
-	void InitChangeOnFire() {
-		var gameVars = Globals.GameVars;
-
-		// the cities in network calculation is too expensive right now. disabled temporarily
-		_changeOnFire = new SkillModifiers {
-			CitiesInNetwork = -gameVars.Network.GetCrewMemberNetwork(this).Count(s => !gameVars.Network.CrewMembersWithNetwork(s).Any(crew => crew != this) && !gameVars.Network.MyImmediateNetwork.Contains(s)),
-			BattlePercentChance = typeOfCrew == CrewType.Warrior ? -5 : 0,
-			Navigation = typeOfCrew == CrewType.Sailor ? -1 : 0,
-			PositiveEvent = typeOfCrew == CrewType.Guide ? -10 : 0
-		};
-	}
-
-	void InitCurrentContribution() {
-		var gameVars = Globals.GameVars;
-
-		// very similar to changeOnFire, but shows it as positives. this is their contribution to your team, not what you'll lose if you fire them (but it's basically the same).
-		_currentContribution = new SkillModifiers {
-			CitiesInNetwork = gameVars.Network.GetCrewMemberNetwork(this).Count(s => !gameVars.Network.CrewMembersWithNetwork(s).Any(crew => crew != this) && !gameVars.Network.MyImmediateNetwork.Contains(s)),
-			BattlePercentChance = typeOfCrew == CrewType.Warrior ? 5 : 0,
-			Navigation = typeOfCrew == CrewType.Sailor ? 1 : 0,
-			PositiveEvent = typeOfCrew == CrewType.Guide ? 10 : 0
-		};
-	}
-
-}
-
-public class CaptainsLogEntry
-{
-	public int settlementID;
-	public string logEntry;
-	public string dateTimeOfEntry;
-
-	public CaptainsLogEntry(int settlementID, string logEntry) {
-		this.settlementID = settlementID;
-		this.logEntry = logEntry;
-	}
-
-}
-
-public class CurrentRose
-{
-	public float direction;
-	public float speed;
-
-	public CurrentRose(float direction, float speed) {
-		this.direction = direction;
-		this.speed = speed;
-
-	}
-}
-
-public class WindRose
-{
-	public float direction;
-	public float speed;
-
-	public WindRose(float direction, float speed) {
-		this.direction = direction;
-		this.speed = speed;
-
-	}
-}
-
+[Serializable]
 public class PlayerRoute
 {
 	//TODO This method as well as the Player Journey Log is a pretty dirty solution that needs some serious clean up and tightening. It's a bit brute force and messy right now.
@@ -398,7 +195,8 @@ public class PlayerRoute
 
 }
 
-// KDTODO: This needs to be rewritten to something less error prone. Probably JSONUtility
+// KDTODO: Need to do a deep dive into everything in AddOtherAttributes / CSVHeader to make sure it's handled correctly before loading from CSV
+[Serializable]
 public class PlayerJourneyLog
 {
 	//TODO This whole function needs retooling--rather htan 3 separate arrays, the PlayerRoute object should store all the necessary variables--In fact this could be replaced with a simple List of Player Routes rather than having two separate objects no apparent reason.
@@ -578,24 +376,6 @@ public class PlayerJourneyLog
 	}
 }
 
-public class MetaResource
-{
-	public string name;
-	public int id;
-	public int trading_priority;
-	public string description;
-	public string icon;
-
-	public MetaResource(string name, int id, string description, string icon, int trading_priority) {
-		this.name = name;
-		this.id = id;
-		this.description = description;
-		this.icon = icon;
-		this.trading_priority = trading_priority;
-	}
-
-}
-
 [Serializable]
 public class Resource : Model
 {
@@ -637,83 +417,22 @@ public class Resource : Model
 	}
 }
 
-public class Region
+// TODO: some instances of this are loaded from CSV (GameVars.captainsLogEntries). should separate static from serialized data
+[Serializable]
+public class CaptainsLogEntry
 {
-	public string Name;
-	public string Description;
-}
-
-public class Settlement
-{
-
 	public int settlementID;
-	public Vector2 location_longXlatY;
-	public string name;
-	public int population;
-	public float elevation;
-	public Resource[] cargo;
-	public float tax_neutral;
-	public float tax_network;
-	public GameObject theGameObject;
-	public Vector3 adjustedGamePosition;
-	public float eulerY;
-	public int typeOfSettlement;
-	public string description;
-	public List<int> networks;
-	public ObservableCollection<CrewMember> availableCrew;
-	public string prefabName;
+	public string logEntry;
+	public string dateTimeOfEntry;
 
-	// tax factors
-	public bool godTax;
-	public int godTaxAmount;
-	public bool transitTax;
-	public float transitTaxPercent;
-	public bool foreignerFee;
-	public float foreignerFeePercent;
-	public float ellimenionPercent;
-
-	public string coinText;
-	public Region Region;
-
-	public Resource GetCargoByName(string name) => cargo.FirstOrDefault(c => c.name == name);
-	public Resource GetCargo(Resource r) => cargo.FirstOrDefault(c => c.name == r.name);
-
-	public Settlement(int settlementID, string name, Vector2 location_longXlatY, float elevation, int population) {
+	public CaptainsLogEntry(int settlementID, string logEntry) {
 		this.settlementID = settlementID;
-		this.location_longXlatY = location_longXlatY;
-		this.elevation = elevation;
-		this.name = name;
-		this.population = population;
-		cargo = Resource.All.Select(r => new Resource(r, 0f)).ToArray();
-		networks = new List<int>();
-		availableCrew = new ObservableCollection<CrewMember>();
+		this.logEntry = logEntry;
 	}
-
-	//This is a debug class to make a blank settlement for testing
-	public Settlement(int id, string name, int networkID) {
-		this.settlementID = id;
-		this.name = name;
-		this.population = 0;
-		this.elevation = 0;
-		this.tax_network = 0;
-		this.tax_neutral = 0;
-		this.description = "FAKE SETTLEMENT--LOOK INTO THIS ERROR";
-		this.networks = new List<int>();
-		availableCrew = new ObservableCollection<CrewMember>();
-
-	}
-
-	override public string ToString() {
-		string mString = this.name + ":\n" + "Population: " + population + "\n\n RESOURCES \n";
-		for (int i = 0; i < this.cargo.Length; i++) {
-			mString += this.cargo[i].name + ":  " + this.cargo[i].amount_kg + "kg\n";
-		}
-
-		return mString;
-	}
-
 }
 
+// TODO: for now, the ship structure is only saved to JSON, it's not loaded from JSON at all aside from the ShipData field
+// this is done for migration purposes to avoid needing to do the whole refactor at once.
 [Serializable]
 public class Ship : Model
 {
@@ -742,7 +461,12 @@ public class Ship : Model
 	public string objective { get => _objective; set { _objective = value; Notify(); } }
 
 	public int crew => crewRoster.Count;
-	public ObservableCollection<CrewMember> crewRoster;
+
+	[Serializable] public class CrewRosterList : SerializableObservableCollection<CrewMember, int>
+	{
+		public CrewRosterList() : base(crew => crew.ID, id => Globals.GameVars.GetCrewMemberFromID(id)) { }
+	}
+	public CrewRosterList crewRoster;
 
 	[SerializeField] private float _totalNumOfDaysTraveled;
 	public float totalNumOfDaysTraveled { get => _totalNumOfDaysTraveled; set { _totalNumOfDaysTraveled = value; Notify(); } }
@@ -779,7 +503,7 @@ public class Ship : Model
 		this.health = health;
 		this.cargo_capicity_kg = cargo_capcity_kg;
 		this.shipCaptainsLog = new List<CaptainsLogEntry>();
-		this.crewRoster = new ObservableCollection<CrewMember>();
+		this.crewRoster = new CrewRosterList();
 		this.playerJournal = new Journal();
 
 		cargo = Resource.All.Select(r => new Resource(r, 0f)).ToArray();
@@ -804,3 +528,6 @@ public class Ship : Model
 		return total;
 	}
 }
+
+#endregion
+

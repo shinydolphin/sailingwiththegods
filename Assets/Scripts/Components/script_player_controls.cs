@@ -123,6 +123,10 @@ public class script_player_controls : MonoBehaviour
 		journey = new PlayerJourneyLog();
 		lastPlayerShipPosition = transform.position;
 
+		// once ship and journey are set, reset the main GameData object which points to them
+		// TODO: Refactor where all data initialization happens. really shouldn't happen here, but this is the only function that seems to get called in both New and Restart game
+		GameVars.ResetGameData();
+
 		ship.mainQuest = CSVLoader.LoadMainQuestLine();
 
 		//Setup the day/night cycle

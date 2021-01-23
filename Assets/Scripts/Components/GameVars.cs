@@ -111,6 +111,9 @@ public class GameVars : MonoBehaviour
 	public Beacon navigatorBeacon;
 	public Beacon crewBeacon;
 
+	// main save data and game state (may want to move it eventually)
+	public GameData data { get; private set; }
+
 	// TODO: unorganized variables
 	[HideInInspector] public GameObject mainCamera;
 	[HideInInspector] public GameObject playerTrajectory;
@@ -279,6 +282,7 @@ public class GameVars : MonoBehaviour
 		mainLightSource = GameObject.FindGameObjectWithTag("main_light_source").GetComponent<Light>();
 
 		playerShipVariables = playerShip.GetComponent<script_player_controls>();
+		ResetGameData();
 
 		Network = new Network(this);
 		Trade = new Trade(this);
@@ -337,12 +341,11 @@ public class GameVars : MonoBehaviour
 	//  THE REMAINDER OF THE SCRIPT IS ALL GLOBALLY ACCESSIBLE FUNCTIONS
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
-	
+
 
 	//====================================================================================================
 	//      CSV / DATA LOADING FUNCTIONS
 	//====================================================================================================
-
 
 	public bool LoadSavedGame() {
 		PlayerJourneyLog loadedJourney = new PlayerJourneyLog();
@@ -361,6 +364,32 @@ public class GameVars : MonoBehaviour
 			ShowANotificationMessage("Sorry! No load game 'player_save_game.txt' was found in the game directory '" + Application.persistentDataPath + "' or the save file is corrupt!\nError Code: " + error);
 			return false;
 		}
+
+		// load new JSON data, but throw most of it out for now
+		// TODO: move all save data to this structure so we can load in one line
+		try {
+			// TODO: Migrate all save data loading to load from JSON. for now most of this data is thrown away (see TODOs in the GameData class)
+			data = JsonUtility.FromJson<GameData>(System.IO.File.ReadAllText(Application.persistentDataPath + "/save.json"));
+
+			// TODO: this is temporary until we make all data actually live on the data object
+			// this allows us to start saving new ship data only to json without needing to add it to the CSV
+			// data comes from JSON first, then is overwritten by the values in the CSV
+			playerShipVariables.ship = data.ship;
+			playerShipVariables.journey = data.journey;
+			ship = data.ship;
+			loadedJourney = data.journey;
+
+			if(data.Version < GameData.LatestVersion) {
+				ShowANotificationMessage("JSON save data was on an old breaking version number. Was: " + data.Version + " Now: " + GameData.LatestVersion + ". JSON save data reset.");
+				ResetGameData();
+
+			}
+		}
+		catch (Exception) {
+			ShowANotificationMessage("JSON save data incompatible with latest version. Now: " + GameData.LatestVersion + ". JSON save data reset.");
+			ResetGameData();
+		}
+
 		//	TextAsset saveGame = (TextAsset)Resources.Load("player_save_game", typeof(TextAsset));
 		string[] fileByLine = saveText.Split(splitFile, StringSplitOptions.None);
 		Debug.Log("file://" + Application.persistentDataPath + "/player_save_game.txt");
@@ -370,6 +399,10 @@ public class GameVars : MonoBehaviour
 		//start at index 1 to skip the record headers we have to then subtract 
 		//one when adding NEW entries to the list to ensure we start at ZERO and not ONE
 		//all past routes will be stored as text, but the last route(last line of file) will also be done this way, but will additionally be parsed out for editing in-game values
+		// the values from the csv completely replace the values from JSON to avoid double adding. TODO: load entirely from JSON instead
+		loadedJourney.routeLog.Clear();
+		loadedJourney.cargoLog.Clear();
+		loadedJourney.otherAttributes.Clear();
 		for (int lineCount = 1; lineCount < fileByLine.Length; lineCount++) {
 			string[] records = fileByLine[lineCount].Split(lineDelimiter, StringSplitOptions.None);
 
@@ -485,6 +518,7 @@ public class GameVars : MonoBehaviour
 
 		string[] parsedKnowns = playerVars[38].Split(recordDelimiter, StringSplitOptions.None);
 		//Debug.Log ("PARSED KNOWNS: " + playerVars[38]);
+		ship.playerJournal.knownSettlements.Clear();	// TODO: completely move to JSON. For now the JSON values are replaced with the CSV values.
 		foreach (string settlementID in parsedKnowns) {
 			//Debug.Log ("PARSED KNOWNS: " + settlementID);
 			ship.playerJournal.knownSettlements.Add(int.Parse(settlementID));
@@ -782,8 +816,8 @@ public class GameVars : MonoBehaviour
 			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileNameServer, fileToUpload);
 			Debug.Log(Application.persistentDataPath);
 
-			// secretly save a JSON version of the save data to prep for a move to make that the canonical save file - but it's not hooked up to be loaded yet
-			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(playerShipVariables.ship));
+			// secretly save a JSON version of the save data to prep for a move to make that the canonical save file - but most of it isn't hooked up to be loaded yet (see TODOs in the class)
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(data));
 		}
 		catch (Exception e) {
 			ShowANotificationMessage("ERROR: a backup wasn't saved at: " + Application.persistentDataPath + "  - which means it may not have uploaded either: " + e.Message);
@@ -969,12 +1003,17 @@ public class GameVars : MonoBehaviour
 		//mainCamera.transform.position = new Vector3(originCity.transform.position.x, 30f, originCity.transform.position.z);
 	}
 
+	// this pulls the references to the ship and journey log
+	public void ResetGameData() {
+		data = GameData.New();
+	}
+
 	public void RestartGame() {
 
 		//Debug.Log ("Quest Seg: " + playerShipVariables.ship.mainQuest.currentQuestSegment);
 		//First we need to save the game that just ended
 		SaveUserGameData();
-		//Then we need to re-initialize all the player's variables
+		//Then we need to re-initialize all the player's variables (which also calls ResetGameData)
 		playerShipVariables.Reset();
 
 		//Reset Other Player Ship Variables
