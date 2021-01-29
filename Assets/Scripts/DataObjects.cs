@@ -14,18 +14,28 @@ using UnityEngine;
 [Serializable]
 public class GameData
 {
-	public const int LatestVersion = 1;
+	public const int LatestVersion = 2;
 
 	public static GameData New() => new GameData() { 
 		_version = LatestVersion,
-		journey = Globals.GameVars.playerShipVariables.journey,
-		ship = Globals.GameVars.playerShipVariables.ship
+		Current = new GameState {
+			journey = Globals.GameVars.playerShipVariables.journey,
+			ship = Globals.GameVars.playerShipVariables.ship
+		}
 	};
 
 	[SerializeField] int _version;
 	public int Version => _version;
 
-	// TODO: add options menu data here
+	// TODO: add options menu data here, since that is decoupled from "active games"
+
+	public GameState Current;
+	public List<Snapshot> History;
+}
+
+[Serializable]
+public class GameState
+{
 	// TODO: add new captain's log data here
 
 	// TODO: Still loaded from CSV. Review and load from JSON later.
@@ -37,7 +47,42 @@ public class GameData
 	public PlayerJourneyLog journey;
 }
 
+[Serializable]
+public class Snapshot
+{
+	public PlayerRoute Route;
+	public GameState State;
+}
+
 #region Nested Save Data Structures
+
+/// <summary>
+/// Helpers for managing game state and save data
+/// </summary>
+public static class GameDataExtensions
+{
+	/// <summary>
+	/// Deep clone the GameState to make a snapshot of the current values
+	/// by serializing in memory and returning the deserialize result.
+	/// </summary>
+	public static GameState Clone(this GameState self) {
+		var serialized = JsonUtility.ToJson(self);
+		return JsonUtility.FromJson<GameState>(serialized);
+	}
+
+	/// <summary>
+	/// Record a snapshot of the current game state using a deep clone,
+	/// and add it to the history list associated with the given route (which the caller should construct new and pre-fill)
+	/// </summary>
+	/// <param name="self"></param>
+	/// <param name="route"></param>
+	public static void AddSnapshot(this GameData self, PlayerRoute route) {
+		self.History.Add(new Snapshot {
+			Route = route,
+			State = self.Current.Clone()
+		});
+	}
+}
 
 [Serializable]
 public class Loan
