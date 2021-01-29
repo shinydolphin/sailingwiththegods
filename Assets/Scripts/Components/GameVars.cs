@@ -374,9 +374,9 @@ public class GameVars : MonoBehaviour
 			// TODO: this is temporary until we make all data actually live on the data object
 			// this allows us to start saving new ship data only to json without needing to add it to the CSV
 			// data comes from JSON first, then is overwritten by the values in the CSV
-			playerShipVariables.ship = data.ship;
+			playerShipVariables.ship = data.Current.ship;
 			playerShipVariables.journey = data.journey;
-			ship = data.ship;
+			ship = data.Current.ship;
 			loadedJourney = data.journey;
 
 			if(data.Version < GameData.LatestVersion) {

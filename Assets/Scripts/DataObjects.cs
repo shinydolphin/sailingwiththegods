@@ -19,9 +19,10 @@ public class GameData
 	public static GameData New() => new GameData() { 
 		_version = LatestVersion,
 		Current = new GameState {
-			journey = Globals.GameVars.playerShipVariables.journey,
 			ship = Globals.GameVars.playerShipVariables.ship
-		}
+		},
+		journey = Globals.GameVars.playerShipVariables.journey,
+		History = new List<Snapshot>()
 	};
 
 	[SerializeField] int _version;
@@ -31,6 +32,10 @@ public class GameData
 
 	public GameState Current;
 	public List<Snapshot> History;
+
+	// TODO: Still loaded from CSV. This should be made into an in-memory only structure soon. It's being replaced by the history snapshot list.
+	// since this is a reference to the real ship, it's safe to modify from here as well as playerShipVariables.ship
+	public PlayerJourneyLog journey;
 }
 
 [Serializable]
@@ -41,10 +46,6 @@ public class GameState
 	// TODO: Still loaded from CSV. Review and load from JSON later.
 	// since this is a reference to the real ship, it's safe to modify from here as well as playerShipVariables.ship
 	public Ship ship;
-
-	// TODO: Still loaded from CSV. Review and load from JSON later.
-	// since this is a reference to the real ship, it's safe to modify from here as well as playerShipVariables.ship
-	public PlayerJourneyLog journey;
 }
 
 [Serializable]
