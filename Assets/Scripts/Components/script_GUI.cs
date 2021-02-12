@@ -44,11 +44,17 @@ public class script_GUI : MonoBehaviour
 	//  SETUP ALL VARIABLES FOR THE GUI
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
-	
+	public enum Intention {Water, Trading, Tavern, All };
+
+	public bool useDialog = true;
+	public bool useDebugDialog = false;
+	public string debugDialogNode = "Start_Debug";
+	public string dialogNode = "Start_Tax";
 
 	//-----------------------------------------------------------
 	// Game Over Notification Variables
 	//-----------------------------------------------------------
+	[Header("Game Over Notification")]
 	public GameObject gameover_main;
 	public GameObject gameover_message;
 	public GameObject gameover_restart;
@@ -57,15 +63,17 @@ public class script_GUI : MonoBehaviour
 	//-----------------------------------------------------------
 	// Player Non-Port Notification Variables
 	//-----------------------------------------------------------
+	[Header("Not Port Notifications")]
 	public GameObject nonport_info_main;
 	public GameObject nonport_info_name;
 	public GameObject nonport_info_notification;
 	public GameObject nonport_info_okay;
 
-
 	//-----------------------------------------------------------
 	// Player Port Notification Variables
 	//-----------------------------------------------------------
+	[Header("Port Notifications")]
+	public GameObject port_dialog;
 	public GameObject port_info_main;
 	public GameObject port_info_name;
 	public GameObject port_info_notification;
@@ -90,12 +98,14 @@ public class script_GUI : MonoBehaviour
 	//-----------------------------------------------------------
 	// Player Notification Variables
 	//-----------------------------------------------------------
+	[Header("Player Notification")]
 	public GameObject notice_notificationParent;
 	public GameObject notice_notificationSystem;
 
 	//-----------------------------------------------------------
 	// Player HUD Variables
 	//-----------------------------------------------------------
+	[Header("Player HUD")]
 	public GameObject player_hud_parent;
 
 	public GameObject hud_waterStores;
@@ -119,7 +129,7 @@ public class script_GUI : MonoBehaviour
 	//****************************************************************
 	//GUI INFORMATION PANEL VARIABLES
 	//****************************************************************
-
+	[Header("Misc")]
 	//---------------------
 	//REPAIR SHIP PANEL VARIABLES
 	int costToRepair;
@@ -132,11 +142,34 @@ public class script_GUI : MonoBehaviour
 	public GameObject player_current_cargo;
 	public GameObject player_max_cargo;
 
+	private PortViewModel port;
+	private TradeViewModel trade;
 
+	//I tried using the default just get; private set; but it refused to work? So it needs to go like this
+	public PortViewModel Port 
+	{
+		get {
+			return port;
+		}
+		private set {
+			port = value;
+		}
+	}
 
+	public TradeViewModel Trade 
+	{
+		get {
+			return trade;
+		}
+		private set {
+			trade = value;
+		}
+	}
 
-
-
+	public void ClearViewModels() {
+		port = null;
+		trade = null;
+	}
 
 	//======================================================================================================================================================================
 	//  INITIALIZE ANY NECESSARY VARIABLES
@@ -145,12 +178,6 @@ public class script_GUI : MonoBehaviour
 		GameVars = Globals.GameVars;
 
 	}
-
-
-
-
-
-
 
 
 	//======================================================================================================================================================================
@@ -289,13 +316,6 @@ public class script_GUI : MonoBehaviour
 	 //======================================================================================================================================================================
 
 
-
-
-
-
-
-
-
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
 	//  ALL FUNCTIONS
@@ -362,38 +382,56 @@ public class script_GUI : MonoBehaviour
 	public void GUI_ShowPortDockingNotification() {
 		GameVars.controlsLocked = true;
 
-		//Show the port notification pop up
-		port_info_main.SetActive(true);
-		//Set the title
-		port_info_name.GetComponent<Text>().text = GameVars.currentSettlement.name;
-		//Setup the message for the scroll view
-		string portMessage = "";
-		portMessage += GameVars.currentSettlement.description;
-		portMessage += "\n\n";
-		if (GameVars.isInNetwork) {
-			var crewMemberWithNetwork = GameVars.Network.CrewMemberWithNetwork(GameVars.currentSettlement);
-			portMessage += "This Port is part of your network!\n";
-			if (crewMemberWithNetwork != null) portMessage += "Your crewman, " + crewMemberWithNetwork.name + " assures you their connections here are strong! They should welcome you openly and waive your port taxes on entering!";
-			else portMessage += "You know this port as captain very well! You expect that your social connections here will soften the port taxes in your favor!";
+		if(GameVars.crewBeacon.Target == GameVars.currentSettlement) {
+			GameVars.DeactivateNavigatorBeacon(GameVars.crewBeacon);
 		}
-		else {
-			portMessage += "This port is outside your social network!\n";
+		if (GameVars.navigatorBeacon.Target == GameVars.currentSettlement) {
+			GameVars.DeactivateNavigatorBeacon(GameVars.navigatorBeacon);
 		}
 
-		if (GameVars.currentPortTax != 0) {
-			portMessage += "If you want to dock here, your tax for entering will be " + GameVars.currentPortTax + " drachma. \n";
-			//If the port tax will make the player go negative--alert them as they enter
-			if (GameVars.playerShipVariables.ship.currency - GameVars.currentPortTax < 0) portMessage += "Docking here will put you in debt for " + (GameVars.playerShipVariables.ship.currency - GameVars.currentPortTax) + "drachma, and you may lose your ship!\n";
+		if (useDialog) {
+			port_dialog.SetActive(true);
+			port_dialog.GetComponent<DialogScreen>().StartDialog(GameVars.currentSettlement, useDebugDialog ? debugDialogNode : dialogNode);
 		}
 		else {
-			portMessage += "You only have food and water stores on board, with no taxable goods. Thankfully you will dock for free!";
+			//Show the port notification pop up
+			port_info_main.SetActive(true);
+			//Set the title
+			port_info_name.GetComponent<Text>().text = GameVars.currentSettlement.name;
+			//Setup the message for the scroll view
+			string portMessage = "";
+			portMessage += GameVars.currentSettlement.description;
+			portMessage += "\n\n";
+			if (GameVars.isInNetwork) {
+				var crewMemberWithNetwork = GameVars.Network.CrewMemberWithNetwork(GameVars.currentSettlement);
+				portMessage += "This Port is part of your network!\n";
+				if (crewMemberWithNetwork != null)
+					portMessage += "Your crewman, " + crewMemberWithNetwork.name + " assures you their connections here are strong! They should welcome you openly and waive your port taxes on entering!";
+				else
+					portMessage += "You know this port as captain very well! You expect that your social connections here will soften the port taxes in your favor!";
+			}
+			else {
+				portMessage += "This port is outside your social network!\n";
+			}
+
+			if (GameVars.currentPortTax != 0) {
+				portMessage += "If you want to dock here, your tax for entering will be " + GameVars.currentPortTax + " drachma. \n";
+				//If the port tax will make the player go negative--alert them as they enter
+				if (GameVars.playerShipVariables.ship.currency - GameVars.currentPortTax < 0)
+					portMessage += "Docking here will put you in debt for " + (GameVars.playerShipVariables.ship.currency - GameVars.currentPortTax) + "drachma, and you may lose your ship!\n";
+			}
+			else {
+				portMessage += "You only have food and water stores on board, with no taxable goods. Thankfully you will dock for free!";
+			}
+
+			port_info_notification.GetComponent<Text>().text = portMessage;
+			port_info_enter.GetComponent<Button>().onClick.RemoveAllListeners();
+			port_info_leave.GetComponent<Button>().onClick.RemoveAllListeners();
+			port_info_enter.GetComponent<Button>().onClick.AddListener(() => GUI_EnterPort());
+			port_info_leave.GetComponent<Button>().onClick.AddListener(() => GUI_ExitPortNotification());
 		}
 
-		port_info_notification.GetComponent<Text>().text = portMessage;
-		port_info_enter.GetComponent<Button>().onClick.RemoveAllListeners();
-		port_info_leave.GetComponent<Button>().onClick.RemoveAllListeners();
-		port_info_enter.GetComponent<Button>().onClick.AddListener(() => GUI_EnterPort());
-		port_info_leave.GetComponent<Button>().onClick.AddListener(() => GUI_ExitPortNotification());
+
 	}
 
 	//-------------------------------------------------------------------------------------------------------------------------
@@ -409,13 +447,14 @@ public class script_GUI : MonoBehaviour
 		GameVars.menuControlsLock = false;
 	}
 
-	public void GUI_EnterPort() {
+	public void GUI_EnterPort(Sprite heraldIcon = null, Sprite noHeraldIcon = null, Intention i = Intention.All, float heraldMod = 1.0f) 
+	{
 		//Turn off port welcome screen
 		GameVars.showPortDockingNotification = false;
 		port_info_main.SetActive(false);
 		port_info_taxes.GetComponent<Text>().text = GameVars.currentPortTax.ToString();
 		//Check if current Settlement is part of the main quest line
-		GameVars.CheckIfCurrentSettlementIsPartOfMainQuest(GameVars.currentSettlement.settlementID);
+		Globals.Quests.CheckCityTriggers(GameVars.currentSettlement.settlementID);
 		//Add this settlement to the player's knowledge base
 		GameVars.playerShipVariables.ship.playerJournal.AddNewSettlementToLog(GameVars.currentSettlement.settlementID);
 		//Determine what settlements are available to the player in the tavern
@@ -423,21 +462,29 @@ public class script_GUI : MonoBehaviour
 		GameVars.showSettlementTradeButton = false;
 		GameVars.controlsLocked = true;
 
+		trade = new TradeViewModel(heraldIcon, noHeraldIcon, i.Equals(Intention.Water), i.Equals(Intention.All), heraldMod);
+		port = new PortViewModel(i.Equals(Intention.All));
+
 		//-------------------------------------------------
 		//NEW GUI FUNCTIONS FOR SETTING UP TAB CONTENT
 		//Show Port Menu
 		Globals.UI.Hide<Dashboard>();
-		Globals.UI.Show<PortScreen, PortViewModel>(new PortViewModel());
+
+		if (i.Equals(Intention.Water) || i.Equals(Intention.Trading)) {
+			Globals.UI.Show<TownScreen, TradeViewModel>(trade);
+		}
+		else {
+			Globals.UI.Show<PortScreen, PortViewModel>(port);
+		}
 
 		//Add a new route to the player journey log as a port entry
-		GameVars.playerShipVariables.journey.AddRoute(new PlayerRoute(GameVars.playerShip.transform.position, Vector3.zero, GameVars.currentSettlement.settlementID, GameVars.currentSettlement.name, false, GameVars.playerShipVariables.ship.totalNumOfDaysTraveled), GameVars.playerShipVariables, GameVars.currentCaptainsLog);
+		GameVars.playerShipVariables.journey.AddRoute(new PlayerRoute(GameVars.playerShip.transform.position, Vector3.zero, GameVars.currentSettlement.settlementID, GameVars.currentSettlement.name, false, GameVars.playerShipVariables.ship.totalNumOfDaysTraveled), GameVars.playerShipVariables, GameVars.CaptainsLog);
 		//We should also update the ghost trail with this route otherwise itp roduce an empty 0,0,0 position later
 		GameVars.playerShipVariables.UpdatePlayerGhostRouteLineRenderer(GameVars.IS_NOT_NEW_GAME);
 
 		//-------------------------------------------------
 		// UPDATE PLAYER CLOUT METER
 		GUI_UpdatePlayerCloutMeter();
-
 
 		//-------------------------------------------------
 		// OTHER PORT GUI SETUP FUNCTIONS
@@ -446,7 +493,6 @@ public class script_GUI : MonoBehaviour
 		GUI_GetBuiltMonuments();
 		port_info_cityName.GetComponent<Text>().text = GameVars.currentSettlement.name;
 		port_info_description.GetComponent<Text>().text = GameVars.currentSettlement.description;
-
 	}
 
 	public void GUI_UpdatePlayerCloutMeter() {
@@ -457,7 +503,7 @@ public class script_GUI : MonoBehaviour
 		hud_playerClout.GetComponent<Text>().text = GameVars.GetCloutTitleEquivalency((int)(Mathf.Round(GameVars.playerShipVariables.ship.playerClout * 1000.0f) / 1000.0f));
 		for (int i = 0; i < port_info_cloutMeter.transform.childCount; i++) {
 			Transform currentCloutMeter = port_info_cloutMeter.transform.GetChild(i);
-			Debug.Log(currentCloutMeter.name + "  =?  " + hud_playerClout.GetComponent<Text>().text);
+			//Debug.Log(currentCloutMeter.name + "  =?  " + hud_playerClout.GetComponent<Text>().text);
 			if (currentCloutMeter.name == hud_playerClout.GetComponent<Text>().text) {
 				currentCloutMeter.gameObject.SetActive(true);
 				foundMatch = true;
@@ -543,21 +589,11 @@ public class script_GUI : MonoBehaviour
 		// also changed to the new popup which i think looks better
 		Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
 			Title = "Attention!",
-			Message = message
-		});
+			Message = message,
+			OnClose = () => GameVars.menuControlsLock = false
+	});
 		
 	}
-
-	public void GUI_RemoveNotification(GameObject notification) {
-		//If there are only 2 children (the hidden template notification and the one we are about to delete), then turn off the notification system window and set it to active = false
-		if (notice_notificationParent.transform.childCount == 2) {
-			notice_notificationSystem.SetActive(false);
-			GameVars.menuControlsLock = false;
-		}
-		//Remove the current notification that flagged this event
-		GameObject.Destroy(notification);
-	}
-
 
 
 	//=================================================================================================================

@@ -5,6 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using UnityEngine;
+using NaughtyAttributes;
 
 public class Loan
 {
@@ -29,24 +30,148 @@ public class Loan
 
 public class QuestSegment
 {
+	#region Triggers
+	public abstract class Trigger
+	{
+		public abstract TriggerType Type { get; }
+	}
+
+	public class CityTrigger : Trigger
+	{
+		public override TriggerType Type => TriggerType.City;
+
+		public readonly int DestinationId;
+
+		public CityTrigger(int destinationId) : base() {
+			DestinationId = destinationId;
+		}
+	}
+
+	public class CoordTrigger : Trigger
+	{
+		public override TriggerType Type => TriggerType.Coord;
+
+		public readonly Vector2 LongXLatY;
+
+		public CoordTrigger(Vector2 longXLatY) : base() {
+			LongXLatY = longXLatY;
+		}
+	}
+
+	public class UpgradeShipTrigger : Trigger
+	{
+		public override TriggerType Type => TriggerType.UpgradeShip;
+	}
+
+	public class NoneTrigger : Trigger
+	{
+		public override TriggerType Type => TriggerType.None;
+	}
+
+	public enum TriggerType
+	{
+		None,
+		City,
+		Coord,
+		UpgradeShip
+	}
+	#endregion
+
+	#region Arrival Events
+
+	public abstract class ArrivalEvent
+	{
+		protected QuestSegment Segment { get; private set; }
+		public abstract ArrivalEventType Type { get; }
+		public abstract void Execute(QuestSegment segment);
+	}
+
+	public class MessageArrivalEvent : ArrivalEvent
+	{
+		public override ArrivalEventType Type => ArrivalEventType.Message;
+
+		public override void Execute(QuestSegment segment) {
+
+			Globals.UI.Show<QuestScreen, QuizScreenModel>(new QuizScreenModel(
+				title: QuestSystem.QuestMessageIntro,
+				message: Message,
+				caption: segment.caption,
+				icon: segment.image,
+				choices: new ObservableCollection<ButtonViewModel> {
+					new ButtonViewModel { Label = "OK", OnClick = () => Globals.UI.Hide<QuestScreen>() }
+				}
+			));
+
+			Globals.Quests.CompleteQuestSegment(segment);
+		}
+
+		public readonly string Message;
+
+		public MessageArrivalEvent(string message) {
+			Message = message;
+		}
+	}
+
+	public class QuizArrivalEvent : ArrivalEvent
+	{
+		public override ArrivalEventType Type => ArrivalEventType.Quiz;
+
+		readonly string QuizName;
+
+		public override void Execute(QuestSegment segment) {
+			Quizzes.QuizSystem.StartQuiz(QuizName, () => Globals.Quests.CompleteQuestSegment(segment));
+		}
+
+		public QuizArrivalEvent(string quizName) {
+			QuizName = quizName;
+		}
+	}
+
+	public class NoneArrivalEvent : ArrivalEvent
+	{
+		public override ArrivalEventType Type => ArrivalEventType.None;
+
+		// just immediately start the next quest with no additional popups
+		public override void Execute(QuestSegment segment) {
+			Globals.Quests.CompleteQuestSegment(segment);
+		}
+	}
+
+	public enum ArrivalEventType
+	{
+		None,
+		Message,
+		Quiz
+	}
+
+	#endregion
+
 	public int segmentID;
-	public int destinationID;
+	public Trigger trigger;
+	public bool skippable;
+	public string objective;
 	public bool isFinalSegment;
 	public List<int> crewmembersToAdd;
 	public List<int> crewmembersToRemove;
 	public string descriptionOfQuest;
-	public string descriptionAtCompletion;
+	public ArrivalEvent arrivalEvent;
 	public List<int> mentionedPlaces;
+	public Sprite image;
+	public string caption;
 
-	public QuestSegment(int segmentID, int destinationID, string descriptionOfQuest, string descriptionAtCompletion, List<int> crewmembersToAdd, List<int> crewmembersToRemove, bool isFinalSegment, List<int> mentionedPlaces) {
+	public QuestSegment(int segmentID, Trigger trigger, bool skippable, string objective, string descriptionOfQuest, ArrivalEvent arrivalEvent, List<int> crewmembersToAdd, List<int> crewmembersToRemove, bool isFinalSegment, List<int> mentionedPlaces, Sprite image, string caption) {
 		this.segmentID = segmentID;
-		this.destinationID = destinationID;
+		this.trigger = trigger;
+		this.skippable = skippable;
+		this.objective = objective;
 		this.descriptionOfQuest = descriptionOfQuest;
-		this.descriptionAtCompletion = descriptionAtCompletion;
+		this.arrivalEvent = arrivalEvent;
 		this.crewmembersToAdd = crewmembersToAdd;
 		this.crewmembersToRemove = crewmembersToRemove;
 		this.isFinalSegment = isFinalSegment;
 		this.mentionedPlaces = mentionedPlaces;
+		this.image = image;
+		this.caption = caption;
 	}
 }
 
@@ -105,6 +230,13 @@ public enum CrewType
 	Lawyer = 9
 }
 
+public class PirateType
+{
+	public int ID;
+	public string name;
+	public int difficulty;
+}
+
 public class CrewMember
 {
 	public int ID;
@@ -115,6 +247,8 @@ public class CrewMember
 	public bool isKillable;
 	public bool isPartOfMainQuest;
 	public CrewType typeOfCrew;
+	public bool isPirate;
+	public PirateType pirateType;
 
 	public bool isJason => name == "Jason";
 
@@ -132,7 +266,7 @@ public class CrewMember
 	//	--navigators provide maps to different settlements and decrease negative random events
 	//	--warriors make sure encounters with pirates or other raiding activities go better in your favor
 	//	--slaves have zero clout--few benefits--but they never leave the ship unless they die
-	public CrewMember(int ID, string name, int originCity, int clout, CrewType typeOfCrew, string backgroundInfo, bool isKillable, bool isPartOfMainQuest) {
+	public CrewMember(int ID, string name, int originCity, int clout, CrewType typeOfCrew, string backgroundInfo, bool isKillable, bool isPartOfMainQuest, bool isPirate, PirateType pirateType) {
 		this.ID = ID;
 		this.name = name;
 		this.originCity = originCity;
@@ -141,6 +275,8 @@ public class CrewMember
 		this.backgroundInfo = backgroundInfo;
 		this.isKillable = isKillable;
 		this.isPartOfMainQuest = isPartOfMainQuest;
+		this.isPirate = isPirate;
+		this.pirateType = pirateType;
 	}
 
 	//This is a helper class to create a void crewman
@@ -240,7 +376,7 @@ public class PlayerRoute
 		this.settlementID = -1;
 		this.timeStampInDays = timeStampInDays;
 		this.UnityXYZEndPoint = destination;
-		Debug.Log("Getting called...." + origin.x + "  " + origin.z);
+		Debug.Log("Player route getting called...." + origin.x + "  " + origin.z);
 
 	}
 
@@ -251,7 +387,7 @@ public class PlayerRoute
 		this.settlementName = settlementName;
 		this.timeStampInDays = timeStampInDays;
 		this.UnityXYZEndPoint = origin;
-		Debug.Log("Getting called 2...." + origin.x + "  " + origin.z);
+		Debug.Log("Player route getting called 2...." + origin.x + "  " + origin.z);
 		//TODO this is a dirty fix--under normal route conditions the Unity XYZ is changed to XZY to match 3d geometry conventions (z is up and not forward like in Unity)
 		//TODO --I'm manually making this port stop XZY here so I don't have to change to much of the ConvertJourneyLogToCSVText() function in the PlayerJourneyLog Class
 		//TODO --We only need to change the 'origin' XYZ to XZY because port stops will have Vector3.zero (0,0,0) for the destination values always 
@@ -278,13 +414,13 @@ public class PlayerJourneyLog
 		this.otherAttributes = new List<string>();
 		this.CSVheader = "Unique_Machine_ID,timestamp,originE,originN,originZ,endE,endN,endZ," +
 			"Water_kg,Provisions_kg,Grain_kg,Wine_kg,Timber_kg,Gold_kg,Silver_kg," +
-			"Copper_kg,Tin_kg,Obsidian_kg,Lead_kg,Slaves_kg,Iron_kg,Bronze_kg,Luxury_kg,Is_Leaving_Port,PortID,PortName," +
+			"Copper_kg,Tin_kg,Obsidian_kg,Lead_kg,Livestock_kg,Iron_kg,Bronze_kg,Luxury_kg,Is_Leaving_Port,PortID,PortName," +
 			"CrewMemberIDs,UnityXYZ,Current_Questleg,ShipHP,Clout,PlayerNetwork,DaysStarving,DaysThirsty,Currency,LoanAmount,LoanOriginID,CurrentNavigatorTarget,KnownSettlements,CaptainsLog,upgradeLevel,crewCap,cargoCap\n";
 	}
 
 	public void AddRoute(PlayerRoute routeToAdd, script_player_controls playerShipVars, string captainsLog) {
 		this.routeLog.Add(routeToAdd);
-		Debug.Log("Getting called 3...." + routeToAdd.theRoute[0].x + "  " + routeToAdd.theRoute[0].z);
+		Debug.Log("Add Route getting called 3...." + routeToAdd.theRoute[0].x + "  " + routeToAdd.theRoute[0].z);
 		AddCargoManifest(playerShipVars.ship.cargo);
 		AddOtherAttributes(playerShipVars, captainsLog, routeToAdd);
 	}
@@ -446,19 +582,21 @@ public class MetaResource
 {
 	public string name;
 	public int id;
+	public int trading_priority;
 	public string description;
 	public string icon;
 
-	public MetaResource(string name, int id, string description, string icon) {
+	public MetaResource(string name, int id, string description, string icon, int trading_priority) {
 		this.name = name;
 		this.id = id;
 		this.description = description;
 		this.icon = icon;
+		this.trading_priority = trading_priority;
 	}
 
 }
 
-
+[Serializable]
 public class Resource : Model
 {
 	public const string Water = "Water";
@@ -472,24 +610,37 @@ public class Resource : Model
 	public const string Tin = "Tin";
 	public const string Obsidian = "Obsidian";
 	public const string Lead = "Lead";
-	public const string Slaves = "Slaves";
+	public const string Livestock = "Livestock";
 	public const string Iron = "Iron";
 	public const string Bronze = "Bronze";
 	public const string PrestigeGoods = "Prestige Goods";
 
-	public string name { get; private set; }
+	public static readonly string[] All = new string[] { Water, Provisions, Grain, Wine, Timber, Gold, Silver, Copper, Tin, Obsidian, Lead, Livestock, Iron, Bronze, PrestigeGoods };
 
-	private float _initial_amount_kg;
+	[SerializeField] private string _name;
+	public string name => _name;
+
+	[SerializeField] private float _initial_amount_kg;
 	public float initial_amount_kg { get => _initial_amount_kg; set { _initial_amount_kg = value; Notify(); } }
 
-	private float _amount_kg;
+	[SerializeField] private float _amount_kg;
 	public float amount_kg { get => _amount_kg; set { _amount_kg = value; Notify(); } }
 
 	public Resource(string name, float amount_kg) {
-		this.name = name;
+		_name = name;
+		Initialize(amount_kg);
+	}
+
+	public void Initialize(float amount_kg) {
 		this.amount_kg = amount_kg;
 		this.initial_amount_kg = amount_kg;
 	}
+}
+
+public class Region
+{
+	public string Name;
+	public string Description;
 }
 
 public class Settlement
@@ -512,7 +663,20 @@ public class Settlement
 	public ObservableCollection<CrewMember> availableCrew;
 	public string prefabName;
 
+	// tax factors
+	public bool godTax;
+	public int godTaxAmount;
+	public bool transitTax;
+	public float transitTaxPercent;
+	public bool foreignerFee;
+	public float foreignerFeePercent;
+	public float ellimenionPercent;
+
+	public string coinText;
+	public Region Region;
+
 	public Resource GetCargoByName(string name) => cargo.FirstOrDefault(c => c.name == name);
+	public Resource GetCargo(Resource r) => cargo.FirstOrDefault(c => c.name == r.name);
 
 	public Settlement(int settlementID, string name, Vector2 location_longXlatY, float elevation, int population) {
 		this.settlementID = settlementID;
@@ -520,23 +684,7 @@ public class Settlement
 		this.elevation = elevation;
 		this.name = name;
 		this.population = population;
-		cargo = new Resource[] {
-			new Resource ("Water", 0f),
-			new Resource ("Provisions", 0f),
-			new Resource ("Grain", 0f),
-			new Resource ("Wine", 0f),
-			new Resource ("Timber", 0f),
-			new Resource ("Gold", 0f),
-			new Resource ("Silver", 0f),
-			new Resource ("Copper", 0f),
-			new Resource ("Tin", 0f),
-			new Resource ("Obsidian", 0f),
-			new Resource ("Lead", 0f),
-			new Resource ("Slaves", 0f),
-			new Resource ("Iron", 0f),
-			new Resource ("Bronze", 0f),
-			new Resource ("Prestige Goods", 0f),
-		};
+		cargo = Resource.All.Select(r => new Resource(r, 0f)).ToArray();
 		networks = new List<int>();
 		availableCrew = new ObservableCollection<CrewMember>();
 	}
@@ -566,6 +714,7 @@ public class Settlement
 
 }
 
+[Serializable]
 public class Ship : Model
 {
 	public const int StartingCrewCap = 10;		// 30
@@ -589,31 +738,31 @@ public class Ship : Model
 	public MainQuestLine mainQuest;
 
 	// TODO: Reconcile mainQuest and objective concepts. These systems seem like they should be merged
-	private string _objective;
+	[SerializeField] private string _objective;
 	public string objective { get => _objective; set { _objective = value; Notify(); } }
 
 	public int crew => crewRoster.Count;
 	public ObservableCollection<CrewMember> crewRoster;
 
-	private float _totalNumOfDaysTraveled;
+	[SerializeField] private float _totalNumOfDaysTraveled;
 	public float totalNumOfDaysTraveled { get => _totalNumOfDaysTraveled; set { _totalNumOfDaysTraveled = value; Notify(); } }
 
-	private int _crewCapacity = StartingCrewCap;
+	[SerializeField] private int _crewCapacity = StartingCrewCap;
 	public int crewCapacity { get => _crewCapacity; set { _crewCapacity = value; Notify(); } }
 
-	private bool _sailsAreUnfurled = true;
+	[SerializeField] private bool _sailsAreUnfurled = true;
 	public bool sailsAreUnfurled { get => _sailsAreUnfurled; set { _sailsAreUnfurled = value; Notify(); } }
 
-	private int _upgradeLevel;
+	[SerializeField] private int _upgradeLevel;
 	public int upgradeLevel { get => _upgradeLevel; set { _upgradeLevel = value; Notify(); } }
 
-	private float _health;
+	[SerializeField] private float _health;
 	public float health { get => _health; set { _health = value; Notify(); } }
 
-	private string _builtMonuments = "";
+	[SerializeField] private string _builtMonuments = "";
 	public string builtMonuments { get => _builtMonuments; set { _builtMonuments = value; Notify(); } }
 
-	private int _currency;
+	[SerializeField] private int _currency;
 	public int currency { get => _currency; set { _currency = value; Notify(); } }
 
 	public float _playerClout;
@@ -633,23 +782,9 @@ public class Ship : Model
 		this.crewRoster = new ObservableCollection<CrewMember>();
 		this.playerJournal = new Journal();
 
-		cargo = new Resource[] {
-			new Resource ("Water", 100f),
-			new Resource ("Provisions", 100f),
-			new Resource ("Grain", 0f),
-			new Resource ("Wine", 0f),
-			new Resource ("Timber", 0f),
-			new Resource ("Gold", 0f),
-			new Resource ("Silver", 0f),
-			new Resource ("Copper", 0f),
-			new Resource ("Tin", 0f),
-			new Resource ("Obsidian", 0f),
-			new Resource ("Lead", 0f),
-			new Resource ("Slaves", 0f),
-			new Resource ("Iron", 0f),
-			new Resource ("Bronze", 0f),
-			new Resource ("Prestige Goods", 0f),
-		};
+		cargo = Resource.All.Select(r => new Resource(r, 0f)).ToArray();
+		GetCargoByName(Resource.Water).Initialize(100f);
+		GetCargoByName(Resource.Provisions).Initialize(100f);
 
 		this.currency = 500;
 		this.crewCapacity = StartingCrewCap;

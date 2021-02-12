@@ -41,7 +41,6 @@ using System.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 
 
 //======================================================================================================================================================================
@@ -70,7 +69,10 @@ public class GameVars : MonoBehaviour
 	public const string TD_minute = "0";
 	public const string TD_second = "0";
 
-	public CrewMember Jason => Globals.GameVars.masterCrewList.FirstOrDefault(c => c.isJason);
+	public CrewMember Jason => masterCrewList.FirstOrDefault(c => c.isJason);
+	public IEnumerable<CrewMember> StandardCrew => masterCrewList.Where(c => !c.isPirate);
+	public IEnumerable<CrewMember> Pirates => masterCrewList.Where(c => c.isPirate);
+	public IEnumerable<PirateType> PirateTypes => masterPirateTypeList;
 
 	[Header("World Scene Refs")]
 	public GameObject FPVCamera;
@@ -86,7 +88,7 @@ public class GameVars : MonoBehaviour
 	public List<CrewMember> currentlyAvailableCrewMembersAtPort; // updated every time ship docks at port
 
 	[Header("GUI Scene Refs")]
-	public GameObject MasterGUISystem;
+	public script_GUI MasterGUISystem;
 	public GameObject GUI_PortMenu;
 	public GameObject GUI_GameHUD;
 	public GameObject selection_ring;
@@ -106,13 +108,13 @@ public class GameVars : MonoBehaviour
 	public Material mat_water;
 
 	[Header("Beacons")]
-	public GameObject navigatorBeacon;
-	public GameObject crewBeacon;
+	public Beacon navigatorBeacon;
+	public Beacon crewBeacon;
 
 	// TODO: unorganized variables
 	[HideInInspector] public GameObject mainCamera;
 	[HideInInspector] public GameObject playerTrajectory;
-	[HideInInspector] public GameObject playerGhostRoute;
+	[HideInInspector] public LineRenderer playerGhostRoute;
 	[HideInInspector] public WindRose[,] windrose_January = new WindRose[10, 8];
 	[HideInInspector] public GameObject windZoneParent;
 	[HideInInspector] public GameObject waterSurface;
@@ -120,6 +122,7 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public GameObject currentZoneParent;
 
 	// settlements
+	[HideInInspector] public Region[] region_masterList;
 	[HideInInspector] public Settlement[] settlement_masterList;
 	[HideInInspector] public GameObject settlement_masterList_parent;
 	[HideInInspector] public GameObject currentSettlementGameObject;
@@ -131,9 +134,14 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public script_player_controls playerShipVariables;
 
 	// captain's log
-	[HideInInspector] public string currentCaptainsLog = "";
-	[HideInInspector] public CaptainsLogEntry[] captainsLogEntries;
-	[HideInInspector] public List<CaptainsLogEntry> currentLogPool = new List<CaptainsLogEntry>();
+	private string currentCaptainsLog = "";
+	private CaptainsLogEntry[] captainsLogEntries;
+	private List<CaptainsLogEntry> currentLogPool = new List<CaptainsLogEntry>();
+	public string CaptainsLog => currentCaptainsLog;
+
+	public void AddToCaptainsLog(string message) {
+		currentCaptainsLog = message + "\n\n" + currentCaptainsLog;
+	}
 
 	// resources
 	[HideInInspector] public List<MetaResource> masterResourceList = new List<MetaResource>();
@@ -141,11 +149,15 @@ public class GameVars : MonoBehaviour
 	// game state
 	[HideInInspector] public bool controlsLocked = false;
 	[HideInInspector] public bool isGameOver = false;
-	[HideInInspector] public bool justLeftPort = false;
 	[HideInInspector] public bool menuControlsLock = false;
+	[HideInInspector] public bool justLeftPort = false;
 	[HideInInspector] public bool gameIsFinished = false;
 	[HideInInspector] public bool isPerformingRandomEvent = false;
 	[HideInInspector] public bool isPassingTime = false;
+
+	// TODO: Should really make all this game state stuff an actual state machine at some point
+	public bool IsCutsceneMode = false;
+
 
 	// notifications
 	public bool NotificationQueued { get; private set; }
@@ -170,7 +182,8 @@ public class GameVars : MonoBehaviour
 	//###################################
 	//	Crew Member Variables
 	//###################################
-	[HideInInspector] public List<CrewMember> masterCrewList = new List<CrewMember>();
+	List<PirateType> masterPirateTypeList = new List<PirateType>();
+	List<CrewMember> masterCrewList = new List<CrewMember>();
 
 	//###################################
 	//	GUI VARIABLES
@@ -186,6 +199,22 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public bool showNonPortDockingNotification = false;
 	[HideInInspector] public bool updatePlayerCloutMeter = false;
 
+	[HideInInspector] public List<DialogText> portDialogText = new List<DialogText>();
+
+	//Mylo's Addition
+	[HideInInspector] public List<DialogText> networkDialogText = new List<DialogText>();
+	[HideInInspector] public List<DialogText> pirateDialogText = new List<DialogText>();
+	[HideInInspector] public List<DialogText> mythDialogText = new List<DialogText>();
+	[HideInInspector] public List<DialogText> guideDialogText = new List<DialogText>(); 
+	[HideInInspector] public List<DialogText> tradingDialogText = new List<DialogText>(); // Perhaps
+	[HideInInspector] public List<FoodText> foodItemText= new List<FoodText>();
+	[HideInInspector] public List<FoodText> wineInfoText = new List<FoodText>();
+	[HideInInspector] public List<FoodText> foodDialogueText = new List<FoodText>();
+
+
+
+	// End Mylo's Addition
+
 	// high level game systems
 	public Trade Trade { get; private set; }
 	public Network Network { get; private set; }
@@ -195,6 +224,28 @@ public class GameVars : MonoBehaviour
 	//	RANDOM EVENT VARIABLES
 	//###################################
 	[HideInInspector] public List<int> activeSettlementInfluenceSphereList = new List<int>();
+
+	//STORMS
+	[HideInInspector] public List<Ritual> stormRituals = new List<Ritual>();
+	[HideInInspector] public List<string> stormTitles;
+	[HideInInspector] public List<string> stormSubtitles;
+	[HideInInspector] public List<string> stormStartText;
+	[HideInInspector] public List<string> stormSeerText;
+	[HideInInspector] public List<string> stormNoSeerText;
+	[HideInInspector] public List<string> stormRitualResultsText;
+	[HideInInspector] public List<string> stormSuccessText;
+	[HideInInspector] public List<string> stormFailureText;
+
+	//PIRATES
+	[HideInInspector] public List<string> pirateTitles;
+	[HideInInspector] public List<string> pirateSubtitles;
+	[HideInInspector] public List<string> pirateStartText;
+	[HideInInspector] public List<string> pirateTypeIntroText;
+	[HideInInspector] public List<string> pirateNegotiateText;
+	[HideInInspector] public List<string> pirateRunSuccessText;
+	[HideInInspector] public List<string> pirateRunFailText;
+	[HideInInspector] public List<string> pirateSuccessText;
+	[HideInInspector] public List<string> pirateFailureText;
 
 	//###################################
 	//	DEBUG VARIABLES
@@ -223,7 +274,7 @@ public class GameVars : MonoBehaviour
 		playerShip = GameObject.FindGameObjectWithTag("playerShip");
 		camera_titleScreen = GameObject.FindGameObjectWithTag("camera_titleScreen");
 		waterSurface = GameObject.FindGameObjectWithTag("waterSurface");
-		playerGhostRoute = GameObject.FindGameObjectWithTag("playerGhostRoute");
+		playerGhostRoute = GameObject.FindGameObjectWithTag("playerGhostRoute").GetComponent<LineRenderer>();
 		playerTrajectory = GameObject.FindGameObjectWithTag("playerTrajectory");
 		mainLightSource = GameObject.FindGameObjectWithTag("main_light_source").GetComponent<Light>();
 
@@ -233,14 +284,38 @@ public class GameVars : MonoBehaviour
 		Trade = new Trade(this);
 
 		//Load all txt database files
-		masterCrewList = CSVLoader.LoadMasterCrewRoster();
+		masterPirateTypeList = CSVLoader.LoadMasterPirateTypes();
+		masterCrewList = CSVLoader.LoadMasterCrewRoster(masterPirateTypeList);
 		captainsLogEntries = CSVLoader.LoadCaptainsLogEntries();
 		masterResourceList = CSVLoader.LoadResourceList();
-		settlement_masterList = CSVLoader.LoadSettlementList();		// depends on resource list and crew list
+		stormRituals = CSVLoader.LoadRituals();
+		CSVLoader.LoadStormText(out stormTitles, out stormSubtitles, out stormStartText, out stormSeerText, out stormNoSeerText, 
+			out stormRitualResultsText, out stormSuccessText, out stormFailureText);
+		CSVLoader.LoadPirateText(out pirateTitles, out pirateSubtitles, out pirateStartText, out pirateTypeIntroText, out pirateNegotiateText,
+			out pirateRunSuccessText, out pirateRunFailText, out pirateSuccessText, out pirateFailureText);
+		portDialogText = CSVLoader.LoadPortDialog();
+
+		// Mylo's Addition
+		networkDialogText = CSVLoader.LoadNetworkDialog();
+		pirateDialogText = CSVLoader.LoadPirateDialog();
+		mythDialogText = CSVLoader.LoadMythDialog();
+		guideDialogText = CSVLoader.LoadHireGuideDialog();
+		// trading goods here
+		foodItemText = CSVLoader.LoadFoodItemsList();
+		foodDialogueText = CSVLoader.LoadFoodDialogueList();
+		wineInfoText = CSVLoader.LoadWineInfoList();
+
+
+		// end Mylo's Addition
+
+		region_masterList = CSVLoader.LoadRegionList();
+		settlement_masterList = CSVLoader.LoadSettlementList();		// depends on resource list, region list, and crew list
 
 		CreateSettlementsFromList();
 		currentSettlementGameObject = settlement_masterList_parent.transform.GetChild(0).gameObject;
 		currentSettlement = currentSettlementGameObject.GetComponent<script_settlement_functions>().thisSettlement;
+		//The lights are on at the start, so turn them off or they'll be on during the first day and no other day
+		cityLightsParent.SetActive(false);
 
 		// wind and current init
 		BuildWindZoneGameObjects();
@@ -358,6 +433,9 @@ public class GameVars : MonoBehaviour
 		//Update Current Quest Leg
 		ship.mainQuest.currentQuestSegment = int.Parse(playerVars[28]);
 
+		// Update objective
+		ship.objective = Globals.Quests.CurrSegment?.objective;
+
 		//Update Ship Health
 		ship.health = float.Parse(playerVars[29]);
 
@@ -398,7 +476,7 @@ public class GameVars : MonoBehaviour
 			for (int x = 0; x < settlement_masterList_parent.transform.childCount; x++)
 				if (settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == targetID)
 					location = settlement_masterList_parent.transform.GetChild(x).position;
-			MoveNavigatorBeacon(navigatorBeacon, location);
+			ActivateNavigatorBeacon(navigatorBeacon, location);
 		}
 		else {
 			ship.currentNavigatorTarget = -1;
@@ -434,11 +512,16 @@ public class GameVars : MonoBehaviour
 		return true;
 	}
 
-	public void MoveNavigatorBeacon(GameObject beacon, Vector3 location) {
+	public void ActivateNavigatorBeacon(Beacon beacon, Vector3 location) {
+		beacon.IsBeaconActive = true;
 		beacon.transform.position = location;
 		beacon.GetComponent<LineRenderer>().SetPosition(0, new Vector3(location.x, 0, location.z));
 		beacon.GetComponent<LineRenderer>().SetPosition(1, location + new Vector3(0, 400, 0));
 		playerShipVariables.UpdateNavigatorBeaconAppearenceBasedOnDistance(beacon);
+	}
+
+	public void DeactivateNavigatorBeacon(Beacon beacon) {
+		beacon.IsBeaconActive = false;
 	}
 
 	public void RotateCameraTowards(Vector3 target) {
@@ -675,7 +758,7 @@ public class GameVars : MonoBehaviour
 	//====================================================================================================
 	//      DATA SAVING FUNCTIONS
 	//====================================================================================================
-	public void SaveUserGameData(bool isRestart) {
+	public void SaveUserGameData() {
 		string delimitedData = playerShipVariables.journey.ConvertJourneyLogToCSVText();
 		Debug.Log(delimitedData);
 		string filePath = Application.persistentDataPath + "/";
@@ -693,12 +776,14 @@ public class GameVars : MonoBehaviour
 		try {
 			//save a backup before Joanna's edits
 			System.IO.File.WriteAllText(Application.persistentDataPath + "/BACKUP-" + SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv", delimitedData);
-			//Only save the game for loading if it's not a restart--otherwise if the player loads, it will load right where the player restarted the game
-			if (!isRestart) System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileName, delimitedData);
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileName, delimitedData);
 			//TODO Temporary addition for joanna to remove the captains log from the server upload
 			string fileToUpload = RemoveCaptainsLogForJoanna(delimitedData);
 			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileNameServer, fileToUpload);
 			Debug.Log(Application.persistentDataPath);
+
+			// secretly save a JSON version of the save data to prep for a move to make that the canonical save file - but it's not hooked up to be loaded yet
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(playerShipVariables.ship));
 		}
 		catch (Exception e) {
 			ShowANotificationMessage("ERROR: a backup wasn't saved at: " + Application.persistentDataPath + "  - which means it may not have uploaded either: " + e.Message);
@@ -880,7 +965,7 @@ public class GameVars : MonoBehaviour
 		}
 		//now set the player ship to the origin city coordinate
 		//!TODO This is arbotrarily set to samothrace right now
-		playerShip.transform.position = new Vector3(1939.846f, .23f, 2313.506f);
+		playerShip.transform.position = new Vector3(1702.414f, .23f, 2168.358f);
 		//mainCamera.transform.position = new Vector3(originCity.transform.position.x, 30f, originCity.transform.position.z);
 	}
 
@@ -888,7 +973,7 @@ public class GameVars : MonoBehaviour
 
 		//Debug.Log ("Quest Seg: " + playerShipVariables.ship.mainQuest.currentQuestSegment);
 		//First we need to save the game that just ended
-		SaveUserGameData(true);
+		SaveUserGameData();
 		//Then we need to re-initialize all the player's variables
 		playerShipVariables.Reset();
 
@@ -923,105 +1008,6 @@ public class GameVars : MonoBehaviour
 
 	}
 
-	public void InitiateMainQuestLineForPlayer() {
-		Debug.Log("Main Quest TESTER");
-		//For the argonautica, let's set the crew capacity to 30
-		playerShipVariables.ship.crewCapacity = Ship.StartingCrewCap;
-
-		//Now let's add all the initial crew from the start screen selection and start the first leg of the quest
-		for (int i = 0; i < newGameAvailableCrew.Count; i++) {
-			if (newGameCrewSelectList[i]) {
-				playerShipVariables.ship.crewRoster.Add(newGameAvailableCrew[i]);
-				//Debug.Log (newGameCrewSelectList[i]);	
-			}
-		}
-		//Debug.Log (playerShipVariables.ship.mainQuest.questSegments[0].crewmembersToAdd.Count + "<<<<<<<<<<<<<CREW");
-		//	foreach (int crewID in playerShipVariables.ship.mainQuest.questSegments[0].crewmembersToAdd){
-		//		playerShipVariables.ship.crewRoster.Add (GetCrewMemberFromID(crewID));
-		//	}
-
-		//Let's increase the ships cargo capacity
-		playerShipVariables.ship.cargo_capicity_kg = Ship.StartingCargoCap;
-
-		//Let's increase the ships Provisions and water base to reflect starting crew members
-		playerShipVariables.ship.cargo[0].amount_kg = Ship.StartingWater;
-		playerShipVariables.ship.cargo[1].amount_kg = Ship.StartingFood;
-
-		//Increase the quest counter because the start screen takes care of the first leg
-		// KD: Your first quest is to find pagasae, not tomb of dolops
-		Debug.Log(playerShipVariables.ship.mainQuest.currentQuestSegment);
-		//playerShipVariables.ship.mainQuest.currentQuestSegment++;
-
-		var segment = playerShipVariables.ship.mainQuest.questSegments[playerShipVariables.ship.mainQuest.currentQuestSegment];
-
-		//first show a window for the welcome message, and if there are any crew member changes, then let the player know.
-		// KD: Removed the concept of the first welcome message
-		//notificationMessage = segment.descriptionAtCompletion;
-		//showNotification = true;
-		//Add this message to the captain's log
-		playerShipVariables.ship.shipCaptainsLog.Add(new CaptainsLogEntry(segment.destinationID, segment.descriptionOfQuest));
-		playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].dateTimeOfEntry = playerShipVariables.ship.totalNumOfDaysTraveled + " days";
-		currentCaptainsLog = playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].dateTimeOfEntry + "\n" + playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].logEntry + "\n\n" + currentCaptainsLog;
-		//Now add the mentioned places attached to this quest leg
-		foreach (int i in segment.mentionedPlaces) {
-			//Make sure we don't add any null values--a -1 represents no mentions of any settlements
-			if (i != -1)
-				playerShipVariables.ship.playerJournal.AddNewSettlementToLog(i);
-		}
-		Debug.Log(playerShipVariables.ship.mainQuest.currentQuestSegment);
-
-		//Then increment the questline to the in succession and update the player captains log with the new information for the next quest line
-		playerShipVariables.ship.mainQuest.currentQuestSegment++;
-		segment = playerShipVariables.ship.mainQuest.questSegments[playerShipVariables.ship.mainQuest.currentQuestSegment];
-
-		playerShipVariables.ship.shipCaptainsLog.Add(new CaptainsLogEntry(segment.destinationID, segment.descriptionOfQuest));
-		playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].dateTimeOfEntry = playerShipVariables.ship.totalNumOfDaysTraveled + " days";
-		currentCaptainsLog = playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].dateTimeOfEntry + "\n" + playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].logEntry + "\n\n" + currentCaptainsLog;
-		//Now add the mentioned places attached to this quest leg
-		foreach (int i in segment.mentionedPlaces) {
-			//Make sure we don't add any null values--a -1 represents no mentions of any settlements
-			if (i != -1)
-				playerShipVariables.ship.playerJournal.AddNewSettlementToLog(i);
-		}
-		//Now add the city name of the next journey quest to the players known settlements
-		playerShipVariables.ship.playerJournal.AddNewSettlementToLog(segment.destinationID);
-		//Now teleport the player ship to an appropriate location near the first target
-		playerShip.transform.position = new Vector3(1702.414f, playerShip.transform.position.y, 2168.358f);
-		//Set the player's initial position to the new position
-		playerShipVariables.lastPlayerShipPosition = playerShip.transform.position;
-
-		//Setup Difficulty Level
-		SetupBeginnerGameDifficulty();
-
-		// setup each city with 5 crew available and for now, they never regenerate.
-		foreach(var settlement in settlement_masterList) {
-			settlement.availableCrew.Clear();
-			GenerateRandomCrewMembers(5).ForEach(c => settlement.availableCrew.Add(c));
-		}
-
-		Debug.Log(playerShipVariables.ship.mainQuest.currentQuestSegment);
-
-		// set the objective to the first part of the argonautica quest
-		playerShipVariables.ship.objective = "Upgrade your ship to the Trireme";
-
-		
-		Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
-			Title = "Trading in the Mediterranean",
-			Message = "You are Jason. Your story begins with a trade ship and a small crew. Sail to Pagasae and buy goods to sell around the bay.\n\nEarn enough money to upgrade your ship to a Trireme so your adventure can begin!"
-		});
-
-
-		// KD TODO: Testing quizzes
-		/*Globals.UI.Show<QuizScreen, InfoScreenModel>(new InfoScreenModel {
-			Title = "Clashing Rocks",
-			Message = "You’re at the clashing rocks: oh no! do you remember your instructions from Phineus? Choose wisely – or you will be smashed to epic smithereens."
-		});
-		*/
-
-		//Flag the main GUI scripts to turn on
-		runningMainGameGUI = true;
-	}
-
 	public void UpgradeShip(int costToBuyUpgrade) {
 		playerShipVariables.ship.upgradeLevel = 1;
 		playerShipVariables.ship.currency -= costToBuyUpgrade;
@@ -1030,24 +1016,10 @@ public class GameVars : MonoBehaviour
 		playerShipVariables.ship.crewCapacity = 30;
 		playerShipVariables.ship.cargo_capicity_kg = 1200;
 
-		// add all the non-fireable story crew members now that you have your big boy ship
-		FillBeginStoryCrew();
-
 		Globals.UI.Hide<RepairsView>();
-		Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
-			Title = "Welcome to the Argonautica!",
-			Message = "Find your way through the dangerous seas to complete your quest! You have found yourself at Pagasae, where King Pelias has given you the task of sailing across " +
-					"the Aegean and the Black Sea to retrieve the Golden Fleece. This is the hide of the flying ram that brought Phrixus from Boetia to Aea. The hide now hangs on a tree on the other side of the Black" +
-					" Sea in the city of Aea. The great lord Aeetes prizes the fleece, and a very large dragon guards it.\n\n" +
-					"The task seems impossible!But you do not sail alone, Jason.You have assembled a group of the most powerful warriors, sailors, and prophets in Greece to help you in your quest. " +
-					"Most are the sons of royal families, and each one has a unique skill.Once the heroes have all arrived, your crew stocks the ships and the people of Pagasae greet you all."
-		});
 
-		var segment = playerShipVariables.ship.mainQuest.questSegments[playerShipVariables.ship.mainQuest.currentQuestSegment];
-		playerShipVariables.ship.objective = string.Concat(segment.descriptionOfQuest
-			.SkipWhile(c => c == '"')
-			.TakeWhile(c => c != '!')
-		);
+		// this will automatically add the story crew that was previously being added manually in a hack
+		Globals.Quests.CheckUpgradeShipTriggers();
 
 		// show the new ship model
 		SetShipModel(playerShipVariables.ship.upgradeLevel);
@@ -1058,18 +1030,6 @@ public class GameVars : MonoBehaviour
 			upgradeLevel.SetActive(false);
 		}
 		shipLevels[shipLevel].SetActive(true);
-	}
-
-	// when you purchase the trireme, we add all the MUST have story crew members. 
-	public void FillBeginStoryCrew() {
-
-		foreach (int crewID in playerShipVariables.ship.mainQuest.questSegments[0].crewmembersToAdd) {
-			CrewMember currentMember = GetCrewMemberFromID(crewID);
-			if (!currentMember.isKillable && !currentMember.isJason) {
-				playerShipVariables.ship.crewRoster.Add(currentMember);
-			}
-		}
-
 	}
 
 	public void FillNewGameCrewRosterAvailability() {
@@ -1093,7 +1053,7 @@ public class GameVars : MonoBehaviour
 		}
 
 		//Now let's add all the possible non-quest historical people for hire
-		foreach (CrewMember thisMember in masterCrewList) {
+		foreach (CrewMember thisMember in StandardCrew) {
 			//make sure we don't go over 40 listings
 			if (newGameAvailableCrew.Count == 40)
 				break;
@@ -1139,8 +1099,9 @@ public class GameVars : MonoBehaviour
 		//	--the most it has available
 		List<CrewMember> availableCrew = new List<CrewMember>();
 		int numOfIterations = 0;
+		int numStandardCrew = StandardCrew.Count();
 		while (numberOfCrewmanNeeded != availableCrew.Count) {
-			CrewMember thisMember = masterCrewList[UnityEngine.Random.Range(0, masterCrewList.Count)];
+			CrewMember thisMember = StandardCrew.RandomElement();
 			if (!thisMember.isPartOfMainQuest) {
 				//Now make sure this crewmember isn't already in the current crew
 				if(!playerShipVariables.ship.crewRoster.Contains(thisMember)) {
@@ -1148,7 +1109,7 @@ public class GameVars : MonoBehaviour
 				}
 			}
 			//Break from the main loop if we've tried enough crewman
-			if (masterCrewList.Count == numOfIterations)
+			if (numStandardCrew == numOfIterations)
 				break;
 			numOfIterations++;
 		}
@@ -1168,10 +1129,10 @@ public class GameVars : MonoBehaviour
 
 	public void LoadSavedGhostRoute() {
 		//For the loadgame function--it just fills the ghost trail with the routes that exist
-		playerGhostRoute.GetComponent<LineRenderer>().positionCount = playerShipVariables.journey.routeLog.Count;
+		playerGhostRoute.positionCount = playerShipVariables.journey.routeLog.Count;
 		for (int routeIndex = 0; routeIndex < playerShipVariables.journey.routeLog.Count; routeIndex++) {
 			Debug.Log("GhostRoute Index: " + routeIndex);
-			playerGhostRoute.GetComponent<LineRenderer>().SetPosition(routeIndex, playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, playerShip.transform.position.y, 0));
+			playerGhostRoute.SetPosition(routeIndex, playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, playerShip.transform.position.y, 0));
 			//set player last origin point for next route add on
 			if (routeIndex == playerShipVariables.journey.routeLog.Count - 1) {
 				playerShipVariables.travel_lastOrigin = playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, playerShip.transform.position.y);
@@ -1219,9 +1180,13 @@ public class GameVars : MonoBehaviour
 		else if (clout > 4000 && clout <= 4499) title = "Prince";
 		else if (clout > 4500 && clout <= 4999) title = "King";
 		else if (clout >= 5000) title = "The God";
+		else if (clout == 0) title = "Dead";
 		else title = "ERROR: clout is not between 0 and 100";
 		return title;
 	}
+
+	public Region GetRegionByName(string name) => region_masterList.FirstOrDefault(r => r.Name == name);
+	public Settlement GetSettlementByName(string name) => settlement_masterList.FirstOrDefault(s => s.name == name);
 
 	public Settlement GetSettlementFromID(int ID) {
 		//Debug.Log (settlement_masterList.Length);
@@ -1244,129 +1209,13 @@ public class GameVars : MonoBehaviour
 		}
 		return null;
 	}
-
-
-
-	//====================================================================================================
-	//    QUEST FUNCTIONS
-	//====================================================================================================   
-
-	public void CheckIfCurrentSettlementIsPartOfMainQuest(int settlementID) {
-
-		//We need to cylcle through each quest destination and see if this current area matches one of the destinations. Preferably the players should go in order--but we are designing it to allow players to
-		//skip ahead and in theory--go directly to the end destination. One of the issues is the removal and addition of crewmembers along the way that are important for the plot. Because the questline is a series
-		//of stock messages for each destination, parsing out the narrative that talks about non-existent crewmen is difficult. For now--the narrative will remain unchanged, but hercules might never actually leave
-		//the ship if they don't stop at a specific destination where he leaves. Some narratives might discuss sailors that aren't actually on the ship. Additionally--the endpoint of the questline is the origin so the questline needs to be
-		//split into 2 parts--the first ends at aea and the player can sell straight there, but must go there in order to return back to Pagasse and can return there directly or follow the questline back there.
-		//ALSO--once the player reachees a certain point in the questline, the player can't return to older points in the quest so the beginning id should start at the current quest segment
-
-		//create a bool that can be accessed by this function's loops etc.
-		bool matchFound = false;
-
-		// you can't progress in the main quest until you finish the tutorial
-		if (playerShipVariables.ship.upgradeLevel == 0) return;
-
-		//First determine if the player has finished the entire questline or yet. We'll use the Count without a -1 to make sure the incremented quest leg is higher thant he last available leg
-		if (playerShipVariables.ship.mainQuest.currentQuestSegment < playerShipVariables.ship.mainQuest.questSegments.Count) {
-			int currentQuestEnd;
-			int aeaID = 15;
-			var segment = playerShipVariables.ship.mainQuest.questSegments[playerShipVariables.ship.mainQuest.currentQuestSegment];
-
-			//First we determine which part of the questleg the player is in which determines which part of the quest array the player can access
-			//If the player is in the first half before Aea--then only search for these quest segments, else only search for the last quest segments
-			if (segment.segmentID < aeaID) {
-				//currentQuestBeginning = 0;
-				currentQuestEnd = aeaID;
-			}
-			else {
-				//currentQuestBeginning = aeaID;
-				//set the end destination to the last position of the array
-				currentQuestEnd = playerShipVariables.ship.mainQuest.questSegments.Count - 1;
-			}
-
-
-			//we add a +1 to the current questline so that the player can't continuously perform the quest at the same stop
-			for (int index = segment.segmentID; index <= currentQuestEnd; index++) {
-				QuestSegment thisQuest = playerShipVariables.ship.mainQuest.questSegments[index];
-				Debug.Log(settlementID + "   : =? :   " + thisQuest.destinationID);
-				//If the current settlement matches the id of any target in the quest line, increment the quest line to that point--preferably we want it to be the next one in sequence--but we're expanding player behavioral choices.
-				if (settlementID == thisQuest.destinationID) {
-					//If there is a match, the player has moved on to a new leg of the quest line
-					//first show a window for the completion message, and if there are any crew member changes, then let the player know.
-					string questMessageIntro = "The Argonautica Quest: ";
-					ShowANotificationMessage(questMessageIntro + thisQuest.descriptionAtCompletion);
-
-					//add the arrival message to Captain's log
-					playerShipVariables.ship.shipCaptainsLog.Add(new CaptainsLogEntry(thisQuest.destinationID, questMessageIntro + thisQuest.descriptionAtCompletion));
-					playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].dateTimeOfEntry = playerShipVariables.ship.totalNumOfDaysTraveled + " days";
-					currentCaptainsLog = playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].dateTimeOfEntry + "\n" + playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].logEntry + "\n\n" + currentCaptainsLog;
-
-					//Remove any crew members if the questline calls for it
-					foreach (int crewID in segment.crewmembersToRemove) {
-						Debug.Log("CREW ID REMOVING: " + crewID);
-						//Make sure the crew ID values are not -1(a null value which means no changes)
-						if (crewID != -1)
-							//foreach (CrewMember currentMember in playerShipVariables.ship.crewRoster){
-							//	Debug.Log ("Checking =  : " + currentMember.ID + " : " + crewID);
-							//	if (currentMember.ID == crewID)
-							playerShipVariables.ship.crewRoster.Remove(GetCrewMemberFromID(crewID));
-						//}
-					}
-
-					//Add any new crew members if the questline calls for it
-					foreach (int crewID in segment.crewmembersToAdd) {
-						//Make sure the crew ID values are not -1(a null value which means no changes)
-						if (crewID != -1)
-							playerShipVariables.ship.crewRoster.Add(GetCrewMemberFromID(crewID));
-					}
-
-					//Then increment the questline to the in succession and update the player captains log with the new information for the next quest line
-					playerShipVariables.ship.mainQuest.currentQuestSegment = thisQuest.segmentID + 1;
-					segment = playerShipVariables.ship.mainQuest.questSegments[playerShipVariables.ship.mainQuest.currentQuestSegment];
-
-					playerShipVariables.ship.shipCaptainsLog.Add(new CaptainsLogEntry(segment.destinationID, questMessageIntro + segment.descriptionOfQuest));
-					playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].dateTimeOfEntry = playerShipVariables.ship.totalNumOfDaysTraveled + " days";
-					currentCaptainsLog = playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].dateTimeOfEntry + "\n" + playerShipVariables.ship.shipCaptainsLog[playerShipVariables.ship.shipCaptainsLog.Count - 1].logEntry + "\n\n" + currentCaptainsLog;
-
-					playerShipVariables.ship.objective = string.Concat(segment.descriptionOfQuest
-						.SkipWhile(c => c == '"')
-						.TakeWhile(c => c != '!')
-					);
-
-					//Now add the city name of the next journey quest to the players known settlements
-					playerShipVariables.ship.playerJournal.AddNewSettlementToLog(segment.destinationID);
-					Debug.Log("next seg: " + segment.destinationID);
-					//Now add the mentioned places attached to this quest leg
-					foreach (int i in segment.mentionedPlaces) {
-						Debug.Log("mentioning: " + i);
-						//Make sure we don't add any null values--a -1 represents no mentions of any settlements
-						if (i != -1)
-							playerShipVariables.ship.playerJournal.AddNewSettlementToLog(i);
-					}
-					//If we find a match, set the appropriate bool flag, and break from the loop
-					matchFound = true;
-					break;
-				}
-
-
-			}
-		}
-		if (!matchFound) {
-			//if it's not a quest line, just tell the player nothing
-			//notificationMessage = "You found " + currentSettlement.name + "!";
-			//showNotification = true;
-		}
-
-	}
-
-
-
+	
 	//====================================================================================================
 	//    PLAYER MODIFICATION FUNCTIONS
 	//====================================================================================================   
 
-	public void AdjustPlayerClout(int cloutAdjustment) {
-		int cloutModifier = 100; //We have a modifier to help link the new system in with the old functions.
+	public void AdjustPlayerClout(int cloutAdjustment, bool useMod = true) {
+		int cloutModifier = useMod? 100 : 1; //We have a modifier to help link the new system in with the old functions.
 		int clout = (int)playerShipVariables.ship.playerClout;
 		//adjust the players clout by the given amount
 		playerShipVariables.ship.playerClout += (cloutAdjustment * cloutModifier);
@@ -1376,7 +1225,7 @@ public class GameVars : MonoBehaviour
 		//if the player's clout is reduced below 0 after the adjustment, then increase it to 0 again
 		if (playerShipVariables.ship.playerClout < 0)
 			playerShipVariables.ship.playerClout = 0;
-		Debug.Log(playerShipVariables.ship.playerClout);
+		Debug.Log("Clout " + playerShipVariables.ship.playerClout);
 		//First check if a player reaches a new clout level
 		//If the titles don't match after adjustment then we have a change!
 		if (GetCloutTitleEquivalency(clout) != GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout)) {
@@ -1392,7 +1241,7 @@ public class GameVars : MonoBehaviour
 				Debug.Log("Lost a level");
 				ShowANotificationMessage("Unfortunately you sunk to a new low level of respect in the world! Before this day you were Jason, " + GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
 			}
-			MasterGUISystem.GetComponent<script_GUI>().GUI_UpdatePlayerCloutMeter();
+			MasterGUISystem.GUI_UpdatePlayerCloutMeter();
 		}
 
 
@@ -1434,6 +1283,8 @@ public class GameVars : MonoBehaviour
 	public void RemoveEntriesFromCurrentLogPool(int logID) {
 		currentLogPool.RemoveAll(entry => entry.settlementID == logID);
 	}
+
+	public CaptainsLogEntry GetRandomCaptainsLogFromPool() => currentLogPool.RandomElement();
 
 
 
@@ -1484,7 +1335,7 @@ public class GameVars : MonoBehaviour
 
 		//###### Now we need to determine whether or not the current city (or representative thereof) 
 		//	--is part of the player's hometown/main network(s), e.g. if the player and city is part of the Samothracian network
-		Debug.Log("DEBUG:  " + settlementID);
+		Debug.Log("DEBUG SETTLEMENT ID:  " + settlementID);
 		//If there is no city attached(settlementID == 0) then we are in open waters so return 0
 		if (settlementID != 0) {
 			foreach (int playerNetworkID in playerShipVariables.ship.networks) {

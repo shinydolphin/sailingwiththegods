@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using NaughtyAttributes;
+using UnityEngine.UI;
 
 public class script_player_controls : MonoBehaviour
 {
@@ -18,7 +20,6 @@ public class script_player_controls : MonoBehaviour
 
 	GameVars GameVars;
 
-	[HideInInspector] public Ship ship;
 	[HideInInspector] public PlayerJourneyLog journey;
 	[HideInInspector] public Vector3 lastPlayerShipPosition;
 	[HideInInspector] public Vector3 travel_lastOrigin;
@@ -50,41 +51,88 @@ public class script_player_controls : MonoBehaviour
 	float initialCelestialAngle = 0f;
 	float targetAngle = 0f;
 
-
+	[Header("Scene References")]
 	public GameObject cursorRing;
+	public GameObject fogWall;
+	public AudioSource SFX_birdsong;
 
 	Material cursorRingMaterial;
 	bool cursorRingIsGreen = true;
 	float cursorRingAnimationClock = 0f;
 
-
-	public GameObject fogWall;
-
 	bool shipTravelStartRotationFinished = false;
-
 
 	[HideInInspector] public bool rayCheck_stopShip = false;
 	bool rayCheck_stopCurrents = false;
 	bool rayCheck_playBirdSong = false;
 
-	public AudioSource SFX_birdsong;
-
 	List<string> windZoneNamesToTurnOn = new List<string>();
 	List<string> currentZoneNamesToTurnOn = new List<string>();
+
+	[HideInInspector] public List<string> zonesList = new List<string>();
+
+	private bool checkedStarvingThirsty = false;
+
+	[Header("Playtesting Bools")]
+	//make sure these are false in Unity's "Inspector" tab before making builds 
+	[SerializeField] bool hotkeysOn = true;
+
+
+	#region Debug Tools (keep at bottom)
+
+	bool ApplicationIsPlaying => Application.isPlaying;
+
+	[Header("Debug Tools")]
+	[EnableIf("ApplicationIsPlaying")]
+	public Ship ship;
+
+	[ReadOnly]
+	public Vector2 longXLatY;
+
+	[Header("Pirate Zones Bools")]
+	[ReadOnly] public bool isAetolianRegionZone = false;
+	[ReadOnly] public bool isCretanRegionZone = false;
+	[ReadOnly] public bool isEtruscanPirateRegionZone = false;
+	[ReadOnly] public bool isIllyrianRegionZone = false;
+
+	List<string> teleportToSettlementOptions = new List<string>();
+
+	[Dropdown("teleportToSettlementOptions")]
+	[SerializeField] string teleportToSettlementChoice = null;
+
+	[Button("Teleport to Settlement")]
+	void TeleportToSettlement() {
+		if (teleportToSettlementChoice == null) {
+			Debug.LogError("No settlement chosen");
+		}
+
+		var settlement = Globals.GameVars.GetSettlementByName(teleportToSettlementChoice);
+		if (settlement == null) {
+			Debug.LogError("Invalid settlement chosen");
+		}
+
+		var goalPos = settlement.theGameObject.transform.position;
+		transform.position = new Vector3(goalPos.x, transform.position.y, goalPos.z);
+	}
+	#endregion
+
 
 	public void Reset() {
 		ship = new Ship("Argo", 7.408f, 100, 500);
 		ship.networkID = 246;
 		journey = new PlayerJourneyLog();
 		lastPlayerShipPosition = transform.position;
+
 		ship.mainQuest = CSVLoader.LoadMainQuestLine();
-		ship.objective = "Upgrade your Ship to a Trireme";
 
 		//Setup the day/night cycle
 		UpdateDayNightCycle(GameVars.IS_NEW_GAME);
 
 		//initialize players ghost route
 		UpdatePlayerGhostRouteLineRenderer(GameVars.IS_NEW_GAME);
+
+		// setup teleport debug tool options (see inspector)
+		teleportToSettlementOptions = GameVars.settlement_masterList.Select(s => s.name).ToList();
 	}
 
 	// Use this for initialization
@@ -121,6 +169,39 @@ public class script_player_controls : MonoBehaviour
 		//	MGV.DEBUG_currentQuestLegIncrease = false;
 		//}
 
+		if (hotkeysOn) {
+			//TODO: Remove - this is just here as an initial test of minigames
+			if (Input.GetKeyUp(KeyCode.B)) {
+				Globals.MiniGames.Enter("Pirate Game/Pirate Game");
+			}
+			if (Input.GetKeyUp(KeyCode.L)) {
+				Globals.UI.Show<DialogScreen>().StartDialog("Start_Taverna");
+			}
+			if (Input.GetKeyUp(KeyCode.N)) {
+				Globals.MiniGames.Enter("Storm MG/Storm Game");
+			}
+
+            if (Input.GetKeyUp(KeyCode.Z))
+            {
+                Globals.MiniGames.EnterScene("Petteia");
+            }
+
+            if (Input.GetKeyUp(KeyCode.R))
+            {
+                Globals.MiniGames.EnterScene("SongCompMainMenu");
+            }
+            if (Input.GetKeyUp(KeyCode.T))
+             {
+              Globals.MiniGames.EnterScene("MiniGameMainMenu");
+             }
+                if (Input.GetKeyUp(KeyCode.M)) {
+
+				Globals.MiniGames.Exit();
+			 }
+		}
+
+		// debug tool to see where you are in lat long
+		longXLatY = CoordinateUtil.ConvertWebMercatorToWGS1984(CoordinateUtil.Convert_UnityWorld_WebMercator(GameVars.playerShip.transform.position));
 
 		//Make sure the camera transform is always tied to the front of the ship model's transform if the FPV camera is enabled
 		if (GameVars.FPVCamera.activeSelf)
@@ -156,14 +237,15 @@ public class script_player_controls : MonoBehaviour
 				//check to see if we just left a port starving
 				if (GameVars.justLeftPort) {
 					GameVars.justLeftPort = false;
-					CheckIfShipLeftPortStarvingOrThirsty();
+					//CheckIfShipLeftPortStarvingOrThirsty();
+					checkedStarvingThirsty = false;
 					//TODO need to add a check here for notification windows to lock controls
 
 					//
 				}
 
 				// don't let the player use the cursor, rotate the camera, or zoom when the mouse is over a blocking UI
-				if(!UISystem.IsMouseOverUI()) {
+				if(!UISystem.IsMouseOverUI() && !GameVars.IsCutsceneMode) {
 					//If we aren't locking the controls for a GUI pop up then look for player cursor
 					CheckForPlayerNavigationCursor();
 					AnimateCursorRing();
@@ -208,7 +290,7 @@ public class script_player_controls : MonoBehaviour
 						GameVars.controlsLocked = false;
 
 						//Initiate the main questline
-						GameVars.InitiateMainQuestLineForPlayer();
+						Globals.Quests.InitiateMainQuestLineForPlayer();
 
 						//Reset Start Game Button
 						GameVars.startGameButton_isPressed = false;
@@ -429,8 +511,6 @@ public class script_player_controls : MonoBehaviour
 
 	}
 
-
-
 	public void TravelToSelectedTarget(Vector3 destination) {
 		//Let's slowly rotate the ship towards the direction it's traveling and then allow the ship to move
 		if (!shipTravelStartRotationFinished) {
@@ -470,8 +550,6 @@ public class script_player_controls : MonoBehaviour
 			//Get direction to settlement from ship
 			Vector3 travelDirection = Vector3.Normalize(destination - transform.position);
 			float distance = Vector3.Distance(destination, transform.position);
-
-
 
 			//figure out the actual speed of the ship if currents/wind are present and if the sails are unfurled or not
 			Vector3 windAndWaterVector = GetCurrentWindWaterForceVector(travelDirection);
@@ -520,10 +598,14 @@ public class script_player_controls : MonoBehaviour
 				//Fire off the coast line raycasts to detect for the coast
 				DetectCoastLinesWithRayCasts();
 
+				// only bother to check coord triggers while moving. this prevents them from getting triggered more 
+				// than once since the quest system will drop anchor and prevent this from running again
+				Globals.Quests.CheckCoordTriggers(GameVars.playerShip.transform.position.XZ());
+
 			}
 			else if (!GameVars.showSettlementGUI || notEnoughSpeedToMove) { //check to see if we're in the trade menu otherwise we will indefintely write duplicate routes until we leave the trade menu
 																			//save this route to the PlayerJourneyLog
-				journey.AddRoute(new PlayerRoute(lastPlayerShipPosition, transform.position, ship.totalNumOfDaysTraveled), gameObject.GetComponent<script_player_controls>(), GameVars.currentCaptainsLog);
+				journey.AddRoute(new PlayerRoute(lastPlayerShipPosition, transform.position, ship.totalNumOfDaysTraveled), gameObject.GetComponent<script_player_controls>(), GameVars.CaptainsLog);
 				//Update player ghost route
 				UpdatePlayerGhostRouteLineRenderer(GameVars.IS_NOT_NEW_GAME);
 				//Reset the travel line to a distance of zero (turn it off)
@@ -544,7 +626,6 @@ public class script_player_controls : MonoBehaviour
 			}//End of Travel
 		}//End of initial ship rotation
 	}
-
 
 	public void UpdateShipAtrophyAfterTravelTime(float travelTime, bool isPassingTime) {
 		float dailyProvisionsKG = .83f;
@@ -572,7 +653,7 @@ public class script_player_controls : MonoBehaviour
 
 
 	void OnTriggerEnter(Collider trigger) {
-		Debug.Log("On trigger enter triggering" + trigger.transform.tag);
+		//Debug.Log("On trigger enter triggering" + trigger.transform.tag);
 		if (trigger.transform.tag == "currentDirectionVector") {
 			currentWaterDirectionVector = trigger.transform.GetChild(0).GetChild(0).up.normalized;
 			currentWaterDirectionMagnitude = trigger.transform.GetChild(0).GetComponent<script_WaterWindCurrentVector>().currentMagnitude;
@@ -586,7 +667,7 @@ public class script_player_controls : MonoBehaviour
 		if (trigger.transform.tag == "settlement_dock_area") {
 			//Here we first figure out what kind of 'settlement' we arrive at, e.g. is it just a point of interest or is it a actual dockable settlement
 			//if it's a dockable settlement, then allow the docking menu to be accessed, otherwise run quest functions etc.
-			Debug.Log(trigger.transform.parent.GetComponent<script_settlement_functions>().thisSettlement);
+			Debug.Log("Entered docking area for " + trigger.transform.parent.GetComponent<script_settlement_functions>().thisSettlement.name);
 			if (trigger.transform.parent.GetComponent<script_settlement_functions>().thisSettlement.typeOfSettlement == 1) {
 				getSettlementDockButtonReady = true;
 				GameVars.currentSettlement = trigger.transform.parent.gameObject.GetComponent<script_settlement_functions>().thisSettlement;
@@ -598,20 +679,37 @@ public class script_player_controls : MonoBehaviour
 				//change the current settlement to this location (normally this is done by opening the docking menu--but in this case there is no docking menu)
 				GameVars.currentSettlement = trigger.transform.parent.GetComponent<script_settlement_functions>().thisSettlement;
 				//Check if current Settlement is part of the main quest line
-				GameVars.CheckIfCurrentSettlementIsPartOfMainQuest(GameVars.currentSettlement.settlementID);
+				Globals.Quests.CheckCityTriggers(GameVars.currentSettlement.settlementID);
 				GameVars.showNonPortDockButton = true;
 			}
 		}
 		if (trigger.transform.tag == "settlement") {
-			Debug.Log("Entering Area of: " + trigger.GetComponent<script_settlement_functions>().thisSettlement.name + ". And the current status of the ghost route is: " + GameVars.playerGhostRoute.activeSelf);
+			Debug.Log("Entering Area of: " + trigger.GetComponent<script_settlement_functions>().thisSettlement.name + ". And the current status of the ghost route is: " + GameVars.playerGhostRoute.gameObject.activeSelf);
 			//This zone is the larger zone of influence that triggers city specific messages to pop up in the captains log journal
 			GameVars.AddEntriesToCurrentLogPool(trigger.GetComponent<script_settlement_functions>().thisSettlement.settlementID);
 			//We add the triggered settlement ID to the list of settlements to look for narrative bits from. In the OnTriggerExit() function, we remove them
 			GameVars.activeSettlementInfluenceSphereList.Add(trigger.GetComponent<script_settlement_functions>().thisSettlement.settlementID);
 			//If the player got lost asea and the memory map ghost route is turned off--check to see if we're enteringg friendly waters
-			if (GameVars.playerGhostRoute.activeSelf == false) {
+			if (GameVars.playerGhostRoute.gameObject.activeSelf == false) {
 				CheckIfPlayerFoundKnownSettlementAndTurnGhostTrailBackOn(trigger.GetComponent<script_settlement_functions>().thisSettlement.settlementID);
 			}
+		}
+
+		if (trigger.transform.tag == "AetolianRegionZone") {
+			isAetolianRegionZone = true;
+			zonesList.Add("Aetolian");
+		}
+		if (trigger.transform.tag == "CretanRegionZone") {
+			isCretanRegionZone = true;
+			zonesList.Add("Cretan");
+		}
+		if (trigger.transform.tag == "EtruscanPirateRegionZone") {
+			isEtruscanPirateRegionZone = true;
+			zonesList.Add("Etruscan");
+		}
+		if (trigger.transform.tag == "IllyrianRegionZone") {
+			isIllyrianRegionZone = true;
+			zonesList.Add("Illyrian");
 		}
 	}
 
@@ -630,6 +728,23 @@ public class script_player_controls : MonoBehaviour
 			GameVars.RemoveEntriesFromCurrentLogPool(trigger.GetComponent<script_settlement_functions>().thisSettlement.settlementID);
 			//We add the triggered settlement ID to the list of settlements to look for narrative bits from. In the OnTriggerExit() function, we remove them
 			GameVars.activeSettlementInfluenceSphereList.Remove(trigger.GetComponent<script_settlement_functions>().thisSettlement.settlementID);
+		}
+
+		if (trigger.transform.tag == "AetolianRegionZone") {
+			isAetolianRegionZone = false;
+			zonesList.Remove("Aetolian");
+		}
+		if (trigger.transform.tag == "CretanRegionZone") {
+			isCretanRegionZone = false;
+			zonesList.Remove("Cretan");
+		}
+		if (trigger.transform.tag == "EtruscanPirateRegionZone") {
+			isEtruscanPirateRegionZone = false;
+			zonesList.Remove("Etruscan");
+		}
+		if (trigger.transform.tag == "IllyrianRegionZone") {
+			isIllyrianRegionZone = false;
+			zonesList.Remove("Illyrian");
 		}
 	}
 
@@ -753,7 +868,7 @@ public class script_player_controls : MonoBehaviour
 	/// <summary>
 	/// the current actual speed of the ship
 	/// </summary>
-	float shipSpeed_Actual {
+	public float shipSpeed_Actual {
 		get {
 			var result = ship.speed - shipSpeedModifiers.Crew - shipSpeedModifiers.Hunger - shipSpeedModifiers.Thirst - shipSpeedModifiers.ShipHP + shipSpeedModifiers.Event;
 
@@ -763,56 +878,119 @@ public class script_player_controls : MonoBehaviour
 			return result;
 		}
 	}
+		
+	public bool CheckIfShipLeftPortStarvingOrThirsty() {
 
-
-	void CheckIfShipLeftPortStarvingOrThirsty() {
 		//We need to check to see if there is enough Provisions for a single days journey for all the crew
 		//if there isn't--some of the crew will leave the ship
 
-		string notificationMessage = "";
-		bool ProvisionsDeaths = false;
+		bool lowFood = ship.cargo[1].amount_kg < dailyProvisionsKG * ship.crewRoster.Count;
+		bool lowWater = ship.cargo[0].amount_kg < dailyWaterKG * ship.crewRoster.Count;
 
+		if (!checkedStarvingThirsty && (lowFood || lowWater)) {
+			string message = "No ship sails on an empty stomach - our supplies are perilously low!";
+
+			if (lowFood) {
+				message += $"\n\nMen are nothing but bellies, as the Muses know - we must have enough food to supply them! For {ship.crewRoster.Count} crew members, we need about " +
+					$"{Mathf.CeilToInt(dailyProvisionsKG * ship.crewRoster.Count)}kgs of provisions per day, but we only have {Mathf.RoundToInt(ship.cargo[1].amount_kg)}kgs. ";
+			}
+			if (lowWater) {
+				message += $"\n\n‘Water is best’, said the greatest of poets (Pindar) - and no ship can sail without it! We need to buy more water or Thirst itself will destroy our ship. " +
+					$"For {ship.crewRoster.Count} crew members, we need about {Mathf.CeilToInt(dailyWaterKG * ship.crewRoster.Count)}kgs of water per day," +
+					$" but we only have {Mathf.Round(ship.cargo[0].amount_kg)}kgs. ";
+			}
+
+			message += "\n\nMen without food and water are mutinous creatures - they’ll sooner leave the voyage than follow a leader who does not care for them!";
+			GameVars.ShowANotificationMessage(message);
+
+			checkedStarvingThirsty = true;
+			return true;
+		}
+		else {
+			string notificationMessage = "";
+
+			//Check food
+			if (lowFood) {
+				int crewDeathCount = CrewQuitsBecauseStarvingOrThirsty();
+				notificationMessage += crewDeathCount + " crewmember(s) quit because you left without a full store of Provisions";
+			}
+			
+			//Check water
+			if (lowWater) {
+				if (lowFood) {
+					notificationMessage += ", and ";
+				}
+				int crewDeathCount = CrewQuitsBecauseStarvingOrThirsty();
+				notificationMessage += crewDeathCount + " crewmember(s) quit because you left without a full store of water.";
+			}
+			//now update the notification string with the message
+			if (!string.IsNullOrEmpty(notificationMessage)) {
+				// KD TODO: Need to revisit if i reimplemented this as robert had it
+				GameVars.ShowANotificationMessage(notificationMessage);
+			}
+		}
+
+		if (lowFood || lowWater) {
+			return !checkedStarvingThirsty;
+		}
+		else {
+			return false;
+		}
+	}
+	//Getting the win total for board games - roughly half of what they need to not starve. 
+	public float GameResultFood() {
+		
+		float ans;
+		
 		if (ship.cargo[1].amount_kg < dailyProvisionsKG * ship.crewRoster.Count) {
-			//start a counter of how many crew members die
-			int crewDeathCount = 0;
-			//make sure we roll for each crew member
-			for (int i = 0; i < ship.crewRoster.Count; i++) {
-				//--we'll base this chance off of a static 30% plus any effect from clout(a maximum change of 25 % in either direction
-				float rollChance = 30 - (((GameVars.playerShipVariables.ship.playerClout - 50f) / 100) / 2);
-				//some crew needs to leave
-				if (Random.Range(0, 100) <= rollChance) {
-					//Kill a crewmember
-					KillCrewMember();
-					crewDeathCount++;
-					ProvisionsDeaths = true;
-				}
-			}
-			notificationMessage += crewDeathCount + " crewmember(s) quit because you left without a full store of Provisions";
+		
+			float neededCargo = (dailyProvisionsKG * ship.crewRoster.Count) - ship.cargo[1].amount_kg;
+			ship.cargo[1].amount_kg += (neededCargo / 2.0f);
+
+
+			ans = neededCargo / 2.0f;
 		}
-		if (ProvisionsDeaths) notificationMessage += ", and ";
-		//We need to check to see if there is enough water for a single days journey for all the crew
-		//if there isn't--some of the crew will leave the ship
+		else {  ship.cargo[1].amount_kg += .96f * ship.crewRoster.Count;
+			ans = .96f * ship.crewRoster.Count;
+		}
+
+		return ans;
+	}
+
+	public float GameResultWater() {
+
+		float ans;
+
 		if (ship.cargo[0].amount_kg < dailyWaterKG * ship.crewRoster.Count) {
-			//start a counter of how many crew members die
-			int crewDeathCount = 0;
-			//make sure we roll for each crew member
-			for (int i = 0; i < ship.crewRoster.Count; i++) {
-				//--we'll base this chance off of a static 30% plus any effect from clout(a maximum change of 25 % in either direction
-				float rollChance = 30 - (((GameVars.playerShipVariables.ship.playerClout - 50f) / 100) / 2);
-				//some crew needs to leave
-				if (Random.Range(0, 100) <= rollChance) {
-					//Kill a crewmember
-					KillCrewMember();
-					crewDeathCount++;
-				}
+
+			float neededWater = (dailyWaterKG * ship.crewRoster.Count) - ship.cargo[0].amount_kg;
+			ship.cargo[0].amount_kg += (neededWater / 2.0f);
+
+
+			ans = neededWater / 2.0f;
+		}
+		else {
+			ship.cargo[0].amount_kg += .96f * ship.crewRoster.Count;
+			ans = .96f * ship.crewRoster.Count;
+		}
+
+		return ans;
+	}
+
+
+
+
+
+	int CrewQuitsBecauseStarvingOrThirsty() {
+		int deathCount = 0;
+		for (int i = 0; i < ship.crewRoster.Count; i++) {
+			float rollChance = 30 - (((GameVars.playerShipVariables.ship.playerClout - 50f) / 100) / 2);
+			if (Random.Range(0, 100) <= rollChance) {
+				KillCrewMember();
+				deathCount++;
 			}
-			notificationMessage += crewDeathCount + " crewmember(s) quit because you left without a full store of water.";
 		}
-		//now update the notification string with the message
-		if(!string.IsNullOrEmpty(notificationMessage)) {
-			// KD TODO: Need to revisit if i reimplemented this as robert had it
-			GameVars.ShowANotificationMessage(notificationMessage);
-		}
+		return deathCount;
 	}
 
 	public void UpdateDayNightCycle(bool restartCycle) {
@@ -862,7 +1040,7 @@ public class script_player_controls : MonoBehaviour
 			GameVars.mat_water.SetColor("_Color", waterColorDay);
 			GameVars.mat_waterCurrents.color = Color.white;
 			testAngle = GameVars.skybox_MAIN_CELESTIAL_SPHERE.transform.localRotation.y;
-			Debug.Log(initialAngle + "*********************");
+			Debug.Log("Initial Angle " + initialAngle + "*********************");
 			GameVars.skybox_horizonColor.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, 1f, 1f, 1f);
 			GameVars.skybox_clouds.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, 1f, 1f);
 			GameVars.skybox_sun.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, 1f, 1f);
@@ -1105,30 +1283,32 @@ public class script_player_controls : MonoBehaviour
 		//We have to take this offset into account later because the player route array will always have 1 less in the array because it doesn't have the origin position as a separate route index(it's not a route)
 		//	--rather than use Count-1 to get the last index of the line renderer, we can just use Count from the route log
 		if (isANewGame) {
-			GameVars.playerGhostRoute.GetComponent<LineRenderer>().positionCount = 1;
-			GameVars.playerGhostRoute.GetComponent<LineRenderer>().SetPosition(0, transform.position - new Vector3(0, transform.position.y, 0)); //We subtract the y value so that the line sits on the surface of the water and not in the air
+			GameVars.playerGhostRoute.positionCount = 1;
+
+			//TODO: find out why this is always setting you to Samothrace instead of your actual starting position
+			GameVars.playerGhostRoute.SetPosition(0, transform.position - new Vector3(0, transform.position.y, 0)); //We subtract the y value so that the line sits on the surface of the water and not in the air
 																																			//TODO this is a quick and dirty fix to load games--the origin point is already established in a loaded game so if we add 1 to the index, it creates a 'blank' Vector.zero route index in the ghost trail
 		}
 		else if (GameVars.isLoadedGame) {
-			GameVars.playerGhostRoute.GetComponent<LineRenderer>().positionCount = journey.routeLog.Count;
+			GameVars.playerGhostRoute.positionCount = journey.routeLog.Count;
 			//TODO This is a quick fix--we use a 0,0,0 to designate the settlement as a stopping points rather than a normal one. This ruins the ghost trail however so we will just use position [0] instead --which just makes no visual diference in the trail
 			if (journey.routeLog[journey.routeLog.Count - 1].theRoute[1].x < 1)
-				GameVars.playerGhostRoute.GetComponent<LineRenderer>().SetPosition(journey.routeLog.Count - 1, journey.routeLog[journey.routeLog.Count - 1].theRoute[0] - new Vector3(0, transform.position.y, 0));//we always use the destination coordinate of the route, because the origin point was already added the last time so [1] position			
+				GameVars.playerGhostRoute.SetPosition(journey.routeLog.Count - 1, journey.routeLog[journey.routeLog.Count - 1].theRoute[0] - new Vector3(0, transform.position.y, 0));//we always use the destination coordinate of the route, because the origin point was already added the last time so [1] position			
 			else
-				GameVars.playerGhostRoute.GetComponent<LineRenderer>().SetPosition(journey.routeLog.Count - 1, journey.routeLog[journey.routeLog.Count - 1].theRoute[1] - new Vector3(0, transform.position.y, 0));//we always use the destination coordinate of the route, because the origin point was already added the last time so [1] position		
+				GameVars.playerGhostRoute.SetPosition(journey.routeLog.Count - 1, journey.routeLog[journey.routeLog.Count - 1].theRoute[1] - new Vector3(0, transform.position.y, 0));//we always use the destination coordinate of the route, because the origin point was already added the last time so [1] position		
 
 			//if it isn't a loaded game then do the original code
 		}
 		else {
-			GameVars.playerGhostRoute.GetComponent<LineRenderer>().positionCount = journey.routeLog.Count + 1;//we add one here because the route list never includes the origin position--so we add it manually for a new game
+			GameVars.playerGhostRoute.positionCount = journey.routeLog.Count + 1;//we add one here because the route list never includes the origin position--so we add it manually for a new game
 																										 //TODO This is a quick fix--we use a 0,0,0 to designate the settlement as a stopping points rather than a normal one. This ruins the ghost trail however so we will just use position [0] instead --which just makes no visual diference in the trail
 
 			if (journey.routeLog[journey.routeLog.Count - 1].theRoute[1].x < 1) {
-				GameVars.playerGhostRoute.GetComponent<LineRenderer>().SetPosition(journey.routeLog.Count, journey.routeLog[journey.routeLog.Count - 1].theRoute[0] - new Vector3(0, transform.position.y, 0));//we always use the destination coordinate of the route, because the origin point was already added the last time so [1] position		
+				GameVars.playerGhostRoute.SetPosition(journey.routeLog.Count, journey.routeLog[journey.routeLog.Count - 1].theRoute[0] - new Vector3(0, transform.position.y, 0));//we always use the destination coordinate of the route, because the origin point was already added the last time so [1] position		
 
 			}
 			else {
-				GameVars.playerGhostRoute.GetComponent<LineRenderer>().SetPosition(journey.routeLog.Count, journey.routeLog[journey.routeLog.Count - 1].theRoute[1] - new Vector3(0, transform.position.y, 0));//we always use the destination coordinate of the route, because the origin point was already added the last time so [1] position		
+				GameVars.playerGhostRoute.SetPosition(journey.routeLog.Count, journey.routeLog[journey.routeLog.Count - 1].theRoute[1] - new Vector3(0, transform.position.y, 0));//we always use the destination coordinate of the route, because the origin point was already added the last time so [1] position		
 			}
 		}
 	}
@@ -1199,7 +1379,7 @@ public class script_player_controls : MonoBehaviour
 
 	}
 
-	public void UpdateNavigatorBeaconAppearenceBasedOnDistance(GameObject beacon) {
+	public void UpdateNavigatorBeaconAppearenceBasedOnDistance(Beacon beacon) {
 		//Get position of player and beacon
 		Vector3 playerPos = transform.position;
 		Vector3 beaconPos = beacon.transform.position;
@@ -1208,18 +1388,16 @@ public class script_player_controls : MonoBehaviour
 
 		//If the distance is less than 100, start fading the beacon to transparent, and fading it's size and reverse
 		//	that if it is 100. We'll be using the same formula to fade the celestial sphere colors.
+		var line = beacon.GetComponent<LineRenderer>();
 
 		//Update size
 		float calculatedWidth = Utils.GetRange(distance, 0, 100f, .1f, 5f);
-		beacon.GetComponent<LineRenderer>().startWidth = calculatedWidth;
-		beacon.GetComponent<LineRenderer>().endWidth = calculatedWidth;
+		line.startWidth = calculatedWidth;
+		line.endWidth = calculatedWidth;
 
-		Color colorEnd = new Color(6f / 255f, 167f / 255f, 1f, 0);
-
-		//Update transparency
+		//Update transparency (infer color from the inspector set values to reduce hardcoding and allow navigator and crew beacons to differ)
 		float alpha = Utils.GetRange(distance, 0, 100f, 0, 1f);
-		beacon.GetComponent<LineRenderer>().startColor = new Color(88f / 255f, 1f, 211 / 255f, alpha);
-		beacon.GetComponent<LineRenderer>().endColor = colorEnd;
+		line.startColor = line.startColor.With(a: alpha);
 	}
 
 
@@ -1272,7 +1450,7 @@ public class script_player_controls : MonoBehaviour
 			if (id == ID) {
 				Debug.Log("Found match in memory lookup");
 				string settlementName = GameVars.GetSettlementFromID(id).name;
-				GameVars.playerGhostRoute.SetActive(true);
+				GameVars.playerGhostRoute.gameObject.SetActive(true);
 				GameVars.ShowANotificationMessage("After a long and difficult journey, you and your crew finally found your bearings in the great sea!" +
 										  " You and your crew recognize the waters surrounding " + settlementName + " and remember the sea routes," +
 										  " you are all familiar with!");
@@ -1466,7 +1644,7 @@ public class script_player_controls : MonoBehaviour
 		foreach (string zoneName in windZoneNamesToTurnOn) {
 			//TODO:This is a quick and dirty way to make sure we don't get errors when on game world edge trying to turn zones on/off that don't exist
 			try {
-				Debug.Log("WIND" + zoneName);
+				//Debug.Log("WIND" + zoneName);
 				GameVars.windZoneParent.transform.Find(zoneName).transform.GetChild(0).gameObject.SetActive(true);
 			}
 			catch { }
@@ -1599,7 +1777,7 @@ public class script_player_controls : MonoBehaviour
 
 		if (!isPort) {//If this isn't a port--then add a journey log at the end
 					  //Add a new route to the player journey log
-			journey.AddRoute(new PlayerRoute(transform.position, transform.position, ship.totalNumOfDaysTraveled), gameObject.GetComponent<script_player_controls>(), GameVars.currentCaptainsLog);
+			journey.AddRoute(new PlayerRoute(transform.position, transform.position, ship.totalNumOfDaysTraveled), gameObject.GetComponent<script_player_controls>(), GameVars.CaptainsLog);
 			//Update player ghost route
 			UpdatePlayerGhostRouteLineRenderer(GameVars.IS_NOT_NEW_GAME);
 		}

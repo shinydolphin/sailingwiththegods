@@ -11,9 +11,68 @@ public static class Utils
 		return (((Xinput - Xmin) / (Xmax - Xmin)) * (Ymax - Ymin)) + Ymin;
 
 	}
+#if UNITY_EDITOR
+	
+	public static void drawString(string text, Vector3 worldPos, Color? colour = null) {
+		UnityEditor.Handles.BeginGUI();
+
+		var restoreColor = GUI.color;
+
+		if (colour.HasValue) GUI.color = colour.Value;
+		var view = UnityEditor.SceneView.currentDrawingSceneView;
+		Vector3 screenPos = view.camera.WorldToScreenPoint(worldPos);
+
+		if (screenPos.y < 0 || screenPos.y > Screen.height || screenPos.x < 0 || screenPos.x > Screen.width || screenPos.z < 0)
+            {
+			GUI.color = restoreColor;
+			UnityEditor.Handles.EndGUI();
+			return;
+		}
+
+		Vector2 size = GUI.skin.label.CalcSize(new GUIContent(text));
+		GUI.Label(new Rect(screenPos.x - (size.x / 2), -screenPos.y + view.position.height + 4, size.x, size.y), text);
+		GUI.color = restoreColor;
+		UnityEditor.Handles.EndGUI();
+	}
+#endif
+
+	public static T WeightedRandomElement<T>(this IEnumerable<T> self, IEnumerable<float> weights) {
+		var totalWeight = weights.Sum();
+		var random = UnityEngine.Random.Range(0f, 1f) * totalWeight;
+		var currWeight = 0f;
+		for (var i = 0; i < weights.Count(); i++) {
+			currWeight += weights.ElementAt(i);
+			if (random < currWeight) {
+				return self.ElementAt(i);
+			}
+		}
+
+		return default(T);
+	}
+
+	public static Vector2 XZ(this Vector3 self) => new Vector2(self.x, self.z);
+	public static Vector2 Reverse(this Vector2 self) => new Vector2(self.y, self.x);
+
+	public static Vector2 With(this Vector2 self, float? x = null, float? y = null) =>
+		new Vector2(x ?? self.x, y ?? self.y);
+
+	public static Vector3 With(this Vector3 self, float? x = null, float? y = null, float? z = null) =>
+		new Vector3(x ?? self.x, y ?? self.y, z ?? self.z);
+
+	public static Color With(this Color self, float? r = null, float? g = null, float? b = null, float? a = null) =>
+		new Color(r ?? self.r, g ?? self.g, b ?? self.b, a ?? self.a);
 
 	public static T RandomElement<T>(this IEnumerable<T> list) {
-		return list.ElementAt(UnityEngine.Random.Range(0, list.Count() - 1));
+		return list.ElementAtOrDefault(UnityEngine.Random.Range(0, list.Count()));
+	}
+
+	// Based on: https://stackoverflow.com/questions/11883469/takewhile-but-get-the-element-that-stopped-it-also
+	public static IEnumerable<T> TakeUntil<T>(this IEnumerable<T> data, Func<T, bool> predicate) {
+		foreach (var item in data) {
+			yield return item;
+			if (predicate(item))
+				break;
+		}
 	}
 
 	public static bool FastApproximately(float a, float b, float threshold) {

@@ -1,18 +1,26 @@
 using UnityEngine;
 using UnityEditor;
+using System.Linq;
 
 public class SpriteImporter : AssetPostprocessor
 {
 	void OnPreprocessTexture() {
 		TextureImporter importer = (TextureImporter)assetImporter;
 
-		// don't rerun if asset already existed
-		Object asset = AssetDatabase.LoadAssetAtPath(importer.assetPath, typeof(Texture2D));
-		if (asset != null) {
+		// attempting to load the asset and looking at its type doesn't work because it may not be in the database yet, and will get marked as first import every time. importSettingsMissing gets around this issue.
+		if (!importer.importSettingsMissing) {
 			return;
 		}
 
-		if (assetPath.Contains("Sprites") && assetPath.Contains(".png")) {
+		var paths = new string[]
+		{
+			"Sprites",
+			"crew_portraits",
+			"settlement_coins",
+			"settlement_portraits"
+		};
+
+		if (paths.Any(p => assetPath.Contains(p)) && assetPath.Contains(".png")) {
 			importer.textureType = TextureImporterType.Sprite;
 			importer.spriteImportMode = SpriteImportMode.Single;
 			importer.mipmapEnabled = false;

@@ -13,6 +13,7 @@ public static class RandomEvents
 	//
 	//#########################################################################################################
 
+
 	// it makes sense for this to have access to the ship, the ship's movement data and position, and the crew, as well as things like clout
 	// doesn't need access to things like the GUI
 	public static void WillARandomEventHappen(GameVars gameVars, Ship ship, ShipSpeedModifiers shipSpeedModifiers, Transform shipTransform) {
@@ -24,8 +25,12 @@ public static class RandomEvents
 		float tenthPlaceTemp = (ship.totalNumOfDaysTraveled - Mathf.FloorToInt(ship.totalNumOfDaysTraveled));
 		tenthPlaceTemp *= 10;
 		//Debug.Log (tenthPlaceTemp + "  " + hundredthPlaceTemp);
+
+		const int noon = 5;
+		const int midnight = 9;
+
 		//If we are at a half day's travel, then see if a random event occurs
-		if ((Mathf.FloorToInt(tenthPlaceTemp) == 5 || Mathf.FloorToInt(tenthPlaceTemp) == 9) && !gameVars.isPerformingRandomEvent) {
+		if ((Mathf.FloorToInt(tenthPlaceTemp) == noon || Mathf.FloorToInt(tenthPlaceTemp) == midnight /*|| Mathf.FloorToInt(tenthPlaceTemp) ==1 || Mathf.FloorToInt(tenthPlaceTemp) ==3 || Mathf.FloorToInt(tenthPlaceTemp) ==7*/) && !gameVars.isPerformingRandomEvent) {
 			gameVars.isPerformingRandomEvent = true;
 			float chanceOfEvent = .95f; //0 - 1 value representing chance of a random event occuring
 										//We determine if the 
@@ -61,9 +66,12 @@ public static class RandomEvents
 			//If we do or don't get a random event, we should always get a message from the crew--let's call them tales
 			//here they describe things like any cities nearby if the crew is familiar or snippets of greek mythology, or they
 			//may be from a list of messages concering any nearby zones of influence from passing settlements/locations of interest
-			ship.shipCaptainsLog.Add(gameVars.currentLogPool[Random.Range(0, gameVars.currentLogPool.Count)]);
-			ship.shipCaptainsLog[ship.shipCaptainsLog.Count - 1].dateTimeOfEntry = ship.totalNumOfDaysTraveled + " days";
-			gameVars.currentCaptainsLog = ship.shipCaptainsLog[ship.shipCaptainsLog.Count - 1].dateTimeOfEntry + "\n" + ship.shipCaptainsLog[ship.shipCaptainsLog.Count - 1].logEntry + "\n\n" + gameVars.currentCaptainsLog;
+			var log = gameVars.GetRandomCaptainsLogFromPool();
+			if(log != null) {
+				ship.shipCaptainsLog.Add(log);
+				log.dateTimeOfEntry = ship.totalNumOfDaysTraveled + " days";
+				gameVars.AddToCaptainsLog(log.dateTimeOfEntry + "\n" + log.logEntry);
+			}
 		}
 
 
@@ -71,7 +79,7 @@ public static class RandomEvents
 		//	by turning it off when the the trigger number changes--which means it won't take effect
 		//	again until the next time the trigger number occurs
 		//Debug.Log (Mathf.FloorToInt(tenthPlaceTemp));
-		if (Mathf.FloorToInt(tenthPlaceTemp) != 5 && Mathf.FloorToInt(tenthPlaceTemp) != 9) gameVars.isPerformingRandomEvent = false;
+		if (Mathf.FloorToInt(tenthPlaceTemp) != noon && Mathf.FloorToInt(tenthPlaceTemp) != midnight /*&& Mathf.FloorToInt(tenthPlaceTemp) !=1 && Mathf.FloorToInt(tenthPlaceTemp) !=3 && Mathf.FloorToInt(tenthPlaceTemp) !=7*/) 		gameVars.isPerformingRandomEvent = false;
 
 	}
 
@@ -91,6 +99,14 @@ public static class RandomEvents
 			this.shipSpeedModifiers = shipSpeedModifiers;
 			this.shipTransform = shipTransform;
 			this.aggregateCloutScore = aggregateCloutScore;
+		}
+
+		public virtual bool isValid() {
+			return true;
+		}
+
+		public virtual float Weight() {
+			return 1f;
 		}
 
 		public abstract void Execute();
@@ -123,8 +139,6 @@ public static class RandomEvents
 
 			//If there are no available members then just return a null flagged member initialize in the beggining of this function
 			return killedMate;
-
-
 		}
 	}
 
@@ -141,7 +155,21 @@ public static class RandomEvents
 	}
 
 	static void ExecuteEvent(IEnumerable<System.Type> options, GameVars gameVars, Ship ship, ShipSpeedModifiers shipSpeedModifiers, Transform shipTransform, float aggregateCloutScore) {
-		var eventObj = CreateEvent(options.RandomElement(), gameVars, ship, shipSpeedModifiers, shipTransform, aggregateCloutScore);
-		eventObj.Execute();
+		
+		IEnumerable<Event> events = options.Select(type => CreateEvent(type, gameVars, ship, shipSpeedModifiers, shipTransform, aggregateCloutScore));
+
+		IEnumerable<Event> filteredEvents = events.Where(evnt => evnt.isValid() == true);
+
+		//calls for an event/ mini game to play wiht a higher chance that minigames will happen due to their higher Weight() return value
+		var eventObj = filteredEvents.WeightedRandomElement(filteredEvents.Select(element => element.Weight()));
+
+		if (eventObj != null) {
+			eventObj.Execute();
+		}
+		else {
+			Debug.Log("EVENT WAS NULL.");
+		}
 	}
+
+
 }

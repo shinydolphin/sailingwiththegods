@@ -42,11 +42,11 @@ public class PortScreen : ViewBehaviour<PortViewModel>
 			Label = "Town",
 			OnClick = model.GoToTown
 		}));
+		Town.Interactable = model.allowTownAccess;
 
 		Info?.Bind(ValueModel.New(new ButtonViewModel {
 			OnClick = () => Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
 				Icon = model.PortCoin,
-				IconScale = 2,                      // coin icons have a bunch of padding in their sprite, so scale it up
 				Title = model.PortName,
 				Subtitle = model.PortPopulationRank,
 				Message = model.PortDescription
@@ -60,7 +60,7 @@ public class PortScreen : ViewBehaviour<PortViewModel>
 
 		Tavern?.Bind(ValueModel.New(new ButtonViewModel {
 			Label = "Tavern",
-			OnClick = () => Globals.UI.Show<TavernView, TavernViewModel>(new TavernViewModel())
+			OnClick = () => Globals.MiniGames.EnterScene("MiniGameMainMenu")
 		}));
 
 		Repairs?.Bind(ValueModel.New(new ButtonViewModel {
