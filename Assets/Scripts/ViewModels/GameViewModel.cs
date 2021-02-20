@@ -110,7 +110,8 @@ public class GameViewModel : Model
 
 		// TODO: For now, skip straight to starting the game since i turned off crew selection
 		GUI_startMainGame();
-
+		//play the intro for the game
+		time_Line_controll.play();
 		// TODO: Turned off crew selection because it's too overwhelming. Needs to be reworked.
 		//title_crew_select.SetActive(true);
 		//GUI_SetupStartScreenCrewSelection();
