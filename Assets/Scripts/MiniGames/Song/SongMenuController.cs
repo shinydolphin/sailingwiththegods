@@ -6,29 +6,43 @@ using UnityEngine.SceneManagement;
 // used for the tavern singing minigaame. TODO: Rename
 public class SongMenuController : MonoBehaviour
 {
+	public GameObject game_state,main_state;
     public void PlayWisdomSong()
     {
-        StartCoroutine(LoadSong("WisdomSongScene"));
-    }
+		SongGameController.set_song(4);
+		game_state.SetActive(true);
+		main_state.SetActive(false);
+
+	}
 
     public void PlayMilitarySong()
     {
-        StartCoroutine(LoadSong("WarSongScene"));
-    }
+		SongGameController.set_song(2);
+		game_state.SetActive(true);
+		main_state.SetActive(false);
+	}
 
     public void PlayMournfulSong()
     {
-        StartCoroutine(LoadSong("SorrowSongScene"));
-    }
+		SongGameController.set_song(3);
+		game_state.SetActive(true);
+		main_state.SetActive(false);
+	}
 
     public void PlayPartySong()
     {
-        StartCoroutine(LoadSong("PartySongScene"));
-    }
+		SongGameController.set_song(1);
+		game_state.SetActive(true);
+		main_state.SetActive(false);
+	}
 
 	public void MainMenuScene()
     {
-		StartCoroutine(UnloadSong());
+		//game_state.SetActive(false);
+		//main_state.SetActive(true);
+		//StartCoroutine(UnloadSong());
+		//SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 
 	public void BackToTavern() {

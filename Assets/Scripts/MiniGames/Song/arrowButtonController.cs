@@ -10,11 +10,14 @@ public class arrowButtonController : MonoBehaviour
     public KeyCode keyToPress;
 
     private Button _button;
-
-    // Start is called before the first frame update
-    void Start()
+	public Color good, bad, perfect;
+	public Button arrow;
+	Color defalt_color;
+	// Start is called before the first frame update
+	void Start()
     {
         _button = GetComponent<Button>();
+		
     }
 
     // Update is called once per frame
@@ -24,8 +27,8 @@ public class arrowButtonController : MonoBehaviour
         {
 			//changes button color when key is pressed
             FadeToColor(_button.colors.pressedColor);
-            //ClickButton
-            _button.onClick.Invoke();
+			//ClickButton
+			_button.onClick.Invoke();
            // Debug.Log("button pressed");
         }
         else if (Input.GetKeyUp(keyToPress))
@@ -39,5 +42,6 @@ public class arrowButtonController : MonoBehaviour
 	{
     Graphic graphic = GetComponent<Graphic>();
     graphic.CrossFadeColor(color, _button.colors.fadeDuration, true, true);
+	graphic.CrossFadeColor(color, arrow.colors.fadeDuration, true, true);
 	}
 }
