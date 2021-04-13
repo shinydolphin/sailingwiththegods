@@ -39,6 +39,7 @@ TagManager:
   - UpActivator
   - DownActivator
   - RightActivator
+  - Arrow
   layers:
   - Default
   - TransparentFX

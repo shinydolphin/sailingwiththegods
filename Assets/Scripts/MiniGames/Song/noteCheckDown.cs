@@ -38,6 +38,7 @@ public class noteCheckDown : MonoBehaviour
             canBePressed = false;
             SongGameController.instance.NoteHit();
         }
+		//else { SongGameController.instance.NoteMissed(); }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -47,8 +48,13 @@ public class noteCheckDown : MonoBehaviour
             canBePressed = true;
         }
     }
-
-    private void OnTriggerExit2D(Collider2D other)
+	private void OnTriggerStay(Collider other) {
+		if (canBePressed) 
+		{
+			other.SendMessage("flash");
+		}
+		}
+	private void OnTriggerExit2D(Collider2D other)
     {
         if (this.gameObject.activeSelf)
         {

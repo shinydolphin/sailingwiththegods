@@ -2,15 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
+using System.Linq;
 
 public class SongGameController : MonoBehaviour
 {
 	public static bool party_song=false, War_song=false, Sorrow_Song=false, Wisdom_Song=true;
-
+	public Text victory, failure;
 	private AudioSource[] musicList;
 	public AudioSource[] party_list, War_list, Sorrow_list, Wisdom_list;
 	private int songChoiceNum;
-	
+	public Animator am;
     public static bool startPlaying;
 	public CanvasGroup win, lose;
 	//End Game Manager
@@ -20,24 +22,32 @@ public class SongGameController : MonoBehaviour
     public static bool endGameState;
 
     public ArrowController arrowController;
-
-    //score holders
-    public static float currentScore;
+	private List<string> lose_message = new List<string>();
+	private List<string> lose_message_badly = new List<string>();
+	private List<string> did_not_win_message = new List<string>();
+	private List<string> Win_message = new List<string>();
+	bool setmessage;
+	//score holders
+	public static float currentScore;
 	public  static int score_check;
 	public int scorePerNote = 100;
+	int clout = 0;
 
-    public static int currentMultiplier;
+	public static int currentMultiplier;
     public int multiplierTracker;
     public int[] multiplierThresholds;
 	
 	public static float Soere_speed {
 		get {
 			//play with this formula to adhust arrow speed based on scrore
-			float x = (currentScore / targetScore) ;
-			//Debug.Log("X speed " + x);
-			if (currentMultiplier > 2) { return 1 + x + (float)(currentMultiplier / 2f); }
-			else { return 1 + x; }
-			
+			float x = (currentScore / targetScore) *2;
+			//Debug.Log("X speed " + x+ (float)(currentMultiplier / currentMultiplier));
+			//if (currentMultiplier == 2) { return 1 + x + (float)(currentMultiplier / 2f); }
+			//else if(currentMultiplier == 3) { return 1 + x + (float)(currentMultiplier / 3f); }
+			//else if(currentMultiplier == 4) { return 1 + x + (float)(currentMultiplier / 4f); }
+			//else { return 1 + x; }
+			return 1 + x;
+
 		}
 	}
 	//text boxes
@@ -67,12 +77,39 @@ public class SongGameController : MonoBehaviour
 			case 4: Wisdom_Song = true; break;
 		}
 	}
+	void set_end_message() 
+	{
+
+		string myFile = Resources.Load<TextAsset>("Song\\You Lose Badly").text;
+		lose_message_badly = myFile.Split('\n').ToList();
+
+		 myFile = Resources.Load<TextAsset>("Song\\You Lose").text;
+		lose_message = myFile.Split('\n').ToList();
+		myFile = Resources.Load<TextAsset>("Song\\You Win by almost nothing").text;
+		did_not_win_message = myFile.Split('\n').ToList();
+		myFile = Resources.Load<TextAsset>("Song\\You Win").text;
+		Win_message = myFile.Split('\n').ToList();
+
+		
+		
+	}
 	private void Awake() {
-		if (party_song) { musicList = party_list; }
-		else if (War_song) { musicList = War_list; }
-		else if (Sorrow_Song) { musicList = Sorrow_list; }
-		else if (Wisdom_Song) { musicList = Wisdom_list; }
+		setmessage = false;
+		if (party_song) {
+			musicList = party_list;
+		}
+		else if (War_song) {
+			musicList = War_list;
+		}
+		else if (Sorrow_Song) {
+			musicList = Sorrow_list;
+		}
+		else if (Wisdom_Song) {
+			musicList = Wisdom_list;
+		}
 		currentScore = 0;
+		am.SetBool("open", false);
+		set_end_message();
 	}
 	// Start is called before the first frame update
 	void Start()
@@ -93,11 +130,50 @@ public class SongGameController : MonoBehaviour
         startPlaying = false;
     }
 
-    // Update is called once per frame
-    void Update()
+	void lose_game(float c) 
+	{
+		if (!setmessage) 
+			{
+			if (c > .6f) { failure.text = lose_message[Random.Range(0, lose_message.Count - 1)]; }
+			else { failure.text = lose_message_badly[Random.Range(0, lose_message_badly.Count - 1)]; }
+		}
+		//failure
+		
+		int x = Random.Range(1, 4);
+		endGameState = true;
+		lose.interactable = true;
+		//lose.alpha += Time.deltaTime; cant use here
+		setmessage = true;
+	}
+
+	void win_game(float score) {
+		if (!setmessage) 
+			{
+			if (score > .60f) {
+				clout = (int)(15 * score / 100);
+				victory.text = Win_message[Random.Range(0, Win_message.Count - 1)] + " (clout +" + clout + ")";
+				
+			}
+			else {
+				clout = 0; //no grade as the claint put it
+				victory.text = did_not_win_message[Random.Range(0, did_not_win_message.Count - 1)]+" (clout +"+clout+")";
+				
+			}
+		}
+		
+		
+		endGameState = true;		
+		win.interactable = true;
+		win.alpha += Time.deltaTime;
+		if (!endGameState && Globals.GameVars != null) { Globals.GameVars.AdjustPlayerClout(clout, false); }
+		setmessage = true;
+	}
+	// Update is called once per frame
+	void Update()
     {
-        // Debug.Log(gameEndTimerHolder);
-        if (!startPlaying)
+		float score_precent = (currentScore / targetScore) * 100;
+		// Debug.Log(gameEndTimerHolder);
+		if (!startPlaying)
         {
             if (Input.anyKeyDown)
             {
@@ -106,7 +182,7 @@ public class SongGameController : MonoBehaviour
                 arrowController.hasStarted = true;
                 musicList[songChoiceNum].Play();
 				gameEndTimerValue = musicList[songChoiceNum].clip.length;
-
+				am.SetBool("open",true);
 			}
         }
 
@@ -115,27 +191,28 @@ public class SongGameController : MonoBehaviour
             gameEndTimerHolder += Time.deltaTime;
         }
 
-        //End Game Manger
-        if (gameEndTimerHolder >= gameEndTimerValue && !(currentScore > targetScore))
-        {
-            endGameState = true;
-			lose.interactable = true;
-			lose.alpha += Time.deltaTime;
+		//End Game Manger
+		if (LyricsController.word_check()) {
+
+			//Debug.Log("score check1 " + score_precent);
+			//Debug.Log("score check2 " + score_precent/100);
+
+			win_game(score_precent);
+
 		}
-        if (currentScore >= targetScore)
+		else  if (!endGameState && gameEndTimerHolder >= gameEndTimerValue)
         {
-			//if (!endGameState) 
-			//	{ Globals.GameVars.AdjustPlayerClout(5, false); }
-            endGameState = true;
-			win.interactable = true;
-			win.alpha += Time.deltaTime;
-			
+			lose_game(score_precent);
+			Debug.Log("time up");
+			lose.alpha = 1;
 		}
+      
 
         //ending game 
         if (endGameState)
         {
 			musicList[songChoiceNum].volume -= .4f * Time.deltaTime;
+			
 			if (musicList[songChoiceNum].volume <= 0) 
 				{ musicList[songChoiceNum].Stop(); }
 			
@@ -163,7 +240,7 @@ public class SongGameController : MonoBehaviour
         multiText.text = "Multiplier: x:" + currentMultiplier;
 
         currentScore += scorePerNote * currentMultiplier;
-		score_check = scorePerNote * currentMultiplier;//only line I added here
+		score_check += scorePerNote * currentMultiplier;//ref to add the wards in LyricsController.cs
 		scoreText.text = "Score: " + currentScore;
     }
 
@@ -174,9 +251,11 @@ public class SongGameController : MonoBehaviour
 
         currentMultiplier = 1;
         multiplierTracker = 0;
-
-        multiText.text = "Multiplier: x:" + currentMultiplier;
-    }
+		currentScore -= scorePerNote * currentMultiplier;
+		if (currentScore < 0) { currentScore = 0; }
+		multiText.text = "Multiplier: x:" + currentMultiplier;
+		scoreText.text = "Score: " + currentScore;
+	}
 
    // public static void ChangeOppacityOfLyrics (Text lyricsText)
 	//{
