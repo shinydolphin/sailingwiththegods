@@ -1,5 +1,6 @@
 // Mylo Gonzalez
 
+using Nav;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,17 +11,44 @@ public class YarnTavern : MonoBehaviour
 {
 
 	private DialogScreen ds;
+	private Navigation _Nav;
 
-	void Awake() 
+	void Start() 
 	{
 		ds = GetComponent<DialogScreen>();
+		ds.Runner.AddCommandHandler("displayknownsettlements", GenerateKnownSettlementUI);
+		_Nav = GameObject.Find("Nav").GetComponent<Navigation>();
 	}
 
-	[YarnCommand("displayKnownSettlements")]
-	public void GenerateKnownSettlementUI() 
+	[YarnCommand("settaverninfo")]
+	public void SetTavernInformation() {
+		ds.YarnUI.onDialogueEnd.RemoveAllListeners();
+		ds.YarnUI.onDialogueEnd.AddListener(ds.gui.CloseTavernDialog);
+	}
+
+
+	[YarnCommand("getcurrentsettlement")]
+	public void GetCurrentSettlement() {
+		ds.Storage.SetValue("$known_city", Globals.GameVars.currentSettlement.name);
+		ds.Storage.SetValue("$known_city_ID", Globals.GameVars.currentSettlement.settlementID);
+	}
+
+	//We need this so we can make sure not to let the player order a guide to the city they're currently at
+	[YarnCommand("checkifcurrent")]
+	public void CheckIfAskingAboutCurrentSettlement() {
+		ds.Storage.SetValue("$asking_current", ds.Storage.GetValue("$known_city_ID").AsNumber == Globals.GameVars.currentSettlement.settlementID);
+	}
+
+	[YarnCommand("getknownsettlementnumber")]
+	public void GetNumberOfKnownSettlements() {
+		ds.Storage.SetValue("$settlement_number", Globals.GameVars.playerShipVariables.ship.playerJournal.knownSettlements.Count);
+	}
+	
+	public void GenerateKnownSettlementUI(string [] parameters, System.Action onComplete) 
 	{
+		ds.yarnOnComplete = onComplete;
 		Globals.UI.Show<TavernView, TavernViewModel>(new TavernViewModel(ds));
-		Debug.Log("POPPING KNOWN SETLLEMTNS");
+		//Debug.Log("POPPING KNOWN SETLLEMTNS");
 	}
 
 	[YarnCommand("randomGuide")]
@@ -33,17 +61,17 @@ public class YarnTavern : MonoBehaviour
 		if(guideText[i].TextQA[0].Equals("")) 
 		{
 			guideText[i].TextQA = guideText[1].TextQA;
-			Debug.Log("WAS EMPT E");
-
+			//Debug.Log("WAS EMPT E");
+			
 		}
 		if (guideText[i].TextQA[1].Equals("")) {
 			guideText[i].TextQA = guideText[1].TextQA;
-			Debug.Log("WAS EMPTY");
+			//Debug.Log("WAS EMPTY");
 		}
 
-		Debug.Log("TEXT: " + guideText[i].Text);
-		Debug.Log("TEXT1: " + guideText[i].TextQA[0]);
-		Debug.Log("TEXT2: " + guideText[i].TextQA[1]);
+		//Debug.Log("TEXT: " + guideText[i].Text);
+		//Debug.Log("TEXT1: " + guideText[i].TextQA[0]);
+		//Debug.Log("TEXT2: " + guideText[i].TextQA[1]);
 
 
 		ds.Storage.SetValue("$flavor_text1", guideText[i].CityType); // Wrongfully added in CityType.
@@ -55,13 +83,14 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("setbeacon")]
 	public void SetSettlementWaypoint()
 	{
-		int cityID = (int)ds.Storage.GetValue("$known_city_ID").AsNumber;
-		Vector3 location = Vector3.zero;
-		for (int x = 0; x < Globals.GameVars.settlement_masterList_parent.transform.childCount; x++)
-			if (Globals.GameVars.settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == cityID)
-				location = Globals.GameVars.settlement_masterList_parent.transform.GetChild(x).position;
-		Globals.GameVars.ActivateNavigatorBeacon(Globals.GameVars.navigatorBeacon, location);
-		Globals.GameVars.playerShipVariables.ship.currentNavigatorTarget = cityID;
+		_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.GameVars.AllNonCrew.RandomElement().ID);
+		//int cityID = (int)ds.Storage.GetValue("$known_city_ID").AsNumber;
+		//Vector3 location = Vector3.zero;
+		//for (int x = 0; x < Globals.GameVars.settlement_masterList_parent.transform.childCount; x++)
+		//	if (Globals.GameVars.settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == cityID)
+		//		location = Globals.GameVars.settlement_masterList_parent.transform.GetChild(x).position;
+		//Globals.GameVars.ActivateNavigatorBeacon(Globals.GameVars.navigatorBeacon, location);
+		//Globals.GameVars.playerShipVariables.ship.currentNavigatorTarget = cityID;
 		//Globals.GameVars.ShowANotificationMessage("You hired a navigator to " + City.name + " for " + CostToHire + " drachma.");
 		
 	}
@@ -105,11 +134,11 @@ public class YarnTavern : MonoBehaviour
 		List<FoodText> foodList =  Globals.GameVars.foodItemText;
 
 		int i = Random.Range(1, foodList.Count);
-		Debug.Log("COUNT THE FOOD " + foodList.Count);
+		//Debug.Log("COUNT THE FOOD " + foodList.Count);
 
 		if (foodList[i].FoodCost == 0) {
 			foodList[i].FoodCost = (int)ds.Storage.GetValue("$generated_cost").AsNumber;
-			Debug.Log("Cost of this item: " + foodList[i].FoodCost + "while i is " + i + " Item should be " + foodList[i].Item);
+			//Debug.Log("Cost of this item: " + foodList[i].FoodCost + " while i is " + i + " Item should be " + foodList[i].Item);
 		}
 
 		ds.Storage.SetValue("$drachma_cost", foodList[i].FoodCost);
@@ -122,7 +151,7 @@ public class YarnTavern : MonoBehaviour
 	{
 		// Get the city we know of
 		string e = ds.Storage.GetValue("$known_city").AsString;
-		Debug.Log("WE ARE ASKING ABOUT " + e);
+		//Debug.Log("WE ARE ASKING ABOUT " + e);
 		List<DialogText> matchingType = new List<DialogText>();
 
 		// Obtain the known settlements we can talk about! (NOTE: will change to display known settlements and we'll search our info based on selection)
@@ -158,7 +187,7 @@ public class YarnTavern : MonoBehaviour
 				matchingType = Globals.GameVars.mythDialogText.FindAll(x => x.CityType == e);
 				break;
 			default:
-				Debug.Log("Nice going, doofus. We will now crash because one of your nodes is probably mispelling your \"input\" and matchingType is empty. Good job.");
+				Debug.Log("Error, probaby because of a misspelling");
 				break;
 		}
 
