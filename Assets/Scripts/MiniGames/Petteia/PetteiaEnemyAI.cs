@@ -6,8 +6,8 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 public class PetteiaEnemyAI : MonoBehaviour
 {
-	public List<GameObject> pieces;
-	private GameObject currentPiece;
+	public List<PetteiaEnemyPiece> pieces;
+	private PetteiaEnemyPiece currentPiece;
 	private int movementDistance = 0;
 	
 	private PetteiaGameController pController;
@@ -67,8 +67,8 @@ public class PetteiaEnemyAI : MonoBehaviour
 
 		string s = "";
 		
-		GameObject pieceToMove = null;
-		foreach (GameObject p in pieces) { //Runs through each available enemy piece and sees if it can capture another piece.
+		PetteiaEnemyPiece pieceToMove = null;
+		foreach (PetteiaEnemyPiece p in pieces) { //Runs through each available enemy piece and sees if it can capture another piece.
 
 			if (p == null) {
 				break;
@@ -281,7 +281,7 @@ public class PetteiaEnemyAI : MonoBehaviour
 		if (pieceToMove != null) {
 			//Debug.Log("capture called with these params:");
 			//Debug.Log(go.name + " " + s + " " + num);
-			yield return StartCoroutine(MovePiece(pieceToMove, s, movementDistance));
+			yield return StartCoroutine(MovePiece(pieceToMove.gameObject, s, movementDistance));
 		} else {
 			// Moves the piece randomly 1-3 spaces if it cannot find a capture. 
 			int tries = 0;
@@ -295,8 +295,21 @@ public class PetteiaEnemyAI : MonoBehaviour
 
 				tries++;
 				//Debug.Log(tries);
+				int findPieceTries = 0;
 				int direction = Random.Range(0, 4);
-				pieceToMove = pieces.RandomElement();
+				do {
+					pieceToMove = pieces.RandomElement();
+					findPieceTries++;
+					//Debug.Log("Trying to select a random enemy piece");
+				} while (pieceToMove == null && findPieceTries < 100);
+
+				if (findPieceTries >= 100) {
+					Debug.Log("Found 100 null pieces in a row, uhoh!");
+				}
+				
+				if (pieceToMove == null) {
+					Debug.Log("Tried to move a null piece, whoopsies!");
+				}
 				currentPiece = pieceToMove;
 				//Simplified Version not working 
 
@@ -537,7 +550,7 @@ public class PetteiaEnemyAI : MonoBehaviour
 			}
 			if (movementDistance == 0) {
 				if (tries >= 50) {
-					yield return StartCoroutine(MovePiece(pieceToMove, s, movementDistance)); //Move cant be found - pass turn
+					yield return StartCoroutine(MovePiece(pieceToMove.gameObject, s, movementDistance)); //Move cant be found - pass turn
 					Debug.Log("passing my turn");
 					//Need some dialouge here like "I pass my turn TODO"
 				}
@@ -548,7 +561,7 @@ public class PetteiaEnemyAI : MonoBehaviour
 			else {
 				//Debug.Log("random called with these params:");
 				//Debug.Log(go.name + " " + s + " " + num);
-				yield return StartCoroutine(MovePiece(pieceToMove, s, movementDistance));
+				yield return StartCoroutine(MovePiece(pieceToMove.gameObject, s, movementDistance));
 				//Debug.Log("Tries to find a move: " + tries);
 			}
 		}
@@ -606,5 +619,15 @@ public class PetteiaEnemyAI : MonoBehaviour
 		//pController.PrintBoard();		
 
 	}
+
+	public void ToggleEnemyHighlight(bool toggle) 
+	{
+		foreach (PetteiaEnemyPiece p in pieces) {
+			if (p != null) {
+				p.highlight.SetActive(toggle);
+			}
+		}
+	}
+
 
 }

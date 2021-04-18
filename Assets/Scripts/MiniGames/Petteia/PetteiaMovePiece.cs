@@ -5,11 +5,11 @@ using UnityEngine.EventSystems;
 
 public class PetteiaMovePiece : MonoBehaviour
 {
-	public Vector3 mouseStartPos,mouseEndPos;
+	//public Vector3 mouseStartPos,mouseEndPos;
 	public Vector2Int pieceStartPos;
 	public Camera cam;
-	public bool lockedx,lockedy, isMoving;
-	public float timer;
+	//public bool lockedx,lockedy, isMoving;
+	//public float timer;
 	public PetteiaGameController pController;
 	public MeshRenderer real;
 	public GameObject dummyParent;
@@ -23,42 +23,41 @@ public class PetteiaMovePiece : MonoBehaviour
 
 	private Vector2Int potentialPos;
 	private List<PetteiaColliderMover> validMoves = new List<PetteiaColliderMover>();
-	[HideInInspector] public static bool showHighlight;
 
 	void Start()
     {
 		//real = GameObject.Find("Sphere").GetComponent<MeshRenderer>();
 		real.enabled = true;
-		lockedx = false;
-		lockedy = false;
-		showHighlight = true;
+		//lockedx = false;
+		//lockedy = false;
 
 		mask = LayerMask.GetMask("GameSquare");
+
+		potentialPos = pieceStartPos;
 	}
 	
-	void Update() {
-		timer += Time.deltaTime;
-		if (!Input.GetKey(KeyCode.Mouse0)) {
-			mouseStartPos = Input.mousePosition;
-			mouseEndPos = Input.mousePosition;
-		}
-	}
+	//void Update() {
+	//	timer += Time.deltaTime;
+	//	if (!Input.GetKey(KeyCode.Mouse0)) {
+	//		mouseStartPos = Input.mousePosition;
+	//		mouseEndPos = Input.mousePosition;
+	//	}
+	//}
 
 	void FixedUpdate()
     {
-		if (showHighlight && !highlight.activeSelf) {
-			highlight.SetActive(true);
-		}
-		if (!showHighlight && highlight.activeSelf) {
-			highlight.SetActive(false);
-		}
+		//if (showHighlight && !highlight.activeSelf) {
+		//	highlight.SetActive(true);
+		//}
+		//if (!showHighlight && highlight.activeSelf) {
+		//	highlight.SetActive(false);
+		//}
 
 		if (pController.yourTurn && active) {
 			RaycastHit hit;
 			Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
-			if (Physics.Raycast(ray, out hit, 100f, mask, QueryTriggerInteraction.Collide)) 
-			{
+			if (Physics.Raycast(ray, out hit, 100f, mask, QueryTriggerInteraction.Collide)) {
 				PetteiaColliderMover pcm = hit.collider.GetComponent<PetteiaColliderMover>();
 				if (validMoves.Contains(pcm)) 
 				{
@@ -110,17 +109,15 @@ public class PetteiaMovePiece : MonoBehaviour
 	void OnMouseDown() 
 	{
 		if (enabled) {
-
+			
 			if (EventSystem.current.IsPointerOverGameObject()) {
 				return;
 			}
-
-			if (pController.yourTurn) 
-			{
-				showHighlight = false;
+			Debug.Log(name + " clicked");
+			if (pController.yourTurn) {
 				active = true;
 				if (real != null) {
-					mouseStartPos = Input.mousePosition;
+					//mouseStartPos = Input.mousePosition;
 					validMoves = PopulateValidMovesList(pieceStartPos);
 					foreach (PetteiaColliderMover p in validMoves) {
 						p.HighlightSpace(true);
@@ -128,10 +125,13 @@ public class PetteiaMovePiece : MonoBehaviour
 					//pieceStartPos = g.position;
 					//ik.SetPiece(real.gameObject);
 					//ik.SetInital(g);
-					real.enabled = false;
+					//real.enabled = false;
 					//Cursor.visible = false;
 					SpawnDummy();
 				}
+			}
+			else {
+				Debug.Log("Clicked on enemy's turn");
 			}
 		}
 	}
@@ -159,17 +159,17 @@ public class PetteiaMovePiece : MonoBehaviour
 			if (real != null) {
 				//Debug.Log("Starting the ending function");
 				//unlock function
-				if (isMoving) {
-					ik.SetFinal(real.gameObject.transform);
-					//ik.onThemMove = true;
-				}
-				lockedx = false;
-				lockedy = false;
+				//if (isMoving) {
+				//	ik.SetFinal(real.gameObject.transform);
+				//	//ik.onThemMove = true;
+				//}
+				//lockedx = false;
+				//lockedy = false;
 				//mouseEndPos = mouseStartPos;
 				//Debug.Log("Checking if the piece was moved or just dropped");
 				//end of turn
 				if (!(pieceStartPos.x == potentialPos.x && pieceStartPos.y == potentialPos.y)) {
-					//Debug.Log("Dropped piece after moving it, preparing to change turn");
+					Debug.Log($"Piece moved from {pieceStartPos.x}, {pieceStartPos.y} to {potentialPos.x}, {potentialPos.y}");
 					pController.MovePiece(pieceStartPos, potentialPos, "PetteiaW");
 					pieceStartPos = potentialPos;
 					//pController.CheckCapture();
@@ -178,8 +178,7 @@ public class PetteiaMovePiece : MonoBehaviour
 					pController.PlayMoveSound();
 				}
 				else {
-					//Debug.Log("Dropped piece without moving it");
-					showHighlight = true;
+					Debug.Log($"Dropped piece without moving it away from {pieceStartPos.x}, {pieceStartPos.y}");
 				}
 
 				foreach (PetteiaColliderMover p in validMoves) {
@@ -192,10 +191,10 @@ public class PetteiaMovePiece : MonoBehaviour
 
 	}
 
-	private void OnMouseDrag() {
-		////Debug.Log("DHAWJLREGHaljsdhflaksjdfh");
-		mouseEndPos = Input.mousePosition;
-	}
+	//private void OnMouseDrag() {
+	//	////Debug.Log("DHAWJLREGHaljsdhflaksjdfh");
+	//	mouseEndPos = Input.mousePosition;
+	//}
 
 	private List<PetteiaColliderMover> PopulateValidMovesList(Vector2Int startPos) 
 	{
@@ -242,5 +241,8 @@ public class PetteiaMovePiece : MonoBehaviour
 
 		return possibleMoves;
 	}
-	
+
+	public void ToggleHighlight(bool toggle) {
+		highlight.SetActive(toggle);
+	}
 }

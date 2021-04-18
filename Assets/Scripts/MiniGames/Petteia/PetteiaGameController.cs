@@ -40,7 +40,7 @@ public class PetteiaGameController : MonoBehaviour
 	public string boardText = "This text will appear in a text area that automatically expands";
 
 
-	[HideInInspector] public bool yourTurn;
+	public bool yourTurn;
 	private int currentPiece;
 	private string moveDir;
 	private Vector2 oldPos, curPos;
@@ -74,6 +74,9 @@ public class PetteiaGameController : MonoBehaviour
 			BoardSquares[6, i] = squaresRow6[i];
 			BoardSquares[7, i] = squaresRow7[i];
 		}
+
+		HighlightPlayerPieces(true);
+		enemyAI.ToggleEnemyHighlight(false);
 	}
 
 	// Update is called once per frame
@@ -156,8 +159,10 @@ public class PetteiaGameController : MonoBehaviour
 			Debug.Log("Ending player turn");
 			yourTurn = false;
 			yield return CheckCapture();
-			Debug.Log("Done CheckCapture");
+			//Debug.Log("Done CheckCapture");
 			CheckGameOver();
+			HighlightPlayerPieces(false);
+			enemyAI.ToggleEnemyHighlight(true);
 			curPosArray = PosToArray((int)curPos.x, (int)curPos.y);
 			oldPosArray = PosToArray((int)oldPos.x, (int)oldPos.y);
 			updateOld = true;
@@ -168,13 +173,22 @@ public class PetteiaGameController : MonoBehaviour
 			Debug.Log("Ending enemy turn");
 			yourTurn = true;
 			yield return CheckCapture();
-			Debug.Log("Done CheckCapture");
+			//Debug.Log("Done CheckCapture");
 			CheckGameOver();
+			HighlightPlayerPieces(true);
+			enemyAI.ToggleEnemyHighlight(false);
 			oldPosArray = Vector2.up;
 			curPosArray = Vector2.up;
 			oldPos = Vector2.up;
 			curPos = Vector2.up;
-			PetteiaMovePiece.showHighlight = true;
+			//PetteiaMovePiece.showHighlight = true;
+		}
+	}
+
+	public void HighlightPlayerPieces(bool toggle) 
+	{
+		foreach (PetteiaMovePiece p in playerPieces) {
+			p.ToggleHighlight(toggle);
 		}
 	}
 
@@ -374,7 +388,7 @@ public class PetteiaGameController : MonoBehaviour
 	}
 
 	public void CheckGameOver() {
-		Debug.Log($"Players: {playerPieces.Count} | Enemies: {enemyAI.pieces.Count}");
+		//Debug.Log($"Players: {playerPieces.Count} | Enemies: {enemyAI.pieces.Count}");
 		if (enemyAI.pieces.Count <= 1) {
 			mgScreen.gameObject.SetActive(true);
 			mgScreen.DisplayText("Petteia Victory", "Taverna Game", "You won the game and now you get a reward.", gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
@@ -394,15 +408,15 @@ public class PetteiaGameController : MonoBehaviour
 
 	private IEnumerator DoCapturePiece(int i, int j) 
 	{
-		Debug.Log("DoCapturePiece");
-		Debug.Log("Line after DoCapturePiece");
+		//Debug.Log("DoCapturePiece");
+		//Debug.Log("Line after DoCapturePiece");
 		positions[i, j] = 0;
-		Debug.Log("Set positions to 0");
+		//Debug.Log("Set positions to 0");
 		BoardSquares[i, j].DestroyPiece();
-		Debug.Log("Destroyed piece");
-		Debug.Log("enemyAI.CheckPieces");
+		//Debug.Log("Destroyed piece");
+		//Debug.Log("enemyAI.CheckPieces");
 		yield return StartCoroutine(enemyAI.CheckPieces());
-		Debug.Log("Finished with enemyAI.CheckPieces");
+		//Debug.Log("Finished with enemyAI.CheckPieces");
 		yield return null;
 
 		//CheckGameOver();

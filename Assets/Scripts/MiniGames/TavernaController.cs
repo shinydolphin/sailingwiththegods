@@ -79,6 +79,7 @@ public class TavernaController : MonoBehaviour
 	{
 		yield return SceneManager.UnloadSceneAsync(sceneName);
 		SceneManager.SetActiveScene(SceneManager.GetSceneByName("TavernaMenu"));
+		Time.timeScale = 1;
 		yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
 		yield return null;
 		SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
@@ -87,6 +88,7 @@ public class TavernaController : MonoBehaviour
 
 	static IEnumerator UnloadTavernaGame() {
 		yield return SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
+		Time.timeScale = 1;
 		Scene scene = SceneManager.GetSceneByName("TavernaMenu");
 		SceneManager.SetActiveScene(scene);
 	}
