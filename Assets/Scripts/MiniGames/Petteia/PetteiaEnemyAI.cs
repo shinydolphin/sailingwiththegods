@@ -49,15 +49,16 @@ public class PetteiaEnemyAI : MonoBehaviour
 		}
 	}
 
-	public IEnumerator CheckPieces() {
+	public int CheckPieces() {
 		Debug.Log("Enemy CheckPieces");
 		for (int i = pieces.Count - 1; i >= 0; i--) {
 			if (pieces[i] == null) {
+				Debug.Log($"Enemy piece {i} null, removing");
 				pieces.RemoveAt(i);
 			}
 		}
-		Debug.Log("Done with Enemy CheckPieces");
-		yield return null;
+		Debug.Log("Enemy CheckPieces method finished");
+		return 1;
 	}
 
 	IEnumerator MakeMove() {
@@ -551,7 +552,7 @@ public class PetteiaEnemyAI : MonoBehaviour
 			if (movementDistance == 0) {
 				if (tries >= 50) {
 					yield return StartCoroutine(MovePiece(pieceToMove.gameObject, s, movementDistance)); //Move cant be found - pass turn
-					Debug.Log("passing my turn");
+					Debug.Log("enemy couldn't find a move, skipping");
 					//Need some dialouge here like "I pass my turn TODO"
 				}
 				else {
@@ -572,7 +573,7 @@ public class PetteiaEnemyAI : MonoBehaviour
 		//Ending turn
 		yield return null;
 
-		StartCoroutine(pController.SwitchTurn());
+		pController.SwitchTurn();
 		
 	}
 

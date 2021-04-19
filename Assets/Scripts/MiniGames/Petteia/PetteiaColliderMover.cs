@@ -42,6 +42,7 @@ public class PetteiaColliderMover : MonoBehaviour
 	public void DestroyPiece() {
 		if (currentPiece != null) {
 			if (pController.playerPieces.Contains(currentPiece)) {
+				currentPiece.GetComponent<PetteiaMovePiece>().DelDummy();
 				pController.playerPieces.Remove(currentPiece);
 			}
 			Destroy(currentPiece.gameObject);

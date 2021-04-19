@@ -113,7 +113,7 @@ public class PetteiaMovePiece : MonoBehaviour
 			if (EventSystem.current.IsPointerOverGameObject()) {
 				return;
 			}
-			Debug.Log(name + " clicked");
+			//Debug.Log(name + " clicked");
 			if (pController.yourTurn) {
 				active = true;
 				if (real != null) {
@@ -130,9 +130,9 @@ public class PetteiaMovePiece : MonoBehaviour
 					SpawnDummy();
 				}
 			}
-			else {
-				Debug.Log("Clicked on enemy's turn");
-			}
+			//else {
+			//	Debug.Log("Clicked on enemy's turn");
+			//}
 		}
 	}
 
@@ -142,8 +142,11 @@ public class PetteiaMovePiece : MonoBehaviour
 		dummySpawned.transform.position = transform.position;
 	}
 
-	void DelDummy() {
-		Destroy(dummySpawned);
+	public void DelDummy() {
+		if (dummySpawned != null) {
+			Destroy(dummySpawned);
+		}
+
 	}
 
 	void OnMouseUp() 
@@ -169,17 +172,17 @@ public class PetteiaMovePiece : MonoBehaviour
 				//Debug.Log("Checking if the piece was moved or just dropped");
 				//end of turn
 				if (!(pieceStartPos.x == potentialPos.x && pieceStartPos.y == potentialPos.y)) {
-					Debug.Log($"Piece moved from {pieceStartPos.x}, {pieceStartPos.y} to {potentialPos.x}, {potentialPos.y}");
+					//Debug.Log($"Piece moved from {pieceStartPos.x}, {pieceStartPos.y} to {potentialPos.x}, {potentialPos.y}");
 					pController.MovePiece(pieceStartPos, potentialPos, "PetteiaW");
 					pieceStartPos = potentialPos;
 					//pController.CheckCapture();
 					//Debug.Log("Preparing to switch turn off of player");
-					StartCoroutine(pController.SwitchTurn());
+					pController.SwitchTurn();
 					pController.PlayMoveSound();
 				}
-				else {
-					Debug.Log($"Dropped piece without moving it away from {pieceStartPos.x}, {pieceStartPos.y}");
-				}
+				//else {
+				//	Debug.Log($"Dropped piece without moving it away from {pieceStartPos.x}, {pieceStartPos.y}");
+				//}
 
 				foreach (PetteiaColliderMover p in validMoves) {
 					p.HighlightSpace(false);

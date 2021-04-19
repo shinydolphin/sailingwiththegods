@@ -151,15 +151,13 @@ public class PetteiaGameController : MonoBehaviour
 		SceneManager.SetActiveScene(SceneManager.GetSceneByName(name));
 	}
 
-	public IEnumerator SwitchTurn() 
+	public void SwitchTurn() 
 	{
 		PrintBoard();
 		//Debug.Log("Switching turn");
 		if (yourTurn) {
-			Debug.Log("Ending player turn");
+			CheckCapture();
 			yourTurn = false;
-			yield return CheckCapture();
-			//Debug.Log("Done CheckCapture");
 			CheckGameOver();
 			HighlightPlayerPieces(false);
 			enemyAI.ToggleEnemyHighlight(true);
@@ -170,10 +168,8 @@ public class PetteiaGameController : MonoBehaviour
 			enemyAI.StartEnemyTurn();
 		}
 		else {
-			Debug.Log("Ending enemy turn");
+			CheckCapture();
 			yourTurn = true;
-			yield return CheckCapture();
-			//Debug.Log("Done CheckCapture");
 			CheckGameOver();
 			HighlightPlayerPieces(true);
 			enemyAI.ToggleEnemyHighlight(false);
@@ -275,49 +271,52 @@ public class PetteiaGameController : MonoBehaviour
 		}
 	}
 
-	public IEnumerator CheckCapture() {
+	public void CheckCapture() {
 		for (int y = 0; y < 8; y++) {
 
 			for (int x = 0; x < 8; x++) {
 				
 				if (x != 0 && x != 7) {
 					
-						if (positions[x, y] == 1
+					if (positions[x, y] == 1
 						&& positions[x + 1, y] == 2
-						&& positions[x - 1, y] == 2) {
-							Debug.Log("CAPTURE1");
-							yield return DoCapturePiece(x, y);
-							//Debug.Log(x.ToString() + y.ToString());
-						}
+						&& positions[x - 1, y] == 2) 
+					{
+						Debug.Log("Enemy captured by player vertically");
+						DoCapturePiece(x, y);
+						//Debug.Log(x.ToString() + y.ToString());
+					}
 					
 					
-						if (positions[x, y] == 2
-					&& positions[x + 1, y] == 1
-					&& positions[x - 1, y] == 1) {
-							Debug.Log("CAPTURE2");
-							yield return DoCapturePiece(x, y);
-							//Debug.Log(x.ToString() + y.ToString());
-						}
+					if (positions[x, y] == 2
+						&& positions[x + 1, y] == 1
+						&& positions[x - 1, y] == 1) 
+					{
+						Debug.Log("Player captured by enemy vertically");
+						DoCapturePiece(x, y);
+						//Debug.Log(x.ToString() + y.ToString());
+					}
 					
 				}
 				if (y != 0 && y != 7) {
 					
-						if (positions[x, y] == 1
-					&& positions[x, y + 1] == 2
-					&& positions[x, y - 1] == 2) {
-							Debug.Log("CAPTURE3");
-							yield return DoCapturePiece(x, y);
-							//Debug.Log(x.ToString() + y.ToString());
-						}
+					if (positions[x, y] == 1
+						&& positions[x, y + 1] == 2
+						&& positions[x, y - 1] == 2) 
+					{
+						Debug.Log("Enemy captured by player horizontally");
+						DoCapturePiece(x, y);
+						//Debug.Log(x.ToString() + y.ToString());
+					}
 					
 					
-						if (positions[x, y] == 2
+					if (positions[x, y] == 2
 						&& positions[x, y + 1] == 1
-						&& positions[x, y - 1] == 1) {
-							Debug.Log("CAPTURE4");
-							yield return DoCapturePiece(x, y);
-							//Debug.Log(x.ToString() + y.ToString());
-						
+						&& positions[x, y - 1] == 1) 
+					{
+						Debug.Log("Player captured by enemy horizontally");
+						DoCapturePiece(x, y);
+						//Debug.Log(x.ToString() + y.ToString());
 					}
 				}
 
@@ -402,25 +401,29 @@ public class PetteiaGameController : MonoBehaviour
 		}
 	}
 
-	private void CapturePiece(int i, int j) {
-		StartCoroutine(DoCapturePiece(i, j));
-	}
+	//private void CapturePiece(int i, int j) {
+	//	StartCoroutine(DoCapturePiece(i, j));
+	//}
 
-	private IEnumerator DoCapturePiece(int i, int j) 
+	private void DoCapturePiece(int i, int j) 
 	{
-		//Debug.Log("DoCapturePiece");
-		//Debug.Log("Line after DoCapturePiece");
-		positions[i, j] = 0;
-		//Debug.Log("Set positions to 0");
 		BoardSquares[i, j].DestroyPiece();
-		//Debug.Log("Destroyed piece");
-		//Debug.Log("enemyAI.CheckPieces");
-		yield return StartCoroutine(enemyAI.CheckPieces());
-		//Debug.Log("Finished with enemyAI.CheckPieces");
-		yield return null;
+		int enemyDone = 0;
+		enemyDone = enemyAI.CheckPieces();
+		int tries = 0;
+		while (enemyDone != 1 && tries < 1000) {
+			Debug.Log("wait...");
+		}
+		if (tries >= 200) {
+			Debug.Log("Waited too long for the enemy to check its pieces");
+		}
+		//Debug.Log("Is it broken yet?");
+		//Debug.Log("Checking if it's broken yet....");
+		//Debug.Log("One last broken check...");
+		//yield return null;
+		//Debug.Log("After yield return null");
 
 		//CheckGameOver();
-		PrintBoard();
 		//colliders[i, j].GetComponent<PetteiaColliderMover>().destroy = true;
 		//colliders[i, j].SetActive(true);
 		//Collider needs time to check for collisions
@@ -437,6 +440,9 @@ public class PetteiaGameController : MonoBehaviour
 				gameBarks.DisplayBragging();
 			}
 		}
+
+		positions[i, j] = 0;
+		PrintBoard();
 	}
 
 	//IEnumerator GetPiece(int i, int j) {
