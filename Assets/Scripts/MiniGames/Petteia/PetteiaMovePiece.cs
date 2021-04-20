@@ -53,7 +53,7 @@ public class PetteiaMovePiece : MonoBehaviour
 		//	highlight.SetActive(false);
 		//}
 
-		if (pController.yourTurn && active) {
+		if (pController.YourTurn && active) {
 			RaycastHit hit;
 			Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
@@ -114,7 +114,7 @@ public class PetteiaMovePiece : MonoBehaviour
 				return;
 			}
 			//Debug.Log(name + " clicked");
-			if (pController.yourTurn) {
+			if (pController.YourTurn) {
 				active = true;
 				if (real != null) {
 					//mouseStartPos = Input.mousePosition;

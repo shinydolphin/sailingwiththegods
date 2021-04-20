@@ -8,6 +8,8 @@ using UnityEngine.SceneManagement;
 
 public class PetteiaGameController : MonoBehaviour
 {
+	public Vector2Int rewardAmts;
+
 	[Header("Game Pieces")]
 	public List<PetteiaMovePiece> playerPieces;
 	public PetteiaEnemyAI enemyAI;
@@ -35,12 +37,19 @@ public class PetteiaGameController : MonoBehaviour
 	public Sprite gameIcon;
 	public float barkChance = 0.25f;
 
+	[Header("Text")]
+	public string introText;
+	[TextArea(2, 30)]
+	public string instructions;
+	public string winText;
+	public string loseText;
 
-	[TextArea(3, 40)]
-	public string boardText = "This text will appear in a text area that automatically expands";
+
+	[TextArea(1, 8)]
+	public string debugPiecePositions;
 
 
-	public bool yourTurn;
+	private bool yourTurn;
 	private int currentPiece;
 	private string moveDir;
 	private Vector2 oldPos, curPos;
@@ -57,7 +66,8 @@ public class PetteiaGameController : MonoBehaviour
 		//menuCanvas.SetActive(false);
 		//endCanvas.SetActive(false);
 		mgScreen.gameObject.SetActive(true);
-		mgScreen.DisplayText("Petteia", "Taverna game", "Petteia is started, here's where stuff will go", gameIcon, MiniGameInfoScreen.MiniGame.TavernaStart);
+		string text = introText + "\n\n" + instructions + "\n\n" + "flavor";
+		mgScreen.DisplayText("Petteia", "Taverna game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaStart);
 		enemyAI = GetComponent<PetteiaEnemyAI>();
 		moveDir = "";
 		InitalStateSetup();
@@ -79,49 +89,35 @@ public class PetteiaGameController : MonoBehaviour
 		enemyAI.ToggleEnemyHighlight(false);
 	}
 
-	// Update is called once per frame
-	void Update() {
-		
-		//if (!menuCanvas.activeSelf) {
-
-		//	if (yourTurn) {
-		//		lastPieceMoved = 1;
-		//		curPosArray = PosToArray((int)curPos.x, (int)curPos.y);
-		//		oldPosArray = PosToArray((int)oldPos.x, (int)oldPos.y);
-		//		if (Input.GetKeyDown(KeyCode.Q)) {
-		//			PrintBoard();
-		//		}
-
-		//		if (Input.GetKeyUp(KeyCode.Mouse0)) {
-		//			if (SetPiecePosition() == "m") {
-
-		//				//Debug.Log("enemyturn");
-		//				//mp.isMoving = true;
-		//				yourTurn = false;
-		//				moveSound.pitch = Random.Range(0.7f, 1.1f);
-		//				moveSound.Play();
-		//				PrintBoard();
-						
-		//			} else {
-		//				//mp.isMoving = false;
-		//			}
-		//			updateOld = true;
-
-		//		}
-		//	}
-		//	else {
-
-		//		EnemyMove();
-
-		//	}
-		//}
+	private void Update() {
+		if (Input.GetKeyDown(KeyCode.Alpha1)) {
+			Debug.Log($"Winning with all 8, expect {rewardAmts.y}");
+			enemyAI.pieces.Clear();
+			CheckGameOver();
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha2)) {
+			Debug.Log($"Winning with half, expect {Mathf.CeilToInt((rewardAmts.y - rewardAmts.x) / 2f + rewardAmts.x)}");
+			playerPieces.RemoveRange(0, 3);
+			enemyAI.pieces.Clear();
+			CheckGameOver();
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha3)) {
+			Debug.Log($"Winning with minimum 2, expect {rewardAmts.x}");
+			playerPieces.RemoveRange(0, 6);
+			enemyAI.pieces.Clear();
+			CheckGameOver();
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha4)) {
+			playerPieces.Clear();
+			CheckGameOver();
+		}
 	}
 
 	public void PauseMinigame() 
 	{
 		mgScreen.gameObject.SetActive(true);
 		Time.timeScale = 0;
-		mgScreen.DisplayText("Petteia", "Taverna game", "Petteia is paused, here's where the controls will go", gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
+		mgScreen.DisplayText("Petteia", "Taverna game", instructions, gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
 	}
 
 	public void UnpauseMinigame() {
@@ -390,13 +386,23 @@ public class PetteiaGameController : MonoBehaviour
 		//Debug.Log($"Players: {playerPieces.Count} | Enemies: {enemyAI.pieces.Count}");
 		if (enemyAI.pieces.Count <= 1) {
 			mgScreen.gameObject.SetActive(true);
-			mgScreen.DisplayText("Petteia Victory", "Taverna Game", "You won the game and now you get a reward.", gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+
+			//Minimum pieces left to win is 2, maximum is all 8
+			//So we need to map [rewardAmt.x rewardAmt.y] to [2, 8]
+			float oldRange = 6f;
+			float newRange = rewardAmts.y - rewardAmts.x;			
+			int reward = Mathf.CeilToInt(((playerPieces.Count - 2) * (newRange * 1.0f) / oldRange) + rewardAmts.x);
+
+			string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!";
+			Globals.GameVars.playerShipVariables.ship.AddToFoodAndWater(reward);
+			mgScreen.DisplayText("Petteia Victory", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
 			gameOver = true;
 		}
 
 		if (playerPieces.Count <= 1) {
 			mgScreen.gameObject.SetActive(true);
-			mgScreen.DisplayText("Petteia Loss", "Taverna Game", "You lost the game and now you get nothing.", gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+			string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!";
+			mgScreen.DisplayText("Petteia Loss", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
 			gameOver = true;
 		}
 	}
@@ -482,7 +488,7 @@ public class PetteiaGameController : MonoBehaviour
 		}
 
 		//Debug.Log(s);
-		boardText = s;
+		debugPiecePositions = s;
 	}
 
 	public void MovePiece(Vector2Int oldPos, Vector2Int newPos, string tag) 
@@ -580,5 +586,9 @@ public class PetteiaGameController : MonoBehaviour
 	public bool GameOver 
 	{
 		get { return gameOver; }
+	}
+
+	public bool YourTurn {
+		get { return yourTurn; }
 	}
 }

@@ -280,6 +280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 558ba331d3fdd06488a252a0012ab89f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rewardAmts: {x: 5, y: 15}
   playerPieces:
   - {fileID: 141680672}
   - {fileID: 1095568833}
@@ -367,8 +368,19 @@ MonoBehaviour:
   gameBarks: {fileID: 5220106615405182563}
   gameIcon: {fileID: 21300000, guid: bc1b4e5108619994fb400220fb761c71, type: 3}
   barkChance: 0.25
+  introText: This is the intro to Petteia.
+  instructions: 'Click and drag your pieces to move them. Pieces can move in horizontal
+    lines in any direction.
+
+    The goal of Petteia is to capture all your opponent''s
+    pieces first. Capture a piece by surrounding it on either side with your own
+    pieces, either vertically or horizontally.
+
+    When moving a piece into a mutual
+    capture, the player is at disadvantage'
+  winText: You won the game!
+  loseText: You lost the game!
   boardText: 
-  yourTurn: 1
 --- !u!4 &4099228
 Transform:
   m_ObjectHideFlags: 0
