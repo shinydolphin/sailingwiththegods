@@ -90,27 +90,27 @@ public class PetteiaGameController : MonoBehaviour
 	}
 
 	private void Update() {
-		if (Input.GetKeyDown(KeyCode.Alpha1)) {
-			Debug.Log($"Winning with all 8, expect {rewardAmts.y}");
-			enemyAI.pieces.Clear();
-			CheckGameOver();
-		}
-		if (Input.GetKeyDown(KeyCode.Alpha2)) {
-			Debug.Log($"Winning with half, expect {Mathf.CeilToInt((rewardAmts.y - rewardAmts.x) / 2f + rewardAmts.x)}");
-			playerPieces.RemoveRange(0, 3);
-			enemyAI.pieces.Clear();
-			CheckGameOver();
-		}
-		if (Input.GetKeyDown(KeyCode.Alpha3)) {
-			Debug.Log($"Winning with minimum 2, expect {rewardAmts.x}");
-			playerPieces.RemoveRange(0, 6);
-			enemyAI.pieces.Clear();
-			CheckGameOver();
-		}
-		if (Input.GetKeyDown(KeyCode.Alpha4)) {
-			playerPieces.Clear();
-			CheckGameOver();
-		}
+		//if (Input.GetKeyDown(KeyCode.Alpha1)) {
+		//	Debug.Log($"Winning with all 8, expect {rewardAmts.y}");
+		//	enemyAI.pieces.Clear();
+		//	CheckGameOver();
+		//}
+		//if (Input.GetKeyDown(KeyCode.Alpha2)) {
+		//	Debug.Log($"Winning with half, expect {Mathf.CeilToInt((rewardAmts.y - rewardAmts.x) / 2f + rewardAmts.x)}");
+		//	playerPieces.RemoveRange(0, 3);
+		//	enemyAI.pieces.Clear();
+		//	CheckGameOver();
+		//}
+		//if (Input.GetKeyDown(KeyCode.Alpha3)) {
+		//	Debug.Log($"Winning with minimum 2, expect {rewardAmts.x}");
+		//	playerPieces.RemoveRange(0, 6);
+		//	enemyAI.pieces.Clear();
+		//	CheckGameOver();
+		//}
+		//if (Input.GetKeyDown(KeyCode.Alpha4)) {
+		//	playerPieces.Clear();
+		//	CheckGameOver();
+		//}
 	}
 
 	public void PauseMinigame() 
