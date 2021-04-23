@@ -280,7 +280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 558ba331d3fdd06488a252a0012ab89f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rewardAmts: {x: 5, y: 15}
+  rewardAmts: {x: 10, y: 20}
   playerPieces:
   - {fileID: 141680672}
   - {fileID: 1095568833}
@@ -380,7 +380,7 @@ MonoBehaviour:
     capture, the player is at disadvantage'
   winText: You won the game!
   loseText: You lost the game!
-  boardText: 
+  debugPiecePositions: 
 --- !u!4 &4099228
 Transform:
   m_ObjectHideFlags: 0
