@@ -31,6 +31,7 @@ public class YarnTavern : MonoBehaviour
 	public void GetCurrentSettlement() {
 		ds.Storage.SetValue("$known_city", Globals.GameVars.currentSettlement.name);
 		ds.Storage.SetValue("$known_city_ID", Globals.GameVars.currentSettlement.settlementID);
+		ds.Storage.SetValue("$known_city_type", Globals.GameVars.currentSettlement.typeOfSettlement);
 	}
 
 	//We need this so we can make sure not to let the player order a guide to the city they're currently at

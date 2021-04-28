@@ -896,7 +896,7 @@ public class script_player_controls : MonoBehaviour
 					$"{Mathf.CeilToInt(dailyProvisionsKG * ship.crewRoster.Count)}kgs of provisions per day, but we only have {Mathf.RoundToInt(ship.cargo[1].amount_kg)}kgs. ";
 			}
 			if (lowWater) {
-				message += $"\n\n‘Water is best’, said the greatest of poets (Pindar) - and no ship can sail without it! We need to buy more water or Thirst itself will destroy our ship. " +
+				message += $"\n\n'Water is best', said the greatest of poets (Pindar) - and no ship can sail without it! We need to buy more water or Thirst itself will destroy our ship. " +
 					$"For {ship.crewRoster.Count} crew members, we need about {Mathf.CeilToInt(dailyWaterKG * ship.crewRoster.Count)}kgs of water per day," +
 					$" but we only have {Mathf.Round(ship.cargo[0].amount_kg)}kgs. ";
 			}
