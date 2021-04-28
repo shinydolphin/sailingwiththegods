@@ -1031,6 +1031,7 @@ public class GameVars : MonoBehaviour
 
 		// show the new ship model
 		SetShipModel(playerShipVariables.ship.upgradeLevel);
+		Globals.GameVars.controlsLocked = true;
 	}
 
 	void SetShipModel(int shipLevel) {

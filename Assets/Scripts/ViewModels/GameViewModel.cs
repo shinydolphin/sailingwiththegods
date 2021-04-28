@@ -83,7 +83,7 @@ public class GameViewModel : Model
 
 			//Turn on the ship HUD
 			Globals.UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
-
+			
 			GameVars.controlsLocked = false;
 			//Flag the main GUI scripts to turn on
 			GameVars.runningMainGameGUI = true;

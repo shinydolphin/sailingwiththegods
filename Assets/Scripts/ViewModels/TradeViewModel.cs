@@ -212,7 +212,7 @@ public class TradeViewModel : CityViewModel
 
 	// REFERENCED IN BUTTON CLICK UNITYEVENT
 	public void GUI_Sell_Resources(CargoItemTradeViewModel item, int amount) {
-		Debug.Log(item.Name + " : " + amount);
+		//Debug.Log(item.Name + " : " + amount);
 
 		int amountToSell = GameVars.Trade.AdjustSell(amount, item.Name);
 		if (amountToSell > 0) {
