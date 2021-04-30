@@ -36,7 +36,7 @@ colorID: 0
 position: -1249,-317
 ---
 << randomcost DialogScreen 25 35>> 
-<< randomFood DialogScreen>> 
+<< randomfood DialogScreen>> 
 
 << setspeaker DialogScreen Jason>> 
 << randomQA DialogScreen network>>
@@ -60,7 +60,7 @@ colorID: 0
 position: -256,35
 ---
 << randomcost DialogScreen 25 35>>
-<< randomFood DialogScreen>> 
+<< randomfood DialogScreen>> 
 
 << setspeaker DialogScreen Jason>> 
 << randomQA DialogScreen pirate >> 
@@ -84,7 +84,7 @@ colorID: 0
 position: -68,-231
 ---
 << randomcost DialogScreen 15 20>>
-<< randomFood DialogScreen>> 
+<< randomfood DialogScreen>> 
 
 << setspeaker DialogScreen Jason>> 
 << randomQA DialogScreen myth>>
@@ -117,8 +117,8 @@ colorID: 0
 position: -369,495
 ---
 << randomcost DialogScreen 75 100>> 
-<< randomFood DialogScreen>> 
-<< randomGuide DialogScreen>> 
+<< randomfood DialogScreen>> 
+<< randomguide DialogScreen>> 
 
 
 << setspeaker DialogScreen Jason>> 
@@ -245,7 +245,7 @@ Local knowledge, tired ears: a worthy balance. I will hire a guide! {$flavor_tex
 It is true, they are often given to too much chatter: {$flavor_text3}
 << set $first_time to true >> 
 
-<< setbeacon DialogScreen >> 
+<< hirenavigator DialogScreen >> 
 
 [[City_Questions]]
 ===

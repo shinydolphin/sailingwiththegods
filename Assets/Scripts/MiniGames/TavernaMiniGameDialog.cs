@@ -18,24 +18,18 @@ public class TavernaMiniGameDialog : MonoBehaviour
     {
 		textBackground.SetActive(false);
 
+		//These null checks are for testing purposes, so you can run this script in a scene without the main scene loaded additively in the background
 		if (Globals.GameVars != null) {
 			crew = Globals.GameVars.currentSettlement.availableCrew.RandomElement();
 			enemyName.text = crew.name;
 			enemyImage.sprite = Resources.Load<Sprite>(ResourcePath + "/" + crew.ID) ?? Resources.Load<Sprite>(DefaultPortrait);
 		}
 
-
-		//enemyName.text = Globals.GameVars.currentSettlement.availableCrew.RandomElement<CrewMember>().name;
-		//enemyName.text = Globals.GameVars.GetSettlementFromID(0).availableCrew.RandomElement<CrewMember>().name;
-		//enemyFaces = Globals.GameVars.newGameAvailableCrew.RandomElement<CrewMember>();
-		//Debug.Log(Globals.GameVars.newGameAvailableCrew.RandomElement<CrewMember>().name);
-
-		//CrewMember c = Globals.GameVars.currentSettlement.availableCrew.RandomElement<CrewMember>();
-		//enemyName.text = c.name;
-		//enemyFaces.sprite = Resources.Load<Sprite>(ResourcePath + "/" + c.ID) ?? Resources.Load<Sprite>(DefaultPortrait);
-
 	}
 
+	/// <summary>
+	/// Displays an insult from the opponent to the player - that is, the opponent is upset with the player
+	/// </summary>
 	public void DisplayInsult() {
 		Time.timeScale = 0;
 		textBackground.SetActive(true);
@@ -47,6 +41,9 @@ public class TavernaMiniGameDialog : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Displays a brag from the opponent - that is, the opponent is happy
+	/// </summary>
 	public void DisplayBragging() {
 		Time.timeScale = 0;
 		textBackground.SetActive(true);
@@ -62,37 +59,4 @@ public class TavernaMiniGameDialog : MonoBehaviour
 		Time.timeScale = 1;
 		textBackground.SetActive(false);
 	}
-
-	//public void EnemyCaptures() {
-	//	if (Random.Range(0, 101) > 50) {
-	//		StartCoroutine(EnemyCapturesFunction());
-	//	}
-	//}
-	//public void PlayerCaptures() {
-	//	if (Random.Range(0, 101) > 50) {
-	//		StartCoroutine(PlayerCapturesFunction());
-	//	}
-	//}
-
-	//IEnumerator EnemyCapturesFunction() {
-	//	yield return new WaitForSeconds(1f);
-	//	textBackground.SetActive(true);
-	//	dialog.text = CaptureLines.RandomElement();
-	//	//yield return new WaitForSeconds(8f);
-		
-	//	//EnemyCanvas.SetActive(false);
-	//}
-
-	//IEnumerator PlayerCapturesFunction() {
-	//	yield return new WaitForSeconds(1f);
-	//	textBackground.SetActive(true);
-	//	dialog.text = getCapturedLines.RandomElement();
-	//	//yield return new WaitForSeconds(8f);
-		
-	//	//EnemyCanvas.SetActive(false);
-	//}
-	//public void ResetBoard() {
-	//	Scene scene = SceneManager.GetActiveScene();
-	//	SceneManager.LoadScene(scene.name);
-	//}
 }
