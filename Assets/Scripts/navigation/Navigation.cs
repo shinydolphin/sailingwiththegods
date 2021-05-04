@@ -13,6 +13,7 @@ namespace Nav {
 		Transform player;
 		private city cities;
 		[SerializeField] private NavMeshAgent AI = null;
+		[SerializeField] private GameObject _fireNavigatorButton;
 		private LineRenderer lineRenderer;
 		[SerializeField] private TMP_Text _Text = null;
 		[SerializeField] private Image _imageSlot = null;
@@ -51,6 +52,7 @@ namespace Nav {
 			//re-assgin the target loction will the navgation is not end
 			if(postion != null) {
 				SetDestination(postion, _crewID.Value);
+				_fireNavigatorButton.SetActive(true);
 			}
 		}
 		//find world angle method
@@ -266,6 +268,13 @@ namespace Nav {
 		}
 		public void DeactiveText() {
 			_menu.SetActive(false);
+		}
+		public void FireNavigation() {
+			_startNavigation = false;
+			postion = null;
+			_crewID = null;
+			_Text.text = "";
+			_Navgater.SetActive(false);
 		}
 	}
 

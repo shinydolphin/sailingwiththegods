@@ -16,7 +16,7 @@ public class test2 : MonoBehaviour
 			navigation.SetDestination("Larisa Thessaly", 2);
 			//cities = new city();
 		}
-		navigation.SetDestination("Larisa Thessaly", 2);
+		//navigation.SetDestination("Larisa Thessaly", 2);
 		//navigation.SetDestination("Tisaia",2);
 		//navigation.SetDestination("Iolcus", 2);
 		//navigation.Setdestination("Iolcus");
