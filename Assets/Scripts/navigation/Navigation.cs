@@ -14,6 +14,7 @@ namespace Nav {
 		Transform player;
 		private city cities;
 		[SerializeField] private NavMeshAgent AI = null;
+		[SerializeField] private GameObject _fireNavigatorButton;
 		private LineRenderer lineRenderer;
 		[SerializeField] private TMP_Text _Text = null;
 		[SerializeField] private Image _imageSlot = null;
@@ -45,6 +46,7 @@ namespace Nav {
 			}
 			if(postion != null) {
 				SetDestination(postion, _crewID.Value);
+				_fireNavigatorButton.SetActive(true);
 			}
 		}
 		public static float CalcAngle(Vector3 from, Vector3 to) {
@@ -241,6 +243,13 @@ namespace Nav {
 		}
 		public void DeactiveText() {
 			_menu.SetActive(false);
+		}
+		public void FireNavigation() {
+			_startNavigation = false;
+			postion = null;
+			_crewID = null;
+			_Text.text = "";
+			_Navgater.SetActive(false);
 		}
 	}
 
