@@ -7743,7 +7743,7 @@ PrefabInstance:
     - target: {fileID: 53686427298755361, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: LeaveKottaboas
+      value: LeaveKotaboas
       objectReference: {fileID: 0}
     - target: {fileID: 380314680271195494, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
@@ -7753,7 +7753,7 @@ PrefabInstance:
     - target: {fileID: 380314680271195494, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: LeaveKottaboas
+      value: LeaveKotaboas
       objectReference: {fileID: 0}
     - target: {fileID: 865746767865399678, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
@@ -7778,7 +7778,7 @@ PrefabInstance:
     - target: {fileID: 865746767865399678, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: KottabosUnPauseMenu
+      value: KotabosUnPauseMenu
       objectReference: {fileID: 0}
     - target: {fileID: 865746767865399678, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
@@ -7813,7 +7813,7 @@ PrefabInstance:
     - target: {fileID: 2132655572235361354, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: LeaveKottaboas
+      value: LeaveKotaboas
       objectReference: {fileID: 0}
     - target: {fileID: 2340616706843157574, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
@@ -8254,7 +8254,7 @@ PrefabInstance:
     - target: {fileID: 7191196735708758109, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: RestartKottabos
+      value: RestartKotabos
       objectReference: {fileID: 0}
     - target: {fileID: 7398002513987589330, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
@@ -8364,7 +8364,7 @@ PrefabInstance:
     - target: {fileID: 8527801526842514904, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: KottabosPauseMenu
+      value: KotabosPauseMenu
       objectReference: {fileID: 0}
     - target: {fileID: 8527801526842514904, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
@@ -8394,7 +8394,7 @@ PrefabInstance:
     - target: {fileID: 8766738322052494194, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: RestartKottabos
+      value: RestartKotabos
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7bddbb20614417b4d982059e874b4a90, type: 3}
