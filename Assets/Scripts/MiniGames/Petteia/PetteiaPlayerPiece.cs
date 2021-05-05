@@ -19,6 +19,7 @@ public class PetteiaPlayerPiece : MonoBehaviour
 
 	private Vector2Int potentialPos;
 	private List<PetteiaBoardPosition> validMoves = new List<PetteiaBoardPosition>();
+	private bool gameStarted = false;
 
 	void Start()
     {
@@ -55,7 +56,7 @@ public class PetteiaPlayerPiece : MonoBehaviour
 		//Apparently OnMouseDown and similar still fire on a disabled script
 		//This means the player could click on an enemy piece and cause problems
 		//which is why we check if the script is enabled first
-		if (enabled) 
+		if (enabled && gameStarted) 
 		{
 			//OnMouseDown will still register through UI, so this checks if it's doing that
 			//It doesn't work 100% of the time, but often enough to fix the majority of issues
@@ -133,7 +134,7 @@ public class PetteiaPlayerPiece : MonoBehaviour
 	/// </summary>
 	/// <param name="startPos"></param>
 	/// <returns></returns>
-	private List<PetteiaBoardPosition> PopulateValidMovesList(Vector2Int startPos) 
+	public List<PetteiaBoardPosition> PopulateValidMovesList(Vector2Int startPos) 
 	{
 		List<PetteiaBoardPosition> possibleMoves = new List<PetteiaBoardPosition>();
 		possibleMoves.Add(pController.BoardSquares[startPos.x, startPos.y]);
@@ -185,5 +186,9 @@ public class PetteiaPlayerPiece : MonoBehaviour
 	/// <param name="toggle"></param>
 	public void ToggleHighlight(bool toggle) {
 		highlight.SetActive(toggle);
+	}
+
+	public void StartGame() {
+		gameStarted = true;
 	}
 }

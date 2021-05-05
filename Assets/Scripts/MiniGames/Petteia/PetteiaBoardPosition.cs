@@ -8,7 +8,7 @@ public class PetteiaBoardPosition : MonoBehaviour
 	public GameObject highlight;
 	public PetteiaGameController pController;
 	
-	public bool occupied;
+	[HideInInspector] public bool occupied;
 
 	private PetteiaPlayerPiece currentPiece;
 

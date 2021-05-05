@@ -52,7 +52,6 @@ public class PetteiaGameController : MonoBehaviour
 		string text = introText + "\n\n" + instructions + "\n\n" + "flavor";
 		mgScreen.DisplayText("Petteia", "Taverna game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaStart);
 		enemyAI = GetComponent<PetteiaEnemyAI>();
-		InitalStateSetup();
 		playerTurn = true;
 
 		//Turns the various rows of board squares into one 2D array
@@ -67,10 +66,19 @@ public class PetteiaGameController : MonoBehaviour
 			BoardSquares[6, i] = squaresRow6[i];
 			BoardSquares[7, i] = squaresRow7[i];
 		}
+		InitalStateSetup();
 
 		//Player goes first, so their pieces are highlighted and the enemy's are not
 		HighlightPlayerPieces(true);
 		enemyAI.ToggleEnemyHighlight(false);
+	}
+
+	public void EnableAllPlayerPieces() 
+	{
+		foreach (PetteiaPlayerPiece p in playerPieces) 
+		{
+			p.StartGame();
+		}
 	}
 
 	public void PauseMinigame() 
@@ -105,11 +113,11 @@ public class PetteiaGameController : MonoBehaviour
 		if (playerTurn) {
 			//Switching from player turn to enemy turn
 			CheckCapture();
+			CheckPlayerBlocked();
 			playerTurn = false;
 			enemyAI.CheckPieces();
 			CheckGameOver();
-
-
+			
 			HighlightPlayerPieces(false);
 			enemyAI.ToggleEnemyHighlight(true);
 
@@ -119,6 +127,7 @@ public class PetteiaGameController : MonoBehaviour
 		{
 			//Switching from enemy turn to player turn
 			CheckCapture();
+			CheckPlayerBlocked();
 			playerTurn = true;
 			enemyAI.CheckPieces();
 			CheckGameOver();
@@ -150,12 +159,21 @@ public class PetteiaGameController : MonoBehaviour
 
 	private void InitalStateSetup() 
 	{
-		for (int i = 0; i < 8; i++) 
+		//1 - enemy
+		//2 - player
+
+		//We could roll these into one since enemy and player should always have the same number of pieces
+		//But while testing, I made one or the other start with fewer so it would be easier to finish
+		for (int i = 0; i < enemyAI.pieces.Count; i++) 
 		{
-			//1 - enemy
-			//2 - player
-			positions[0, i] = 1;
-			positions[7, i] = 2;
+			positions[enemyAI.pieces[i].pieceStartPos.x, enemyAI.pieces[i].pieceStartPos.y] = 1;
+			BoardSquares[enemyAI.pieces[i].pieceStartPos.x, enemyAI.pieces[i].pieceStartPos.y].occupied = true;
+		}
+
+		for (int i = 0; i < playerPieces.Count; i++) 
+		{
+			positions[playerPieces[i].pieceStartPos.x, playerPieces[i].pieceStartPos.y] = 2;
+			BoardSquares[playerPieces[i].pieceStartPos.x, playerPieces[i].pieceStartPos.y].occupied = true;
 		}
 	}
 
@@ -247,6 +265,42 @@ public class PetteiaGameController : MonoBehaviour
 			mgScreen.DisplayText("Petteia Loss", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
 			gameOver = true;
 		}
+	}
+	
+	public void BlockingGameOver(bool playerBlocked) 
+	{
+		if (playerBlocked) {
+			//player can't move, has therefore lost
+			Debug.Log("Player is blocked in");
+			mgScreen.gameObject.SetActive(true);
+			string text = "Lost because of blocking" + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!";
+			mgScreen.DisplayText("Petteia Loss", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+			gameOver = true;
+		}
+		else {
+			//enemy can't move, player has therefore won
+			//Won't have special text, so can just trick the game into thinking the player won normally
+			Debug.Log("Enemy is blocked in");
+			enemyAI.pieces.Clear();
+			CheckGameOver();
+		}
+	}
+
+	private void CheckPlayerBlocked() 
+	{
+		for (int i = 0; i < playerPieces.Count; i++) 
+		{
+			List<PetteiaBoardPosition> validMoves = playerPieces[i].PopulateValidMovesList(playerPieces[i].pieceStartPos);
+
+			//If any one player piece can still move, you're not blocked
+			//We check if it's more than 1 because the square the piece is currently on is always counted
+			if (validMoves.Count > 1) 
+			{
+				return;
+			}
+		}
+
+		BlockingGameOver(true);
 	}
 
 	/// <summary>

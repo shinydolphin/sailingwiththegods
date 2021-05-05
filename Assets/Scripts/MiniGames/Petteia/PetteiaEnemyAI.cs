@@ -501,9 +501,8 @@ public class PetteiaEnemyAI : MonoBehaviour
 			{
 				if (tries >= 50) 
 				{
-					yield return StartCoroutine(MovePiece(pieceToMove.gameObject, s, movementDistance)); //Move cant be found - pass turn
-					Debug.Log("enemy couldn't find a move, skipping");
-					//Need some dialouge here like "I pass my turn TODO"
+					Debug.Log("Enemy can't find a move");
+					pController.BlockingGameOver(false);
 				}
 				else 
 				{

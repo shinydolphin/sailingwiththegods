@@ -4,5 +4,6 @@ using UnityEngine;
 
 public class PetteiaEnemyPiece : MonoBehaviour
 {
+	public Vector2Int pieceStartPos;
 	public GameObject highlight;
 }
