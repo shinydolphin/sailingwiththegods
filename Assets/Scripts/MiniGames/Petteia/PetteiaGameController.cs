@@ -29,7 +29,8 @@ public class PetteiaGameController : MonoBehaviour
 
 	[Header("UI")]
 	public MiniGameInfoScreen mgScreen;
-	public TavernaMiniGameDialog gameBarks;
+	public TavernaMiniGameDialog playerBarks;
+	public TavernaEnemyDialog enemyBarks;
 	public Sprite gameIcon;
 	public float barkChance = 0.25f;
 
@@ -116,7 +117,7 @@ public class PetteiaGameController : MonoBehaviour
 			CheckPlayerBlocked();
 			playerTurn = false;
 			enemyAI.CheckPieces();
-			CheckGameOver();
+			StartCoroutine(CheckGameOver());
 			
 			HighlightPlayerPieces(false);
 			enemyAI.ToggleEnemyHighlight(true);
@@ -130,7 +131,7 @@ public class PetteiaGameController : MonoBehaviour
 			CheckPlayerBlocked();
 			playerTurn = true;
 			enemyAI.CheckPieces();
-			CheckGameOver();
+			StartCoroutine(CheckGameOver());
 
 			HighlightPlayerPieces(true);
 			enemyAI.ToggleEnemyHighlight(false);
@@ -232,9 +233,12 @@ public class PetteiaGameController : MonoBehaviour
 	/// <summary>
 	/// Checks if either the player or opponent is down to 1 piece left
 	/// </summary>
-	public void CheckGameOver() 
+	public IEnumerator CheckGameOver() 
 	{
 		//Debug.Log($"Players: {playerPieces.Count} | Enemies: {enemyAI.pieces.Count}");
+		yield return null;
+		enemyAI.CheckPieces();
+		yield return null;
 
 		//Player win
 		if (enemyAI.pieces.Count <= 1) 
@@ -282,7 +286,7 @@ public class PetteiaGameController : MonoBehaviour
 			//Won't have special text, so can just trick the game into thinking the player won normally
 			Debug.Log("Enemy is blocked in");
 			enemyAI.pieces.Clear();
-			CheckGameOver();
+			StartCoroutine(CheckGameOver());
 		}
 	}
 
@@ -328,15 +332,30 @@ public class PetteiaGameController : MonoBehaviour
 			Debug.Log("Waited too long for the enemy to check its pieces");
 		}
 		
-		if (Random.Range(0f, 1f) < barkChance) {
-			//player captures enemy
-			if (positions[i, j] == 1) {
-				gameBarks.DisplayInsult();
+		if (Random.Range(0f, 1f) < barkChance) 
+		{
+			if (Random.Range(0f, 1f) > 0.5f) 
+			{
+				//player captures enemy - player brags
+				if (positions[i, j] == 1) {
+					playerBarks.DisplayBragging();
+				}
+				//enemy captures player - player insults
+				else if (positions[i, j] == 2) {
+					playerBarks.DisplayInsult();
+				}
 			}
-			//enemy captures player
-			else if (positions[i, j] == 2) {
-				gameBarks.DisplayBragging();
+			else {
+				//player captures enemy - enemy insults
+				if (positions[i, j] == 1) {
+					enemyBarks.DisplayInsult();
+				}
+				//enemy captures player - enemy brags
+				else if (positions[i, j] == 2) {
+					enemyBarks.DisplayBragging();
+				}
 			}
+
 		}
 
 		positions[i, j] = 0;

@@ -2,29 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+
 public class TavernaMiniGameDialog : MonoBehaviour
 {
 	public GameObject textBackground;
-	public Text enemyName;
 	public Text dialog;
-	public Image enemyImage;
-	private const string ResourcePath = "crew_portraits";
-	private const string DefaultPortrait = "crew_portraits/phoenician_sailor";
 
-	private CrewMember crew;
+	protected List<string> braggingTexts;
+	protected List<string> insultingTexts;
 
-    void Start()
-    {
+	private void Start() 
+	{
 		textBackground.SetActive(false);
 
-		//These null checks are for testing purposes, so you can run this script in a scene without the main scene loaded additively in the background
-		if (Globals.GameVars != null) {
-			crew = Globals.GameVars.currentSettlement.availableCrew.RandomElement();
-			enemyName.text = crew.name;
-			enemyImage.sprite = Resources.Load<Sprite>(ResourcePath + "/" + crew.ID) ?? Resources.Load<Sprite>(DefaultPortrait);
-		}
-
+		//Will be replaced with pulling texts from a CSV
+		braggingTexts = new List<string> { "Player brag 1", "Player brag 2" };
+		insultingTexts = new List<string> { "Player insult 1", "Player insult 2" };
 	}
 
 	/// <summary>
@@ -34,7 +27,7 @@ public class TavernaMiniGameDialog : MonoBehaviour
 		Time.timeScale = 0;
 		textBackground.SetActive(true);
 		if (Globals.GameVars != null) {
-			dialog.text = Globals.GameVars.tavernaGameInsults.RandomElement();
+			dialog.text = insultingTexts.RandomElement();
 		}
 		else {
 			dialog.text = "Insult goes here";
@@ -48,7 +41,7 @@ public class TavernaMiniGameDialog : MonoBehaviour
 		Time.timeScale = 0;
 		textBackground.SetActive(true);
 		if (Globals.GameVars != null) {
-			dialog.text = Globals.GameVars.tavernaGameBragging.RandomElement();
+			dialog.text = braggingTexts.RandomElement();
 		}
 		else {
 			dialog.text = "Bragging goes here";

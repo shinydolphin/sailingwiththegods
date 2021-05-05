@@ -50,6 +50,7 @@ public class PetteiaBoardPosition : MonoBehaviour
 				pController.playerPieces.Remove(currentPiece);
 			}
 			Destroy(currentPiece.gameObject);
+			pController.enemyAI.CheckPieces();
 			currentPiece = null;
 			occupied = false;
 		}
