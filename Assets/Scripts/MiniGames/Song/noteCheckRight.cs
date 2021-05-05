@@ -30,9 +30,13 @@ public class noteCheckRight : MonoBehaviour
 
 }
 
-
+	private void OnTriggerStay(Collider other) {
+		if (canBePressed) {
+			other.SendMessage("flash");
+		}
+	}
 	//When note is hit correctly 
-    public void correctNoteHit()
+	public void correctNoteHit()
     {
 		if(canBePressed)
            {

@@ -101,6 +101,7 @@ public class QuestSystem : MonoBehaviour
 		}
 		else {
 			// TODO: until we have a better idea, show the description as a message box for quest segments that aren't targeting a specific city (and so can't use the usual captain's log entry system which depends on city ids)
+			//if (segmentId != 0) { gameVars.ShowANotificationMessage(QuestMessageIntro + nextSegment.descriptionOfQuest); }
 			gameVars.ShowANotificationMessage(QuestMessageIntro + nextSegment.descriptionOfQuest);
 		}
 

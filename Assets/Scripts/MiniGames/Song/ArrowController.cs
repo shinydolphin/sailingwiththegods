@@ -32,7 +32,7 @@ public class ArrowController : MonoBehaviour
         }
         else
         {
-            transform.position -= new Vector3(0f, noteTempo * Time.deltaTime, 0f);
+            transform.position -= new Vector3(0f,SongGameController.Soere_speed * noteTempo * Time.deltaTime, 0f);
         }
 
 		//destroys this arrow when game ends

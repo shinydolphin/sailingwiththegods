@@ -4,10 +4,19 @@ this is in place to keep the hand motions from inyerfering with cotobos
 
 to routate the arm use animamator.getfloat(name) or animamator.setfloat(name,vale)
 animamator.getfloat(Upper_arm_angle_UP_Down); (-1=down, 1=UP)
-animamator.getfloat(Upper_arm_angle_Forward); (0=nutral, 1=forward)
+animamator.getfloat(Upper_arm_angle_Forward); (0=nutral, 1=forward)// no need to move backwards so I did not make a clip for that
 animamator.getfloat(lower_arm_angle); (0=nutral, 1=forward)//dose not work right now
 
 // each animation on the arm as a mask on it other than the cotobos clips 
 the mask was set up in the fbx inport settings 
 this was needed as the mask cant be set for non-human clips other waise
 I added the second arm to bing in the arms movement clips that the origanal did not have
+
+
+//for the bend trees
+each clip in the blend tree is more of a pose than an animation and each one is give an (x,y) coordinate.
+I set them between 1 and -1 for each direction so for example (0,1) is the pose to move the arm all the way up 
+were as (-1,0) is all the way to the left (.5,1) is 50% between nutral and left and 100% up.
+
+controlling the float values is how you can get any possible angle
+note the lower arm only move one way as the elbow as it can only move one way 

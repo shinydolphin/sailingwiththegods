@@ -41,4 +41,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Kottaboas/Scenes/Kottaboas_Game.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/_Scenes/Song_game.unity
+    guid: 57c9d78f816a5a84b93ded3c44e5120c
   m_configObjects: {}
