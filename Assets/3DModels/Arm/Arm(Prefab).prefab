@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: 167735875948047484}
   - component: {fileID: 421459980617692513}
   m_Layer: 0
-  m_Name: arm
+  m_Name: Arm(Prefab)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -968,7 +968,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -7389566162146866752, guid: 329abafdd7b3419429e61f5e2605e0d6, type: 3}
+  - {fileID: 2100000, guid: a1ec029a91a73084386e14ea913f24ef, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

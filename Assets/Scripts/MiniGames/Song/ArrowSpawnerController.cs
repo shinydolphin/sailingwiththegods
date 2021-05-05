@@ -40,12 +40,13 @@ public class ArrowSpawnerController : MonoBehaviour
         // arrow.parent = spawnParent;
 
       
-
+		// josh's notes I moved the code down below line 45 so arrows would not spawn at the games start
+		// spawn time is set publicly in the inspecter
 			callFunction = false;
             yield return new WaitForSeconds(Random.Range(minTimeBetweenSpawn, maxTimeBetweenSpawn));
 			callFunction = true;
-		arrow = Instantiate(arrowToSpawn, spawnLoc.transform.position, spawnLoc.transform.rotation) as GameObject;
-		if (spawnParent != null) //get rid of null ref at the games end
+			arrow = Instantiate(arrowToSpawn, spawnLoc.transform.position, spawnLoc.transform.rotation) as GameObject;
+			if (spawnParent != null) //get rid of null ref at the games end
 			{ arrow.transform.SetParent(spawnParent.transform); }
 		
 		// }

@@ -31,7 +31,7 @@ public class SongGameController : MonoBehaviour
 	public static float currentScore;
 	public  static int score_check;
 	public int scorePerNote = 100;
-	int clout = 0;
+	
 
 	public static int currentMultiplier;
     public int multiplierTracker;
@@ -39,13 +39,12 @@ public class SongGameController : MonoBehaviour
 	
 	public static float Soere_speed {
 		get {
-			//play with this formula to adhust arrow speed based on scrore
+			//josh's notes I made this to act as a multiplyer for ArrowController.cs line 35 
+			// it was meet to make it harder as you got more points 
+			// I never got it quite right so I have this as a place holder for now
+			// feel free to change it
+
 			float x = (currentScore / targetScore) *2;
-			//Debug.Log("X speed " + x+ (float)(currentMultiplier / currentMultiplier));
-			//if (currentMultiplier == 2) { return 1 + x + (float)(currentMultiplier / 2f); }
-			//else if(currentMultiplier == 3) { return 1 + x + (float)(currentMultiplier / 3f); }
-			//else if(currentMultiplier == 4) { return 1 + x + (float)(currentMultiplier / 4f); }
-			//else { return 1 + x; }
 			return 1 + x;
 
 		}
@@ -65,6 +64,7 @@ public class SongGameController : MonoBehaviour
 	}
 	public static void set_song(int x) 
 	{
+		//quick check to see what song to play
 		party_song = false;
 		War_song = false;
 		Sorrow_Song = false; 
@@ -79,7 +79,7 @@ public class SongGameController : MonoBehaviour
 	}
 	void set_end_message() 
 	{
-
+		//reading the messages from the files
 		string myFile = Resources.Load<TextAsset>("Song\\You Lose Badly").text;
 		lose_message_badly = myFile.Split('\n').ToList();
 
@@ -114,10 +114,14 @@ public class SongGameController : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
+		//not sure if this is used now
         instance = this;
         //lyricsColor = lyricsText.color;  //  sets color to object
         lyricsColor.a = 0.0f; // makes the color transparent
-        targetScore = 100*LyricsController.word_limit;
+        
+		
+		//josh's notes set the ending target (may not be used after the last cchanges)
+		targetScore = 100*LyricsController.word_limit;
 
 
         //Resetting score at Start
@@ -147,6 +151,7 @@ public class SongGameController : MonoBehaviour
 	}
 
 	void win_game(float score) {
+		int clout = 0;
 		if (!setmessage) 
 			{
 			if (score > .60f) {
@@ -192,7 +197,7 @@ public class SongGameController : MonoBehaviour
         }
 
 		//End Game Manger
-		if (LyricsController.word_check()) {
+		if (LyricsController.word_check()) {//check for win condisions
 
 			//Debug.Log("score check1 " + score_precent);
 			//Debug.Log("score check2 " + score_precent/100);
@@ -200,8 +205,7 @@ public class SongGameController : MonoBehaviour
 			win_game(score_precent);
 
 		}
-		else  if (!endGameState && gameEndTimerHolder >= gameEndTimerValue)
-        {
+		else  if (!endGameState && gameEndTimerHolder >= gameEndTimerValue) {//check for lose condisions
 			lose_game(score_precent);
 			Debug.Log("time up");
 			lose.alpha = 1;

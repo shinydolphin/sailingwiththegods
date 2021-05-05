@@ -68,7 +68,7 @@ public class LyricsController : MonoBehaviour
 		myFile = Resources.Load<TextAsset>("Song\\party").text;
 		partyLyricsList = myFile.Split('\n').ToList();
 
-
+		//(josh)decide witch list of songs to load up
 		if (SongGameController.party_song)
         {
             currentLyricsIndex = wisdomyLyricsList[Random.Range(0, wisdomyLyricsList.Count)];
@@ -104,10 +104,11 @@ public class LyricsController : MonoBehaviour
 		// GameManager.ChangeOppacityOfLyrics(lyricsText);
 		//text_mask.fillAmount = SongGameController.currentScore / SongGameController.targetScore; 
 		if (SongGameController.score_check>=100 && word_count<active_words.Length) 
-		{
+		{//josh's notes loop to add one word for every 100 points 
 			for(int i = SongGameController.score_check; i > 0; i -= 100) 
 			{  // add one word for every 100 points
 				if (word_count == active_words.Length) { break; }//prevent going out of bounds
+				//josh's notes add HTML tages to give the thext coloer 
 				lyricsText.text += " "+ lyricsColor + active_words[word_count]+"</color>";
 				//lyricsText.text += " " + active_words[word_count];
 				word_count++;
@@ -133,7 +134,7 @@ public class LyricsController : MonoBehaviour
         //using a game object 
         //changingLyrics.GetComponent<Text>().text = currentLyricsIndex; 
 
-        //using a Text 
+        //set the array of words to fill in
        active_words = currentLyricsIndex.Split(' ');
 		lyricsText.text = "";
 	}

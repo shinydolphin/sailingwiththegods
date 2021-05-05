@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 public class SongMenuController : MonoBehaviour
 {
 	public GameObject game_state,main_state;
+	//as a part of condincing this to one seen set the main menue and the song menue to there own game objects
+	// on start the main state is true.
     public void PlayWisdomSong()
     {
 		SongGameController.set_song(4);
@@ -38,10 +40,7 @@ public class SongMenuController : MonoBehaviour
 
 	public void MainMenuScene()
     {
-		//game_state.SetActive(false);
-		//main_state.SetActive(true);
-		//StartCoroutine(UnloadSong());
-		//SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+		//use to relod the seen
 		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 
@@ -51,6 +50,7 @@ public class SongMenuController : MonoBehaviour
 
 	// set the menu active before unloading the song scene since that will cancel the coroutine
 	// TODO: Needs a refactor so that the context doesn't get lost on unloading the song (same issue with tavern menu)
+	// (josh) I did not tuch this (I over looked it)
 	IEnumerator UnloadSong() {
 		var songScene = SceneManager.GetActiveScene();
 		var songMenuScene = SceneManager.GetSceneByName("SongCompMainMenu");

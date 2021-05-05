@@ -4,6 +4,9 @@ using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 [Serializable]
+
+
+//josh's notes this is a quick script that was made to have subitle funtonality with the time line to use in the intro seen
 public class SubtitleDataPlayable : PlayableBehaviour {
     public string text = "A Subtitle";
     public Color color = Color.white;

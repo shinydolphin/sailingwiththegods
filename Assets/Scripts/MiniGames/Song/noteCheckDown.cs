@@ -51,6 +51,7 @@ public class noteCheckDown : MonoBehaviour
 	private void OnTriggerStay(Collider other) {
 		if (canBePressed) 
 		{
+			//josh's notes I added this funton for the green flash effect 
 			other.SendMessage("flash");
 		}
 		}
