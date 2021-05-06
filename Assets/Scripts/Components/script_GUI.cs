@@ -469,7 +469,7 @@ public class script_GUI : MonoBehaviour
 		//Check if current Settlement is part of the main quest line
 		Globals.Quests.CheckCityTriggers(GameVars.currentSettlement.settlementID);
 		//Add this settlement to the player's knowledge base
-		Debug.Log("Adding known city from script_GUI: " + GameVars.currentSettlement.name);
+		//Debug.Log("Adding known city from script_GUI: " + GameVars.currentSettlement.name);
 		GameVars.playerShipVariables.ship.playerJournal.AddNewSettlementToLog(GameVars.currentSettlement.settlementID);
 		//Determine what settlements are available to the player in the tavern
 		GameVars.showSettlementGUI = true;
@@ -594,8 +594,7 @@ public class script_GUI : MonoBehaviour
 
 
 	//=================================================================================================================
-	// NOTIFICATION POP-UP SYSTEM
-	//=================================================================================================================	
+	// NOTIFICATION POP-UP SYSTEM	//=================================================================================================================	
 
 	void ShowNotification(string message) {
 
@@ -604,11 +603,16 @@ public class script_GUI : MonoBehaviour
 		Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
 			Title = "Attention!",
 			Message = message,
-			OnClose = () => GameVars.menuControlsLock = false
+			OnClose = () => OnNotificationClose()
 	});
 		
 	}
 
+	public void OnNotificationClose() {
+		if (!Globals.UI.IsShown<PortScreen>() && !Globals.UI.IsShown<CityView>()) {
+			GameVars.menuControlsLock = false;
+		}
+	}
 
 	//=================================================================================================================
 	// HELPER FUNCTIONS FOR IN-PORT TRADE WINDOW

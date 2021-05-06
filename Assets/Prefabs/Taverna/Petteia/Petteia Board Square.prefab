@@ -113,7 +113,7 @@ GameObject:
   - component: {fileID: 6886506424855428057}
   - component: {fileID: 6886506424855428060}
   m_Layer: 23
-  m_Name: Board Square
+  m_Name: Petteia Board Square
   m_TagString: Untagged
   m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -208,6 +208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   position: {x: 0, y: 0}
   highlight: {fileID: 637227422417881653}
+  pController: {fileID: 0}
   occupied: 0
 --- !u!1 &7415768217072750508
 GameObject:

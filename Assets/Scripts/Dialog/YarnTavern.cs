@@ -9,7 +9,6 @@ using Yarn.Unity;
 
 public class YarnTavern : MonoBehaviour
 {
-
 	private DialogScreen ds;
 	private Navigation _Nav;
 
@@ -20,17 +19,18 @@ public class YarnTavern : MonoBehaviour
 		_Nav = GameObject.Find("Nav").GetComponent<Navigation>();
 	}
 
+	#region Yarn Functions - Set Variables (Taverna)
 	[YarnCommand("settaverninfo")]
 	public void SetTavernInformation() {
 		ds.YarnUI.onDialogueEnd.RemoveAllListeners();
 		ds.YarnUI.onDialogueEnd.AddListener(ds.gui.CloseTavernDialog);
 	}
-
-
+	
 	[YarnCommand("getcurrentsettlement")]
 	public void GetCurrentSettlement() {
 		ds.Storage.SetValue("$known_city", Globals.GameVars.currentSettlement.name);
 		ds.Storage.SetValue("$known_city_ID", Globals.GameVars.currentSettlement.settlementID);
+		ds.Storage.SetValue("$known_city_type", Globals.GameVars.currentSettlement.typeOfSettlement);
 	}
 
 	//We need this so we can make sure not to let the player order a guide to the city they're currently at
@@ -43,62 +43,13 @@ public class YarnTavern : MonoBehaviour
 	public void GetNumberOfKnownSettlements() {
 		ds.Storage.SetValue("$settlement_number", Globals.GameVars.playerShipVariables.ship.playerJournal.knownSettlements.Count);
 	}
-	
-	public void GenerateKnownSettlementUI(string [] parameters, System.Action onComplete) 
-	{
-		ds.yarnOnComplete = onComplete;
-		Globals.UI.Show<TavernView, TavernViewModel>(new TavernViewModel(ds));
-		//Debug.Log("POPPING KNOWN SETLLEMTNS");
-	}
+	#endregion
 
-	[YarnCommand("randomGuide")]
-	public void GenerateGuideDialogue() 
-	{
-		List<DialogText> guideText = Globals.GameVars.guideDialogText;
-
-		int i = Random.Range(1, guideText.Count);
-
-		if(guideText[i].TextQA[0].Equals("")) 
-		{
-			guideText[i].TextQA = guideText[1].TextQA;
-			//Debug.Log("WAS EMPT E");
-			
-		}
-		if (guideText[i].TextQA[1].Equals("")) {
-			guideText[i].TextQA = guideText[1].TextQA;
-			//Debug.Log("WAS EMPTY");
-		}
-
-		//Debug.Log("TEXT: " + guideText[i].Text);
-		//Debug.Log("TEXT1: " + guideText[i].TextQA[0]);
-		//Debug.Log("TEXT2: " + guideText[i].TextQA[1]);
-
-
-		ds.Storage.SetValue("$flavor_text1", guideText[i].CityType); // Wrongfully added in CityType.
-		ds.Storage.SetValue("$flavor_text2", guideText[i].TextQA[0]);
-		ds.Storage.SetValue("$flavor_text3", guideText[i].TextQA[1]);
-
-	}
-
-	[YarnCommand("setbeacon")]
-	public void SetSettlementWaypoint()
-	{
-		_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.GameVars.AllNonCrew.RandomElement().ID);
-		//int cityID = (int)ds.Storage.GetValue("$known_city_ID").AsNumber;
-		//Vector3 location = Vector3.zero;
-		//for (int x = 0; x < Globals.GameVars.settlement_masterList_parent.transform.childCount; x++)
-		//	if (Globals.GameVars.settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == cityID)
-		//		location = Globals.GameVars.settlement_masterList_parent.transform.GetChild(x).position;
-		//Globals.GameVars.ActivateNavigatorBeacon(Globals.GameVars.navigatorBeacon, location);
-		//Globals.GameVars.playerShipVariables.ship.currentNavigatorTarget = cityID;
-		//Globals.GameVars.ShowANotificationMessage("You hired a navigator to " + City.name + " for " + CostToHire + " drachma.");
-		
-	}
-
-	[YarnCommand("randomFoodDialogue")]
-	public void GenerateRandomFoodDialogue() {
+	#region Yarn Functions - Random (Taverna)
+	[YarnCommand("randomfooddialog")]
+	public void GenerateRandomFoodDialog() {
 		// Begin pulling random food item.
-		List<FoodText> foodList = Globals.GameVars.foodDialogueText;
+		List<FoodText> foodList = Globals.GameVars.foodDialogText;
 
 		int i = Random.Range(1, foodList.Count);
 
@@ -106,35 +57,35 @@ public class YarnTavern : MonoBehaviour
 			foodList[i].FoodCost = (int)ds.Storage.GetValue("$dracma_cost").AsNumber;
 		}
 
-		ds.Storage.SetValue("$food_dialogue_item", foodList[i].Item);
-		ds.Storage.SetValue("$food_dialogue_quote", foodList[i].GetQuote);
-	}
-
-	[YarnCommand("randomWine")]
-	public void GenerateRandomWineInfo() {
-		// Begin pulling random food item.
-		List<FoodText> foodList = Globals.GameVars.wineInfoText;
-
-		int i = Random.Range(1, foodList.Count);
-
-		if (foodList[i].FoodCost == 0) {
-			foodList[i].FoodCost = (int)ds.Storage.GetValue("$dracma_cost").AsNumber;
-		}
-
+		ds.Storage.SetValue("$food_dialog_item", foodList[i].Item);
+		ds.Storage.SetValue("$food_dialog_quote", foodList[i].GetQuote);
 		ds.Storage.SetValue("$drachma_cost", foodList[i].FoodCost);
-		ds.Storage.SetValue("$random_wine", foodList[i].Item);
-		ds.Storage.SetValue("$wine_quote", foodList[i].GetQuote);
+	}
+
+	[YarnCommand("randomwine")]
+	public void GenerateRandomWineInfo() {
+		// Begin pulling random wine items
+		List<FoodText> wineList = Globals.GameVars.wineInfoText;
+
+		int i = Random.Range(1, wineList.Count);
+
+		if (wineList[i].FoodCost == 0) {
+			wineList[i].FoodCost = (int)ds.Storage.GetValue("$dracma_cost").AsNumber;
+		}
+
+		ds.Storage.SetValue("$drachma_cost", wineList[i].FoodCost);
+		ds.Storage.SetValue("$random_wine", wineList[i].Item);
+		ds.Storage.SetValue("$wine_quote", wineList[i].GetQuote);
 	}
 
 
-	[YarnCommand("randomFood")]
+	[YarnCommand("randomfood")]
 	public void GenerateRandomFoodItem() 
 	{
 		// Begin pulling random food item.
 		List<FoodText> foodList =  Globals.GameVars.foodItemText;
 
 		int i = Random.Range(1, foodList.Count);
-		//Debug.Log("COUNT THE FOOD " + foodList.Count);
 
 		if (foodList[i].FoodCost == 0) {
 			foodList[i].FoodCost = (int)ds.Storage.GetValue("$generated_cost").AsNumber;
@@ -151,7 +102,6 @@ public class YarnTavern : MonoBehaviour
 	{
 		// Get the city we know of
 		string e = ds.Storage.GetValue("$known_city").AsString;
-		//Debug.Log("WE ARE ASKING ABOUT " + e);
 		List<DialogText> matchingType = new List<DialogText>();
 
 		// Obtain the known settlements we can talk about! (NOTE: will change to display known settlements and we'll search our info based on selection)
@@ -220,7 +170,41 @@ public class YarnTavern : MonoBehaviour
 			ds.Storage.SetValue("$response2", matchingType[i].TextQA[2]);
 
 		//Special condition for home town?
+	}
+	#endregion
 
+	#region Yarn Functions - Navigation
+	[YarnCommand("randomguide")]
+	public void GenerateGuideDialogue() 
+	{
+		List<DialogText> guideText = Globals.GameVars.guideDialogText;
+
+		int i = Random.Range(1, guideText.Count);
+
+		if(guideText[i].TextQA[0].Equals("")) 
+		{
+			guideText[i].TextQA = guideText[1].TextQA;
+			
+		}
+		if (guideText[i].TextQA[1].Equals("")) {
+			guideText[i].TextQA = guideText[1].TextQA;
+		}
+
+		ds.Storage.SetValue("$flavor_text1", guideText[i].CityType); // Wrongfully added in CityType.
+		ds.Storage.SetValue("$flavor_text2", guideText[i].TextQA[0]);
+		ds.Storage.SetValue("$flavor_text3", guideText[i].TextQA[1]);
 	}
 
+	[YarnCommand("hirenavigator")]
+	public void SetSettlementWaypoint()
+	{
+		_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.GameVars.AllNonCrew.RandomElement().ID);		
+	}
+	#endregion
+
+	public void GenerateKnownSettlementUI(string [] parameters, System.Action onComplete) 
+	{
+		ds.yarnOnComplete = onComplete;
+		Globals.UI.Show<TavernView, TavernViewModel>(new TavernViewModel(ds));
+	}
 }

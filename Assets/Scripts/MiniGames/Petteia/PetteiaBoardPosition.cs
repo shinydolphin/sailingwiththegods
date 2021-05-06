@@ -2,22 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PetteiaColliderMover : MonoBehaviour
+public class PetteiaBoardPosition : MonoBehaviour
 {
 	public Vector2Int position;
 	public GameObject highlight;
 	public PetteiaGameController pController;
+	
+	[HideInInspector] public bool occupied;
 
-	//public bool destroy;
-	//public PetteiaGameController p;
-	public bool occupied;
-
-	private PetteiaMovePiece currentPiece;
+	private PetteiaPlayerPiece currentPiece;
 
     void Start()
     {
-		//p = GameObject.Find("board").GetComponent<PetteiaGameController>();
-		//destroy = false;
 		highlight.SetActive(false);
     }
 
@@ -26,7 +22,7 @@ public class PetteiaColliderMover : MonoBehaviour
 		if (other.CompareTag("PetteiaB") || other.CompareTag("PetteiaW")) 
 		{
 			occupied = true;
-			currentPiece = other.GetComponent<PetteiaMovePiece>();
+			currentPiece = other.GetComponent<PetteiaPlayerPiece>();
 		}
 	}
 
@@ -39,12 +35,22 @@ public class PetteiaColliderMover : MonoBehaviour
 		}
 	}
 
-	public void DestroyPiece() {
-		if (currentPiece != null) {
-			if (pController.playerPieces.Contains(currentPiece)) {
+	/// <summary>
+	/// Destroys the piece on this board position
+	/// </summary>
+	public void DestroyPiece() 
+	{
+		//Null check probably isn't necessary, but just in case
+		if (currentPiece != null) 
+		{
+			//If this piece is part of the player piece array, it's a player piece and you have to do some special stuff
+			if (pController.playerPieces.Contains(currentPiece)) 
+			{
+				currentPiece.GetComponent<PetteiaPlayerPiece>().DestroyDummy();
 				pController.playerPieces.Remove(currentPiece);
 			}
 			Destroy(currentPiece.gameObject);
+			pController.enemyAI.CheckPieces();
 			currentPiece = null;
 			occupied = false;
 		}
@@ -53,6 +59,10 @@ public class PetteiaColliderMover : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Toggles the visual highlight on this board position
+	/// </summary>
+	/// <param name="toggle"></param>
 	public void HighlightSpace(bool toggle) 
 	{
 		highlight.SetActive(toggle);

@@ -81,7 +81,7 @@ public class YarnTaxes : MonoBehaviour
 		ds.YarnUI.onDialogueEnd.AddListener(ExitPortConversation);
 	}
 
-	#region Yarn Functions - Set Variables
+	#region Yarn Functions - Set Variables (Taxes)
 	[YarnCommand("citynetworks")]
 	public void NumberOfCityNetworks() 
 	{
@@ -211,12 +211,17 @@ public class YarnTaxes : MonoBehaviour
 	[YarnCommand("cargopay")]
 	public void PayAmountResources(string cost) 
 	{
+		if (owedResources.Count == 0) {
+			Debug.Log("ERROR: You don't owe any cargo!");
+			return;
+		}
 		Globals.GameVars.playerShipVariables.ship.currency = 0;
 		ds.UpdateMoney();
 		for (int i = 0; i < owedResources.Count; i++) {
 			System.Array.Find(Globals.GameVars.playerShipVariables.ship.cargo, x => x.name == owedResources[i].name).amount_kg -= owedResources[i].amount_kg;
 			Debug.Log($"Paying {owedResources[i].amount_kg}kg of {owedResources[i].name}");
 		}
+		owedResources.Clear();
 	}
 
 	[YarnCommand("getresources")]
