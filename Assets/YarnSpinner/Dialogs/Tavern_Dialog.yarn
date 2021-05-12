@@ -36,7 +36,7 @@ colorID: 0
 position: -1249,-317
 ---
 << randomcost DialogScreen 25 35>> 
-<< randomFood DialogScreen>> 
+<< randomfood DialogScreen>> 
 
 << setspeaker DialogScreen Jason>> 
 << randomQA DialogScreen network>>
@@ -60,7 +60,7 @@ colorID: 0
 position: -256,35
 ---
 << randomcost DialogScreen 25 35>>
-<< randomFood DialogScreen>> 
+<< randomfood DialogScreen>> 
 
 << setspeaker DialogScreen Jason>> 
 << randomQA DialogScreen pirate >> 
@@ -81,10 +81,10 @@ It's risky to speak of pirates! I would talk more easily if I had {$random_food}
 title: myths
 tags: 
 colorID: 0
-position: -68,-229
+position: -68,-231
 ---
 << randomcost DialogScreen 15 20>>
-<< randomFood DialogScreen>> 
+<< randomfood DialogScreen>> 
 
 << setspeaker DialogScreen Jason>> 
 << randomQA DialogScreen myth>>
@@ -117,8 +117,8 @@ colorID: 0
 position: -369,495
 ---
 << randomcost DialogScreen 75 100>> 
-<< randomFood DialogScreen>> 
-<< randomGuide DialogScreen>> 
+<< randomfood DialogScreen>> 
+<< randomguide DialogScreen>> 
 
 
 << setspeaker DialogScreen Jason>> 
@@ -245,14 +245,14 @@ Local knowledge, tired ears: a worthy balance. I will hire a guide! {$flavor_tex
 It is true, they are often given to too much chatter: {$flavor_text3}
 << set $first_time to true >> 
 
-<< setbeacon DialogScreen >> 
+<< hirenavigator DialogScreen >> 
 
 [[City_Questions]]
 ===
 title: City_Questions
 tags: 
 colorID: 0
-position: -680,-377
+position: -681,-379
 ---
 << setend DialogScreen>> 
 << if $first_time is true >>
@@ -267,8 +267,13 @@ position: -680,-377
 
 <<checkifcurrent DialogScreen>>
 
+<<if $known_city_type == 1>>
 [[What are {$known_city}'s connections to other cities? |Networks_QA]]
+<<endif>>
 [[What can you tell me about pirates in the area? |pirates]]
+//<<if $known_city_type == 1>>
+//[[What goods are traded in {$known_city}? |trading_goods]]
+//<<endif>>
 [[What tales and myths are told here? |myths]]
 
 <<if $asking_current == false>>
@@ -284,16 +289,16 @@ position: -680,-377
 title: City_Setup
 tags: 
 colorID: 0
-position: -534,-1018
+position: -535,-1019
 ---
 << if $first_time is false >> 
     << setspeaker DialogScreen Jason >>
     I want to ask about somewhere in the area.
     << setspeaker DialogScreen other >>
-    Of course! Where do you want to ask about?
+    Of course! Which city do you want to ask about?
 << else >>
      << setspeaker DialogScreen Jason >>
-    I want to ask about another place.
+    I want to ask about another city.
     << setspeaker DialogScreen other >>
     Certainly! Where does your curiosity take you?
 << endif >>   

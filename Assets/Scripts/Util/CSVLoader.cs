@@ -673,7 +673,7 @@ public static class CSVLoader
 	}
 
 	// Food Dialogue load
-	public static List<FoodText> LoadFoodDialogueList() {
+	public static List<FoodText> LoadFoodDialogList() {
 		List<FoodText> foodList = new List<FoodText>();
 
 		char[] lineDelimeter = new char[] { '@' };

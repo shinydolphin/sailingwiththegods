@@ -14,13 +14,6 @@ public class YarnGeneral : MonoBehaviour
 	}
 
 	#region Yarn Funtions - Start
-	[YarnCommand("setconvotitle")]
-	public void SetConversationTitle(string title) 
-	{
-		string text = title.Replace('_', ' ');
-		ds.conversationTitle.text = text;
-	}
-
 	[YarnCommand("reset")]
 	public void ResetConversation() 
 	{
@@ -43,19 +36,18 @@ public class YarnGeneral : MonoBehaviour
 			}
 		}
 	}
+
+	[YarnCommand("setconvotitle")]
+	public void SetConversationTitle(string title) 
+	{
+		string text = title.Replace('_', ' ');
+		ds.conversationTitle.text = text;
+	}
 	#endregion
 
 	#region Yarn Functions - Random
 
 	//Create a random amount between inputs
-	[YarnCommand("randomcost")]
-	public void GenerateRandomAmount(string[] inputs) 
-	{
-		int amount = Random.Range(int.Parse(inputs[0]), int.Parse(inputs[1]));
-		//Debug.Log("Ran Randomcost. Cost is " + amount);
-		ds.Storage.SetValue("$generated_cost", amount);
-	}
-
 	[YarnCommand("randomtext")]
 	public void GenerateRandomText(string[] inputs) 
 	{
@@ -84,8 +76,6 @@ public class YarnGeneral : MonoBehaviour
 		ds.Storage.SetValue("$emotion", e.ToString());
 	}
 
-	
-
 	[YarnCommand("randombool")]
 	public void TrueOrFalse(string threshold) 
 	{
@@ -93,13 +83,22 @@ public class YarnGeneral : MonoBehaviour
 		bool b = Random.Range(0f, 1f) < limit;
 		ds.Storage.SetValue("$random_bool", b);
 	}
+
+	[YarnCommand("randomcost")]
+	public void GenerateRandomAmount(string[] inputs) 
+	{
+		int amount = Random.Range(int.Parse(inputs[0]), int.Parse(inputs[1]));
+		//Debug.Log("Ran Randomcost. Cost is " + amount);
+		ds.Storage.SetValue("$generated_cost", amount);
+	}
 	#endregion
 
+	#region Yarn Functions - Money
 	[YarnCommand("checkafford")]
 	public void CheckAffordability(string cost) {
 		int itemCost = 0;
 		if (cost[0] == '$') {
-			itemCost = YarnGeneral.IntFromVariableName(cost, ds.Storage);
+			itemCost = IntFromVariableName(cost, ds.Storage);
 		}
 		else {
 			itemCost = Mathf.CeilToInt(float.Parse(cost));
@@ -111,7 +110,7 @@ public class YarnGeneral : MonoBehaviour
 	public void RoundToInt(string cost) {
 		int itemCost = 0;
 		if (cost[0] == '$') {
-			itemCost = YarnGeneral.IntFromVariableName(cost, ds.Storage);
+			itemCost = IntFromVariableName(cost, ds.Storage);
 		}
 		else {
 			itemCost = Mathf.CeilToInt(float.Parse(cost));
@@ -119,12 +118,11 @@ public class YarnGeneral : MonoBehaviour
 		ds.Storage.SetValue("$rounded_num", itemCost);
 	}
 
-
 	[YarnCommand("pay")]
 	public void PayAmount(string cost) {
 		int itemCost = 0;
 		if (cost[0] == '$') {
-			itemCost = YarnGeneral.IntFromVariableName(cost, ds.Storage);
+			itemCost = IntFromVariableName(cost, ds.Storage);
 		}
 		else {
 			itemCost = Mathf.RoundToInt(float.Parse(cost));
@@ -133,6 +131,7 @@ public class YarnGeneral : MonoBehaviour
 		Globals.GameVars.playerShipVariables.ship.currency -= itemCost;
 		ds.UpdateMoney();
 	}
+	#endregion
 
 	#region Yarn Helpers
 	public static int IntFromVariableName(string name, InMemoryVariableStorage storage) 

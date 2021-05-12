@@ -180,24 +180,22 @@ public class script_player_controls : MonoBehaviour
 			if (Input.GetKeyUp(KeyCode.N)) {
 				Globals.MiniGames.Enter("Storm MG/Storm Game");
 			}
-
             if (Input.GetKeyUp(KeyCode.Z))
             {
                 Globals.MiniGames.EnterScene("Petteia");
             }
-
             if (Input.GetKeyUp(KeyCode.R))
             {
                 Globals.MiniGames.EnterScene("SongCompMainMenu");
             }
             if (Input.GetKeyUp(KeyCode.T))
-             {
-              Globals.MiniGames.EnterScene("TavernaMenu");
-             }
-                if (Input.GetKeyUp(KeyCode.M)) {
-
+            {
+				Globals.MiniGames.EnterScene("TavernaMenu");
+            }
+			if (Input.GetKeyUp(KeyCode.M)) 
+			{
 				Globals.MiniGames.Exit();
-			 }
+			}
 		}
 
 		// debug tool to see where you are in lat long
@@ -309,8 +307,9 @@ public class script_player_controls : MonoBehaviour
 					//	-If we aren't in the settlement menu then we know we're traveling
 					if (!GameVars.menuControlsLock && !Globals.UI.IsShown<TitleScreen>()) {
 						//If the ship is dead in the water--don't do anything
-						if (shipSpeed_Actual != 0)
+						if (shipSpeed_Actual != 0) {
 							TravelToSelectedTarget(currentDestination);
+						}
 						else {
 							GameVars.controlsLocked = false;
 							GameVars.isGameOver = true;
@@ -896,12 +895,12 @@ public class script_player_controls : MonoBehaviour
 					$"{Mathf.CeilToInt(dailyProvisionsKG * ship.crewRoster.Count)}kgs of provisions per day, but we only have {Mathf.RoundToInt(ship.cargo[1].amount_kg)}kgs. ";
 			}
 			if (lowWater) {
-				message += $"\n\n‘Water is best’, said the greatest of poets (Pindar) - and no ship can sail without it! We need to buy more water or Thirst itself will destroy our ship. " +
+				message += $"\n\n'Water is best', said the greatest of poets (Pindar) - and no ship can sail without it! We need to buy more water or Thirst itself will destroy our ship. " +
 					$"For {ship.crewRoster.Count} crew members, we need about {Mathf.CeilToInt(dailyWaterKG * ship.crewRoster.Count)}kgs of water per day," +
 					$" but we only have {Mathf.Round(ship.cargo[0].amount_kg)}kgs. ";
 			}
 
-			message += "\n\nMen without food and water are mutinous creatures - they’ll sooner leave the voyage than follow a leader who does not care for them!";
+			message += "\n\nMen without food and water are mutinous creatures - they'll sooner leave the voyage than follow a leader who does not care for them!";
 			GameVars.ShowANotificationMessage(message);
 
 			checkedStarvingThirsty = true;
@@ -913,7 +912,12 @@ public class script_player_controls : MonoBehaviour
 			//Check food
 			if (lowFood) {
 				int crewDeathCount = CrewQuitsBecauseStarvingOrThirsty();
-				notificationMessage += crewDeathCount + " crewmember(s) quit because you left without a full store of Provisions";
+				if (crewDeathCount > 1) {
+					notificationMessage += crewDeathCount + " crewmembers quit because you left without a full store of provisions";
+				}
+				else {
+					notificationMessage += crewDeathCount + " crewmember quit because you left without a full store of provisions";
+				}
 			}
 			
 			//Check water
@@ -922,11 +926,17 @@ public class script_player_controls : MonoBehaviour
 					notificationMessage += ", and ";
 				}
 				int crewDeathCount = CrewQuitsBecauseStarvingOrThirsty();
-				notificationMessage += crewDeathCount + " crewmember(s) quit because you left without a full store of water.";
+				if (crewDeathCount > 1) {
+					notificationMessage += crewDeathCount + " crewmembers quit because you left without a full store of water";
+				}
+				else {
+					notificationMessage += crewDeathCount + " crewmember quit because you left without a full store of water";
+				}
 			}
 			//now update the notification string with the message
 			if (!string.IsNullOrEmpty(notificationMessage)) {
 				// KD TODO: Need to revisit if i reimplemented this as robert had it
+				notificationMessage += ".";
 				GameVars.ShowANotificationMessage(notificationMessage);
 			}
 		}

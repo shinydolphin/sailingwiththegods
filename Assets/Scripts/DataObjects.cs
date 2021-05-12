@@ -803,4 +803,9 @@ public class Ship : Model
 		}
 		return total;
 	}
+
+	public void AddToFoodAndWater(int amt) {
+		cargo[0].amount_kg += amt;
+		cargo[1].amount_kg += amt;
+	}
 }

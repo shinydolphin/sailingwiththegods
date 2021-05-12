@@ -211,7 +211,7 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public List<DialogText> tradingDialogText = new List<DialogText>(); // Perhaps
 	[HideInInspector] public List<FoodText> foodItemText= new List<FoodText>();
 	[HideInInspector] public List<FoodText> wineInfoText = new List<FoodText>();
-	[HideInInspector] public List<FoodText> foodDialogueText = new List<FoodText>();
+	[HideInInspector] public List<FoodText> foodDialogText = new List<FoodText>();
 	[HideInInspector] public List<string> tavernaGameInsults;
 	[HideInInspector] public List<string> tavernaGameBragging;
 
@@ -304,7 +304,7 @@ public class GameVars : MonoBehaviour
 		guideDialogText = CSVLoader.LoadHireGuideDialog();
 		// trading goods here
 		foodItemText = CSVLoader.LoadFoodItemsList();
-		foodDialogueText = CSVLoader.LoadFoodDialogueList();
+		foodDialogText = CSVLoader.LoadFoodDialogList();
 		wineInfoText = CSVLoader.LoadWineInfoList();
 
 
@@ -563,7 +563,7 @@ public class GameVars : MonoBehaviour
 
 	private void Update() {
 		UpdateCameraRotation();
-		DebugHotkeys();
+		//DebugHotkeys();
 	}
 
 	void DebugHotkeys() {
@@ -1031,6 +1031,7 @@ public class GameVars : MonoBehaviour
 
 		// show the new ship model
 		SetShipModel(playerShipVariables.ship.upgradeLevel);
+		Globals.GameVars.controlsLocked = true;
 	}
 
 	void SetShipModel(int shipLevel) {
