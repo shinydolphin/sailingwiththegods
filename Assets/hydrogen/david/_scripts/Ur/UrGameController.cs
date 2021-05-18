@@ -104,7 +104,12 @@ public class UrGameController : MonoBehaviour
 			selectedCounter = c;
 			int bIndex = boardPositions.IndexOf(c.currentTile);
 			//for (int i = 0; i < diceValue; i++) {
-			if (!IsSpaceOccupied(boardPositions[bIndex + diceValue])) { boardPositions[bIndex + diceValue].ShowAvailable(); selectingBoardPosition = !selectingBoardPosition; }
+			int moveToSpace = Mathf.Clamp(bIndex + diceValue, 0, boardPositions.Count - 1);
+			if (!IsSpaceOccupied(boardPositions[moveToSpace])) 
+			{
+				boardPositions[moveToSpace].ShowAvailable();
+				selectingBoardPosition = !selectingBoardPosition;
+			}
 			else { Debug.Log("This tile cannot move."); }
 				//bIndex++;
 			//}
