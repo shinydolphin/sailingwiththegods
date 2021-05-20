@@ -234,7 +234,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &68212262
 RectTransform:
   m_ObjectHideFlags: 0
@@ -675,7 +675,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &622271928
 Light:
   m_ObjectHideFlags: 0
@@ -1997,7 +1997,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tavernaListener: {fileID: 2080988695}
-  tavernaLight: {fileID: 622271928}
 --- !u!1 &2002488759
 GameObject:
   m_ObjectHideFlags: 0
@@ -2258,7 +2257,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1959031028}
-        m_MethodName: LeaveTavernaGame
+        m_MethodName: LeaveTavernaScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

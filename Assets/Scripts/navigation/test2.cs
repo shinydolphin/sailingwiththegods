@@ -11,11 +11,14 @@ public class test2 : MonoBehaviour
 
 	// Update is called once per frame
 	void Update() {
+
+		/*
 		if (Input.GetKeyDown(KeyCode.Q)) {
 			//Debug.Log(navigation.player.transform.position);
 			navigation.SetDestination("Iolcus",2);
 			//cities = new city();
 		}
+		*/
 		//navigation.SetDestination("Tisaia",2);
 		//navigation.SetDestination("Iolcus", 2);
 		//navigation.Setdestination("Iolcus");

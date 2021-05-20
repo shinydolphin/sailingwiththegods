@@ -8,7 +8,6 @@ using UnityEngine.SceneManagement;
 public class TavernaController : MonoBehaviour
 {
 	public AudioListener tavernaListener;
-	public Light tavernaLight;
 
 	private Scene thisScene;
 
@@ -33,7 +32,7 @@ public class TavernaController : MonoBehaviour
 	}
 
 	public void StartTavernaConvo() {
-		LeaveTavernaGame();
+		LeaveTavernaScene();
 		Globals.UI.Show<DialogScreen>().StartDialog("Start_Taverna", "taverna");
 	}
 
@@ -49,6 +48,9 @@ public class TavernaController : MonoBehaviour
 		BackToTavernaMenu();
 	}
 
+	/// <summary>
+	/// Returns to the main taverna scene
+	/// </summary>
 	public static void BackToTavernaMenu() {
 
 		TavernaController controller = GetTavernaControllerInstance();
@@ -59,12 +61,15 @@ public class TavernaController : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Unloads and reloads the given scene
+	/// </summary>
+	/// <param name="sceneName"></param>
 	public static void ReloadTavernaGame(string sceneName) 
 	{
 		TavernaController controller = GetTavernaControllerInstance();
 
 		if (controller != null) {
-			Debug.Log("Found controller, starting coroutine");
 			controller.StartCoroutine(TavernaReload(sceneName, controller));
 		}
 		else {
@@ -79,25 +84,36 @@ public class TavernaController : MonoBehaviour
 		return GameObject.FindObjectsOfType<TavernaController>().FirstOrDefault(d => d.GetComponentInParent<Canvas>() != null);
 	}
 
+	/// <summary>
+	/// Handles the actual reloading of the given scene
+	/// </summary>
+	/// <param name="sceneName"></param>
+	/// <param name="c"></param>
+	/// <returns></returns>
 	private static IEnumerator TavernaReload(string sceneName, TavernaController c) 
 	{
+		//Unloads and then sets this as the active scene
 		yield return SceneManager.UnloadSceneAsync(sceneName);
 		SceneManager.SetActiveScene(SceneManager.GetSceneByName("TavernaMenu"));
+		//If you reloaded from a pause menu, your timescale is 0, so it needs to get set back to 1
+		Time.timeScale = 1;
+		//Loads in the same scene again, then sets it active
 		yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
 		yield return null;
 		SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
+		//Makes sure the taverna's audioListener is off
 		c.ToggleTavernaObjects(false);
 		Time.timeScale = 1;
 	}
 
 	static IEnumerator UnloadTavernaGame() {
 		yield return SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
+		Time.timeScale = 1;
 		Scene scene = SceneManager.GetSceneByName("TavernaMenu");
 		SceneManager.SetActiveScene(scene);
 	}
 
-	// can just call minigames.exit because MiniGames system kept track of minigamemainmenu and will unload it for us
-	public void LeaveTavernaGame() {
+	public void LeaveTavernaScene() {
 		Globals.MiniGames.Exit();
 	}
 
@@ -114,7 +130,6 @@ public class TavernaController : MonoBehaviour
 	private void ToggleTavernaObjects(bool toggle) {
 		Debug.Log($"Toggling {name}: {toggle}");
 		tavernaListener.enabled = toggle;
-		tavernaLight.enabled = toggle;
 	}
 
 	

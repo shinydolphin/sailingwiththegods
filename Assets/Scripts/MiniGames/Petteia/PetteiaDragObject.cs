@@ -1,13 +1,8 @@
 using System.Collections;
-
 using System.Collections.Generic;
-
 using UnityEngine;
 
-
-
 public class PetteiaDragObject : MonoBehaviour
-
 {
 	GameObject g;
 	public Camera c;
@@ -28,6 +23,4 @@ public class PetteiaDragObject : MonoBehaviour
 		cursorPosition.y = 1;
 		transform.position = cursorPosition;
 	}
-
-
 }

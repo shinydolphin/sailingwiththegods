@@ -6,29 +6,42 @@ using UnityEngine.SceneManagement;
 // used for the tavern singing minigaame. TODO: Rename
 public class SongMenuController : MonoBehaviour
 {
+	public GameObject game_state,main_state;
+	//as a part of condincing this to one seen set the main menue and the song menue to there own game objects
+	// on start the main state is true.
     public void PlayWisdomSong()
     {
-        StartCoroutine(LoadSong("WisdomSongScene"));
-    }
+		SongGameController.set_song(4);
+		game_state.SetActive(true);
+		main_state.SetActive(false);
+
+	}
 
     public void PlayMilitarySong()
     {
-        StartCoroutine(LoadSong("WarSongScene"));
-    }
+		SongGameController.set_song(2);
+		game_state.SetActive(true);
+		main_state.SetActive(false);
+	}
 
     public void PlayMournfulSong()
     {
-        StartCoroutine(LoadSong("SorrowSongScene"));
-    }
+		SongGameController.set_song(3);
+		game_state.SetActive(true);
+		main_state.SetActive(false);
+	}
 
     public void PlayPartySong()
     {
-        StartCoroutine(LoadSong("PartySongScene"));
-    }
+		SongGameController.set_song(1);
+		game_state.SetActive(true);
+		main_state.SetActive(false);
+	}
 
 	public void MainMenuScene()
     {
-		StartCoroutine(UnloadSong());
+		//use to relod the seen
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 
 	public void BackToTavern() {
@@ -37,6 +50,7 @@ public class SongMenuController : MonoBehaviour
 
 	// set the menu active before unloading the song scene since that will cancel the coroutine
 	// TODO: Needs a refactor so that the context doesn't get lost on unloading the song (same issue with tavern menu)
+	// (josh) I did not tuch this (I over looked it)
 	IEnumerator UnloadSong() {
 		var songScene = SceneManager.GetActiveScene();
 		var songMenuScene = SceneManager.GetSceneByName("SongCompMainMenu");

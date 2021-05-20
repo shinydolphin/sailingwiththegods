@@ -6,8 +6,8 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 public class PetteiaEnemyAI : MonoBehaviour
 {
-	public List<GameObject> pieces;
-	private GameObject currentPiece;
+	public List<PetteiaEnemyPiece> pieces;
+	private PetteiaEnemyPiece currentPiece;
 	private int movementDistance = 0;
 	
 	private PetteiaGameController pController;
@@ -18,107 +18,101 @@ public class PetteiaEnemyAI : MonoBehaviour
 		
 	}
 
-    void Update()
-    {
-	//	Debug.Log("Numpieces" + pieces.Count);
-		//if (pieces.Count == 0 || Input.GetKeyDown(KeyCode.W)) {
-		//	Debug.Log("youwin!");
-		//	gameOver = true;
-		//	winCanvas.SetActive(true);
-			
-		//	water.text ="+" + playerShip.GameResultWater().ToString();
-		//	food.text = "+" + playerShip.GameResultFood().ToString();
-
-		//	//	ship.cargo[1].amount_kg < dailyProvisionsKG * ship.crewRoster.Count
-			
-		//}
-		//if (Input.GetKeyDown(KeyCode.W)) {
-		//	PrintBoard();
-		//}
-		//if(!pController.GameOver && pController.yourTurn == false && isMoving == false) {
-		//	isMoving = true;
-		//	StartCoroutine(MakeMove()); //Checks if the user has made a move and runs the enemy move command is so
-		//}
-		
-	}
-
-	public void StartEnemyTurn() {
+	/// <summary>
+	/// Starts the enemy looking for a move to make
+	/// </summary>
+	public void StartEnemyTurn() 
+	{
 		if (!pController.GameOver) 
 		{
 			StartCoroutine(MakeMove());
 		}
 	}
 
-	public IEnumerator CheckPieces() {
-		Debug.Log("Enemy CheckPieces");
-		for (int i = pieces.Count - 1; i >= 0; i--) {
+	/// <summary>
+	/// Checks if any pieces have been destroyed and need to be removed from the list
+	/// </summary>
+	/// <returns>Returns 1 once finished</returns>
+	public int CheckPieces() {
+		for (int i = pieces.Count - 1; i >= 0; i--) 
+		{
 			if (pieces[i] == null) {
 				pieces.RemoveAt(i);
 			}
 		}
-		Debug.Log("Done with Enemy CheckPieces");
-		yield return null;
+		return 1;
 	}
 
+	/// <summary>
+	/// Chooses which piece to move and where to move it to
+	/// </summary>
+	/// <returns></returns>
 	IEnumerator MakeMove() {
-		
+		//This method was written by Paul Reichling, and since I (Kylie Gilde) don't use goto, I don't really follow it
+		//I'm not going to comment it because I'm not fulling sure what's going on and I don't want to be misleading
+		//Anyway, it seems to work as-is
+		//I have made a few changes - namely checking for null pieces and streamlining some redundant function calls with variables
+		//but other than that it's untouched
+
 		yield return new WaitForSeconds(1f);
-		//CheckPieces();
 
 		string s = "";
 		
-		GameObject pieceToMove = null;
-		foreach (GameObject p in pieces) { //Runs through each available enemy piece and sees if it can capture another piece.
+		PetteiaEnemyPiece pieceToMove = null;
+		//Checks for available captures to make
+		foreach (PetteiaEnemyPiece p in pieces) {
 
+			//If there's still a null piece, don't move it
 			if (p == null) {
 				break;
 			}
 
 			currentPiece = p;
+			PetteiaPosition piecePos = p.GetComponent<PetteiaPosition>();
 			
 			//moving up loop
-			for (int x = (int)p.GetComponent<Positions>().pos.x; x > 2; x--) {
-				//Debug.Log("looking up");
-				//Debug.Log(currentg.name);
-				if (pController.positions[x, (int)p.GetComponent<Positions>().pos.y] != 0 &&
-					x != (int)p.GetComponent<Positions>().pos.x) {
-					//Debug.Log("BREAKING");
+			for (int x = piecePos.Pos.x; x > 2; x--) 
+			{
+				//If this position isn't empty we can't move to it
+				if (pController.positions[x, piecePos.Pos.y] != 0 && x != piecePos.Pos.x) 
+				{
 					break;
 				}
-				if (pController.positions[x - 1, (int)p.GetComponent<Positions>().pos.y] == 2
-					&& pController.positions[x - 2, (int)p.GetComponent<Positions>().pos.y] == 1
-					&& pController.positions[x, (int)p.GetComponent<Positions>().pos.y] == 0) {
+				
+				if (pController.positions[x - 1, piecePos.Pos.y] == 2
+					&& pController.positions[x - 2, piecePos.Pos.y] == 1
+					&& pController.positions[x, piecePos.Pos.y] == 0) 
+				{
+					//look up while moving
 					pieceToMove = p;
 					s = "up";
-					movementDistance = (int)p.GetComponent<Positions>().pos.x - x;
+					movementDistance = piecePos.Pos.x - x;
 
 					goto End;
 				}
 
-				if ((int)p.GetComponent<Positions>().pos.y <= 5) {
+				if (piecePos.Pos.y <= 5) {
 					//look right while moving 
-					if (pController.positions[x, 1 + (int)p.GetComponent<Positions>().pos.y] == 2
-						&& pController.positions[x, 2 + (int)p.GetComponent<Positions>().pos.y] == 1
-						&& pController.positions[x, (int)p.GetComponent<Positions>().pos.y] == 0) {
-						//Debug.Log("right looking");
+					if (pController.positions[x, 1 + piecePos.Pos.y] == 2
+						&& pController.positions[x, 2 + piecePos.Pos.y] == 1
+						&& pController.positions[x, piecePos.Pos.y] == 0) 
+					{
 						pieceToMove = p;
 						s = "up";
-						movementDistance = (int)p.GetComponent<Positions>().pos.x - x;
+						movementDistance = piecePos.Pos.x - x;
 
 						goto End;
 					}
 				}
-				if ((int)p.GetComponent<Positions>().pos.y >= 2) {
+				if (piecePos.Pos.y >= 2) {
 					//look left while moving 
-					//Debug.Log(1 - (int)g.GetComponent<Positions>().pos.y);
-
-					if (pController.positions[x, (int)p.GetComponent<Positions>().pos.y - 1] == 2
-						&& pController.positions[x, (int)p.GetComponent<Positions>().pos.y - 2] == 1
-						&& pController.positions[x, (int)p.GetComponent<Positions>().pos.y] == 0) {
-						//Debug.Log("left looking");
+					if (pController.positions[x, piecePos.Pos.y - 1] == 2
+						&& pController.positions[x, piecePos.Pos.y - 2] == 1
+						&& pController.positions[x, piecePos.Pos.y] == 0) 
+					{
 						pieceToMove = p;
 						s = "up";
-						movementDistance = (int)p.GetComponent<Positions>().pos.x - x;
+						movementDistance = piecePos.Pos.x - x;
 
 						goto End;
 					}
@@ -129,98 +123,94 @@ public class PetteiaEnemyAI : MonoBehaviour
 			//////////////////////////////////////////////////////////////////////////////////////////
 			
 			//moving down loop
-			for (int x = (int)p.GetComponent<Positions>().pos.x; x < 5; x++) {
-				//Debug.Log("looking down");
-				//Debug.Log(currentg.name);
-				if (pController.positions[x, (int)p.GetComponent<Positions>().pos.y] != 0 && 
-					x != (int)p.GetComponent<Positions>().pos.x) {
-					//Debug.Log("BREAKING");
+			for (int x = piecePos.Pos.x; x < 5; x++) 
+			{
+				if (pController.positions[x, piecePos.Pos.y] != 0 && x != piecePos.Pos.x) 
+				{
 					break;
 				}
-					if (pController.positions[x + 1, (int)p.GetComponent<Positions>().pos.y] == 2
-						&& pController.positions[x + 2, (int)p.GetComponent<Positions>().pos.y] == 1
-						&& pController.positions[x, (int)p.GetComponent<Positions>().pos.y] == 0) {
+				if (pController.positions[x + 1, piecePos.Pos.y] == 2
+					&& pController.positions[x + 2, piecePos.Pos.y] == 1
+					&& pController.positions[x, piecePos.Pos.y] == 0) 
+				{
+					pieceToMove = p;
+					s = "down";
+					movementDistance = x - piecePos.Pos.x;
+
+					goto End;
+				}
+
+				if (piecePos.Pos.y <= 5) {
+					//look right while moving 
+					if (pController.positions[x, 1 + piecePos.Pos.y] == 2
+						&& pController.positions[x, 2 + piecePos.Pos.y] == 1
+						&& pController.positions[x, piecePos.Pos.y] == 0) 
+					{
 						pieceToMove = p;
 						s = "down";
-						movementDistance = x - (int)p.GetComponent<Positions>().pos.x;
+						movementDistance = x - piecePos.Pos.x;
 
 						goto End;
 					}
-
-					if ((int)p.GetComponent<Positions>().pos.y <= 5) {
-						//look right while moving 
-						if (pController.positions[x, 1 + (int)p.GetComponent<Positions>().pos.y] == 2
-							&& pController.positions[x, 2 + (int)p.GetComponent<Positions>().pos.y] == 1
-							&& pController.positions[x, (int)p.GetComponent<Positions>().pos.y] == 0) {
-						//Debug.Log("right looking");
+				}
+				if (piecePos.Pos.y >= 2) {
+					//look left while moving 
+					if (pController.positions[x, piecePos.Pos.y - 1] == 2
+						&& pController.positions[x, piecePos.Pos.y - 2] == 1
+						&& pController.positions[x, piecePos.Pos.y] == 0) 
+					{
 						pieceToMove = p;
-							s = "down";
-							movementDistance = x - (int)p.GetComponent<Positions>().pos.x;
+						s = "down";
+						movementDistance = x - piecePos.Pos.x;
 
-							goto End;
-						}
+						goto End;
 					}
-					if ((int)p.GetComponent<Positions>().pos.y >= 2) {
-						//look left while moving 
-						//Debug.Log(1 - (int)g.GetComponent<Positions>().pos.y);
-
-						if (pController.positions[x, (int)p.GetComponent<Positions>().pos.y - 1] == 2
-							&& pController.positions[x, (int)p.GetComponent<Positions>().pos.y - 2] == 1
-							&& pController.positions[x, (int)p.GetComponent<Positions>().pos.y] == 0) {
-						//Debug.Log("left looking");
-						pieceToMove = p;
-							s = "down";
-							movementDistance = x - (int)p.GetComponent<Positions>().pos.x;
-
-							goto End;
-						}
-					
 				}
 			}
 
 			////////////////////////////////////////////////////////////////////////////////////////
 
 			//moving right loop
-			for (int y = (int)p.GetComponent<Positions>().pos.y; y < 5; y++) {
-				if (pController.positions[(int)p.GetComponent<Positions>().pos.x, y] != 0 &&
-					y != (int)p.GetComponent<Positions>().pos.y) {
-					//Debug.Log("BREAKING");
+			for (int y = piecePos.Pos.y; y < 5; y++) 
+			{
+				if (pController.positions[piecePos.Pos.x, y] != 0 && y != piecePos.Pos.y) 
+				{
 					break;
 				}
-				//Debug.Log("looking right");
-				//Debug.Log(currentg.name);
-				if (pController.positions[(int)p.GetComponent<Positions>().pos.x, y + 1 ] == 2
-					&& pController.positions[(int)p.GetComponent<Positions>().pos.x, y + 2] == 1
-					&& pController.positions[(int)p.GetComponent<Positions>().pos.x, y] == 0) {
+
+				if (pController.positions[piecePos.Pos.x, y + 1 ] == 2
+					&& pController.positions[piecePos.Pos.x, y + 2] == 1
+					&& pController.positions[piecePos.Pos.x, y] == 0) 
+				{
 					pieceToMove = p;
 					s = "right";
-					movementDistance =  y - (int)p.GetComponent<Positions>().pos.y ;
+					movementDistance =  y - piecePos.Pos.y ;
 
 					goto End;
 				}
 
-				if ((int)p.GetComponent<Positions>().pos.x >= 2) {
+				if (piecePos.Pos.x >= 2) {
 					//look up while moving 
-					if (pController.positions[(int)p.GetComponent<Positions>().pos.x - 1, y] == 2
-						&& pController.positions[(int)p.GetComponent<Positions>().pos.x - 2, y ] == 1
-						&& pController.positions[(int)p.GetComponent<Positions>().pos.x, y ] == 0) {
-						//Debug.Log("up looking");
+					if (pController.positions[piecePos.Pos.x - 1, y] == 2
+						&& pController.positions[piecePos.Pos.x - 2, y ] == 1
+						&& pController.positions[piecePos.Pos.x, y ] == 0) 
+					{
 						pieceToMove = p;
 						s = "right";
-						movementDistance = y - (int)p.GetComponent<Positions>().pos.y;
+						movementDistance = y - piecePos.Pos.y;
 
 						goto End;
 					}
 				}
-				if ((int)p.GetComponent<Positions>().pos.x <=5 ) {
+				if (piecePos.Pos.x <=5 ) {
 					//look down while moving 
-					if (pController.positions[(int)p.GetComponent<Positions>().pos.x + 1, y] == 2
-						&& pController.positions[(int)p.GetComponent<Positions>().pos.x + 2,y ] == 1
-						&& pController.positions[(int)p.GetComponent<Positions>().pos.x,y ] == 0) {
-						//Debug.Log("down looking");
+					if (pController.positions[piecePos.Pos.x + 1, y] == 2
+						&& pController.positions[piecePos.Pos.x + 2,y ] == 1
+						&& pController.positions[piecePos.Pos.x,y ] == 0) 
+					{
 						pieceToMove = p;
 						s = "right";
-						movementDistance = y - (int)p.GetComponent<Positions>().pos.y;
+						movementDistance = y - piecePos.Pos.y;
 
 						goto End;
 					}
@@ -230,128 +220,117 @@ public class PetteiaEnemyAI : MonoBehaviour
 			////////////////////////////////////////////////////////////////////////////////////////
 
 			//moving left loop
-			for (int y = (int)p.GetComponent<Positions>().pos.y; y > 2; y--) {
-				if (pController.positions[(int)p.GetComponent<Positions>().pos.x, y] != 0 &&
-					y != (int)p.GetComponent<Positions>().pos.y) {
-					//Debug.Log("BREAKING");
+			for (int y = piecePos.Pos.y; y > 2; y--) 
+			{
+				if (pController.positions[piecePos.Pos.x, y] != 0 && y != piecePos.Pos.y) 
+				{
 					break;
 				}
-				//Debug.Log("looking left");
-				//Debug.Log(currentg.name);
-				if (pController.positions[(int)p.GetComponent<Positions>().pos.x, y - 1] == 2
-					&& pController.positions[(int)p.GetComponent<Positions>().pos.x, y - 2] == 1
-					&& pController.positions[(int)p.GetComponent<Positions>().pos.x, y] == 0) {
+
+				if (pController.positions[piecePos.Pos.x, y - 1] == 2
+					&& pController.positions[piecePos.Pos.x, y - 2] == 1
+					&& pController.positions[piecePos.Pos.x, y] == 0) 
+				{
 					pieceToMove = p;
 					s = "left";
-					movementDistance = (int)p.GetComponent<Positions>().pos.y - y ;
+					movementDistance = piecePos.Pos.y - y ;
 
 					goto End;
 				}
 
-				if ((int)p.GetComponent<Positions>().pos.x >= 2) {
+				if (piecePos.Pos.x >= 2) {
 					//look up while moving 
-					if (pController.positions[(int)p.GetComponent<Positions>().pos.x - 1, y] == 2
-						&& pController.positions[(int)p.GetComponent<Positions>().pos.x - 2, y] == 1
-						&& pController.positions[(int)p.GetComponent<Positions>().pos.x, y] == 0) {
-						//Debug.Log("up looking");
+					if (pController.positions[piecePos.Pos.x - 1, y] == 2
+						&& pController.positions[piecePos.Pos.x - 2, y] == 1
+						&& pController.positions[piecePos.Pos.x, y] == 0) 
+					{
 						pieceToMove = p;
 						s = "left";
-						movementDistance = (int)p.GetComponent<Positions>().pos.y - y;
+						movementDistance = piecePos.Pos.y - y;
 
 						goto End;
 					}
 				}
-				if ((int)p.GetComponent<Positions>().pos.x <= 5) {
+				if (piecePos.Pos.x <= 5) {
 					//look down while moving 
-					if (pController.positions[(int)p.GetComponent<Positions>().pos.x + 1, y] == 2
-						&& pController.positions[(int)p.GetComponent<Positions>().pos.x + 2, y] == 1
-						&& pController.positions[(int)p.GetComponent<Positions>().pos.x, y] == 0) {
-						//Debug.Log("down looking");
+					if (pController.positions[piecePos.Pos.x + 1, y] == 2
+						&& pController.positions[piecePos.Pos.x + 2, y] == 1
+						&& pController.positions[piecePos.Pos.x, y] == 0) 
+					{
 						pieceToMove = p;
 						s = "left";
-						movementDistance = (int)p.GetComponent<Positions>().pos.y - y;
+						movementDistance = piecePos.Pos.y - y;
 
 						goto End;
 					}
 				}
 			}
-
 		}
-		End:
-		if (pieceToMove != null) {
-			//Debug.Log("capture called with these params:");
-			//Debug.Log(go.name + " " + s + " " + num);
-			yield return StartCoroutine(MovePiece(pieceToMove, s, movementDistance));
-		} else {
+
+	End:
+		if (pieceToMove != null) 
+		{
+			yield return StartCoroutine(MovePiece(pieceToMove.gameObject, s, movementDistance));
+		}
+		else 
+		{
 			// Moves the piece randomly 1-3 spaces if it cannot find a capture. 
 			int tries = 0;
-			Rand:
-			//Debug.Log("moving randomly");
-			
+		Rand:
 			bool trying = false;
 			movementDistance = 0;
 			
-			while (trying == false && tries < 50) {
-
+			while (trying == false && tries < 50) 
+			{
 				tries++;
-				//Debug.Log(tries);
+				int findPieceTries = 0;
 				int direction = Random.Range(0, 4);
-				pieceToMove = pieces.RandomElement();
+				//If somehow there's still a null piece in here, make sure it doesn't get picked
+				//100 is probably WAY higher than it needs to be, but just to be safe
+				do 
+				{
+					pieceToMove = pieces.RandomElement();
+					findPieceTries++;
+				} while (pieceToMove == null && findPieceTries < 100);
+
+				if (findPieceTries >= 100) {
+					Debug.Log("Found 100 null pieces in a row, uhoh!");
+				}
+				
+				if (pieceToMove == null) {
+					Debug.Log("Tried to move a null piece, whoopsies!");
+				}
 				currentPiece = pieceToMove;
-				//Simplified Version not working 
-
-				//for (int i = 0; i < num - 2; i++) {
-				//	if ((int)go.GetComponent<Positions>().pos.x - i > 0) {
-				//		//Debug.Log((int)go.GetComponent<Positions>().pos.x - i);
-				//		if (p.positions[(int)go.GetComponent<Positions>().pos.y ,
-				//			(int)go.GetComponent<Positions>().pos.x - i] == 0) {
-				//			//Debug.Log("abley" + (int)go.GetComponent<Positions>().pos.y);
-				//			//Debug.Log("ablex" + ((int)go.GetComponent<Positions>().pos.x - i));
-				//			able = true;
-				//			useNum =  i;
-				//		} else {
-
-				//			able = false;
-				//			break;
-				//		}
-				//	}
-				//	else {
-				//		able = false;
-				//		break;
-				//	}
-				//}
 
 				////////////////////////////////////////////////////////////////////////
+				PetteiaPosition movingPiecePos = pieceToMove.GetComponent<PetteiaPosition>();
 
-				if (direction == 0) {
+				if (direction == 0) 
+				{
 					s = "up";
-					//Debug.Log("moving randomly up ");
-					if ((int)pieceToMove.GetComponent<Positions>().pos.x - 1 > 0) {
-						//if (p.positions[(int)go.GetComponent<Positions>().pos.y,
-						//			(int)go.GetComponent<Positions>().pos.x - 1] == 0) {
-						if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x - 1,
-									(int)pieceToMove.GetComponent<Positions>().pos.y] == 0) {
+					if (movingPiecePos.Pos.x - 1 > 0) 
+					{
+						if (pController.positions[movingPiecePos.Pos.x - 1, movingPiecePos.Pos.y] == 0) 
+						{
 							trying = true;
+							//can move 1 space
 							movementDistance = 1;
-							//Debug.Log("can move 1");
-							////Debug.Log((int)go.GetComponent<Positions>().pos.y + ";" +
-									//((int)go.GetComponent<Positions>().pos.x - 1));
-							if ((int)pieceToMove.GetComponent<Positions>().pos.x - 2 > 0) {
-								if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x - 2,
-									(int)pieceToMove.GetComponent<Positions>().pos.y] == 0) {
+							
+							if (movingPiecePos.Pos.x - 2 > 0) {
+								if (pController.positions[movingPiecePos.Pos.x - 2, movingPiecePos.Pos.y] == 0) 
+								{
+									//can move 2 spaces
 									movementDistance = Random.Range(1, 3);
-									//Debug.Log("can move 2");
-									////Debug.Log((int)go.GetComponent<Positions>().pos.y + ";" +
-									//((int)go.GetComponent<Positions>().pos.x - 2));
-									if ((int)pieceToMove.GetComponent<Positions>().pos.x - 3 > 0) {
-										if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x - 3,
-									(int)pieceToMove.GetComponent<Positions>().pos.y] == 0) {
+
+									if (movingPiecePos.Pos.x - 3 > 0) 
+									{
+										if (pController.positions[movingPiecePos.Pos.x - 3, movingPiecePos.Pos.y] == 0) 
+										{
+											//can move 3 spaces
 											movementDistance = Random.Range(1, 4);
-											//Debug.Log("can move 3");
-											////Debug.Log((int)go.GetComponent<Positions>().pos.y + ";" +
-									//((int)go.GetComponent<Positions>().pos.x - 3));
 										}
-										else {
+										else 
+										{
 											trying = true;
 											movementDistance = Random.Range(1, 3);
 											break;
@@ -363,45 +342,40 @@ public class PetteiaEnemyAI : MonoBehaviour
 									movementDistance = 1;
 									break;
 								}
-								
-
 							}
 						}
 						else {
 							trying = false;
 							break;
 						}
-						
 					}
 				}
 
 				
-				if (direction ==1) {
+				if (direction == 1) 
+				{
 					s = "left";
-					//Debug.Log("moving randomly left ");
-					if ((int)pieceToMove.GetComponent<Positions>().pos.y - 1 > 0) {
-						//if (p.positions[(int)go.GetComponent<Positions>().pos.y - 1,
-						//			(int)go.GetComponent<Positions>().pos.x] == 0) {
-						if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x,
-									(int)pieceToMove.GetComponent<Positions>().pos.y - 1] == 0) {
+					if (movingPiecePos.Pos.y - 1 > 0) 
+					{
+						if (pController.positions[movingPiecePos.Pos.x, movingPiecePos.Pos.y - 1] == 0) 
+						{
 							trying = true;
+							//can move 1
 							movementDistance = 1;
-							////Debug.Log((int)go.GetComponent<Positions>().pos.y - 1 + ";" +
-								//	(int)go.GetComponent<Positions>().pos.x);
-							if ((int)pieceToMove.GetComponent<Positions>().pos.y - 2 > 0) {
-								if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x,
-									(int)pieceToMove.GetComponent<Positions>().pos.y - 2] == 0) {
+
+							if (movingPiecePos.Pos.y - 2 > 0) 
+							{
+								if (pController.positions[movingPiecePos.Pos.x, movingPiecePos.Pos.y - 2] == 0) 
+								{
+									//can move 2
 									movementDistance = Random.Range(1, 3);
-									//Debug.Log("can move 2");
-								//	//Debug.Log((int)go.GetComponent<Positions>().pos.y - 2 + ";" +
-								//	(int)go.GetComponent<Positions>().pos.x);
-									if ((int)pieceToMove.GetComponent<Positions>().pos.y - 3 > 0) {
-										if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x,
-									(int)pieceToMove.GetComponent<Positions>().pos.y - 3] == 0) {
+									
+									if (movingPiecePos.Pos.y - 3 > 0) 
+									{
+										if (pController.positions[movingPiecePos.Pos.x, movingPiecePos.Pos.y - 3] == 0) 
+										{
+											//can move 3
 											movementDistance = Random.Range(1, 4);
-											//Debug.Log("can move 3");
-										//	//Debug.Log((int)go.GetComponent<Positions>().pos.y - 3 + ";" +
-									//(int)go.GetComponent<Positions>().pos.x);
 										}
 										else {
 											trying = true;
@@ -415,181 +389,169 @@ public class PetteiaEnemyAI : MonoBehaviour
 									movementDistance = 1;
 									break;
 								}
-								
-
 							}
 						}
 						else {
 							trying = false;
 							break;
 						}
-						
 					}
 				}
 			
-				if (direction == 2) {
+				if (direction == 2) 
+				{
 					s = "right";
-					//Debug.Log("moving randomly right ");
-					if ((int)pieceToMove.GetComponent<Positions>().pos.y + 1 < 7) {
-						//if (p.positions[(int)go.GetComponent<Positions>().pos.y - 1,
-						//			(int)go.GetComponent<Positions>().pos.x] == 0) {
-						if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x,
-									(int)pieceToMove.GetComponent<Positions>().pos.y + 1] == 0) {
+					if (movingPiecePos.Pos.y + 1 < 7) 
+					{
+						if (pController.positions[movingPiecePos.Pos.x, movingPiecePos.Pos.y + 1] == 0) 
+						{
 							trying = true;
+							//can move 1
 							movementDistance = 1;
-							////Debug.Log((int)go.GetComponent<Positions>().pos.y - 1 + ";" +
-							//	(int)go.GetComponent<Positions>().pos.x);
-							if ((int)pieceToMove.GetComponent<Positions>().pos.y + 2 < 7) {
-								if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x,
-									(int)pieceToMove.GetComponent<Positions>().pos.y + 2] == 0) {
+
+							if (movingPiecePos.Pos.y + 2 < 7) 
+							{
+								if (pController.positions[movingPiecePos.Pos.x, movingPiecePos.Pos.y + 2] == 0) 
+								{
+									//can move 2
 									movementDistance = Random.Range(1, 3);
-									//Debug.Log("can move 2");
-									//	//Debug.Log((int)go.GetComponent<Positions>().pos.y - 2 + ";" +
-									//	(int)go.GetComponent<Positions>().pos.x);
-									if ((int)pieceToMove.GetComponent<Positions>().pos.y + 3 < 7) {
-										if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x, 
-									(int)pieceToMove.GetComponent<Positions>().pos.y + 3] == 0) {
+
+									if (movingPiecePos.Pos.y + 3 < 7) 
+									{
+										if (pController.positions[movingPiecePos.Pos.x, movingPiecePos.Pos.y + 3] == 0) 
+										{
+											//can move 3
 											movementDistance = Random.Range(1, 4);
-											//Debug.Log("can move 3");
-											//	//Debug.Log((int)go.GetComponent<Positions>().pos.y - 3 + ";" +
-											//(int)go.GetComponent<Positions>().pos.x);
 										}
-										else {
+										else 
+										{
 											trying = true;
 											movementDistance = Random.Range(1, 3);
 											break;
 										}
 									}
 								}
-								else {
+								else 
+								{
 									trying = true;
 									movementDistance = 1;
 									break;
 								}
-
-
 							}
 						}
-						else {
+						else 
+						{
 							trying = false;
 							break;
 						}
-
 					}
 				}
-
-
-				if (direction == 3) {
+				
+				if (direction == 3) 
+				{
 					s = "down";
 					
-					//Debug.Log("moving randomly down ");
-					if ((int)pieceToMove.GetComponent<Positions>().pos.x + 1 < 7) {
-						//if (p.positions[(int)go.GetComponent<Positions>().pos.y,
-						//			(int)go.GetComponent<Positions>().pos.x - 1] == 0) {
-						if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x + 1,
-									(int)pieceToMove.GetComponent<Positions>().pos.y] == 0) {
+					if (movingPiecePos.Pos.x + 1 < 7) 
+					{
+						if (pController.positions[movingPiecePos.Pos.x + 1, movingPiecePos.Pos.y] == 0) {
 							trying = true;
+							//can move 1
 							movementDistance = 1;
-							//Debug.Log("can move 1");
-							////Debug.Log((int)go.GetComponent<Positions>().pos.y + ";" +
-							//((int)go.GetComponent<Positions>().pos.x - 1));
-							if ((int)pieceToMove.GetComponent<Positions>().pos.x + 2 < 7) {
-								if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x + 2,
-									(int)pieceToMove.GetComponent<Positions>().pos.y] == 0) {
+
+							if (movingPiecePos.Pos.x + 2 < 7) 
+							{
+								if (pController.positions[movingPiecePos.Pos.x + 2, movingPiecePos.Pos.y] == 0) 
+								{
+									//can move 2
 									movementDistance = Random.Range(1, 3);
-									//Debug.Log("can move 2");
-									////Debug.Log((int)go.GetComponent<Positions>().pos.y + ";" +
-									//((int)go.GetComponent<Positions>().pos.x - 2));
-									if ((int)pieceToMove.GetComponent<Positions>().pos.x + 3 < 7) {
-										if (pController.positions[(int)pieceToMove.GetComponent<Positions>().pos.x + 3,
-									(int)pieceToMove.GetComponent<Positions>().pos.y] == 0) {
+
+									if (movingPiecePos.Pos.x + 3 < 7) 
+									{
+										if (pController.positions[movingPiecePos.Pos.x + 3, movingPiecePos.Pos.y] == 0) 
+										{
+											//can move 3
 											movementDistance = Random.Range(1, 4);
-											//Debug.Log("can move 3");
-											////Debug.Log((int)go.GetComponent<Positions>().pos.y + ";" +
-											//((int)go.GetComponent<Positions>().pos.x - 3));
 										}
-										else {
+										else 
+										{
 											trying = true;
 											movementDistance = Random.Range(1, 3);
 											break;
 										}
 									}
 								}
-								else {
+								else 
+								{
 									trying = true;
 									movementDistance = 1;
 									break;
 								}
-
-
 							}
 						}
-						else {
+						else 
+						{
 							trying = false;
 							break;
 						}
-
 					}
 				}
-
-				
-
 			}
-			if (movementDistance == 0) {
-				if (tries >= 50) {
-					yield return StartCoroutine(MovePiece(pieceToMove, s, movementDistance)); //Move cant be found - pass turn
-					Debug.Log("passing my turn");
-					//Need some dialouge here like "I pass my turn TODO"
+
+			if (movementDistance == 0) 
+			{
+				if (tries >= 50) 
+				{
+					Debug.Log("Enemy can't find a move");
+					pController.BlockingGameOver(false);
 				}
-				else {
+				else 
+				{
 					goto Rand; //Needs to make sure that the piece is not trying to move zero squares, since this isn't a legal move
 				}
 			}
-			else {
-				//Debug.Log("random called with these params:");
-				//Debug.Log(go.name + " " + s + " " + num);
-				yield return StartCoroutine(MovePiece(pieceToMove, s, movementDistance));
-				//Debug.Log("Tries to find a move: " + tries);
+			else 
+			{
+				yield return StartCoroutine(MovePiece(pieceToMove.gameObject, s, movementDistance));
 			}
 		}
 
-
-		//find out which piece we want to move AND why and where it needs to go 
-
-		//Ending turn
 		yield return null;
-
-		StartCoroutine(pController.SwitchTurn());
+		pController.SwitchTurn();
 		
 	}
 
+	/// <summary>
+	/// Moves the piece to its new space
+	/// </summary>
+	/// <param name="piece">Piece to move</param>
+	/// <param name="dir">The direction to move in</param>
+	/// <param name="dist">How far to move the piece</param>
+	/// <returns></returns>
 	IEnumerator MovePiece(GameObject piece, string dir, int dist) 
 	{
 		int x, y;
-		////Debug test
-		x = (int)piece.GetComponent<Positions>().pos.x;
-		y = (int)piece.GetComponent<Positions>().pos.y;
+		//Debug test
+
+		PetteiaPosition piecePos = piece.GetComponent<PetteiaPosition>();
+
+		x = piecePos.Pos.x;
+		y = piecePos.Pos.y;
 		pController.positions[x, y] = 0;
-		//Debug.Log((int)piece.GetComponent<Positions>().pos.x);
-		//Debug.Log((int)piece.GetComponent<Positions>().pos.y);
 
-		//piece.transform.Translate(Vector3.back * 6.25f);
-
-		if (dir == "up") {
-			//piece.transform.Translate(Vector3.forward * 6.25f * dist);
+		if (dir == "up") 
+		{
 			x -= dist;
 		}
-		else if (dir == "left") {
-			//piece.transform.Translate(Vector3.left * 6.25f * dist);
+		else if (dir == "left") 
+		{
 			y -= dist;
-
 		}
-		else if (dir == "right") {
-			//piece.transform.Translate(Vector3.right * 6.25f * dist);
+		else if (dir == "right") 
+		{
 			y += dist;
 		}
-		else if (dir == "down") {
-			//piece.transform.Translate(Vector3.back * 6.25f * dist);
+		else if (dir == "down") 
+		{
 			x += dist;
 		}
 
@@ -599,12 +561,21 @@ public class PetteiaEnemyAI : MonoBehaviour
 
 		pController.PlayMoveSound();
 		pController.positions[x, y] = 1;
-
-		//Debug.Log((int)piece.GetComponent<Positions>().pos.x);
-		//Debug.Log((int)piece.GetComponent<Positions>().pos.y);
-		//Debug.Log(currentg.name);
-		//pController.PrintBoard();		
-
 	}
 
+	/// <summary>
+	/// Turns the enemy turn highlight on or off
+	/// </summary>
+	/// <param name="toggle"></param>
+	public void ToggleEnemyHighlight(bool toggle) 
+	{
+		foreach (PetteiaEnemyPiece p in pieces) 
+		{
+			if (p != null) 
+			{
+				p.highlight.SetActive(toggle);
+			}
+		}
+	}
+	
 }

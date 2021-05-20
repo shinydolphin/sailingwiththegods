@@ -140,7 +140,7 @@ public class TradeViewModel : CityViewModel
 		//if you're selling and there's a herald in play and this is what's being boosted, check the price
 		if (changeAmount < 0 && heraldTarget != null && heraldTarget.Name == resourceName) 
 		{
-			Debug.Log($"Calculating herald price for {changeAmount} units");
+			//Debug.Log($"Calculating herald price for {changeAmount} units");
 			//We do it one by one in case you run out of herald uses partway through selling multiples
 
 			if (heraldUses >= Mathf.Abs(changeAmount)) 
@@ -158,22 +158,22 @@ public class TradeViewModel : CityViewModel
 			}
 
 			if (heraldUses <= 0) {
-				Debug.Log("Out of herald uses");
+				//Debug.Log("Out of herald uses");
 				heraldTarget.PriceMod = 1.0f;
 				heraldTarget.HeraldIcon = noHeraldIcon;
 				heraldTarget.NotifyAny();
 				heraldTarget = null;
 			}
-			Debug.Log("Price with herald mod figured in: " + price);
+			//Debug.Log("Price with herald mod figured in: " + price);
 		}
 		else 
 		{
 			price = unitPrice * changeAmount;
-			Debug.Log("Price without herald: " + price);
+			//Debug.Log("Price without herald: " + price);
 		}
 
 		
-		Debug.Log(resourceName + "  :  " + GameVars.playerShipVariables.ship.GetCargoByName(resourceName).amount_kg + "  :  " + changeAmount);
+		//Debug.Log(resourceName + "  :  " + GameVars.playerShipVariables.ship.GetCargoByName(resourceName).amount_kg + "  :  " + changeAmount);
 		GameVars.playerShipVariables.ship.GetCargoByName(resourceName).amount_kg += changeAmount;
 		//we use a (-) change amount here because the changeAmount reflects the direction of the goods
 		//e.g. if the player is selling--they are negative in cargo---but their currency is positive and vice versa.
@@ -212,7 +212,7 @@ public class TradeViewModel : CityViewModel
 
 	// REFERENCED IN BUTTON CLICK UNITYEVENT
 	public void GUI_Sell_Resources(CargoItemTradeViewModel item, int amount) {
-		Debug.Log(item.Name + " : " + amount);
+		//Debug.Log(item.Name + " : " + amount);
 
 		int amountToSell = GameVars.Trade.AdjustSell(amount, item.Name);
 		if (amountToSell > 0) {
