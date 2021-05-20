@@ -3112,7 +3112,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 651499825}
-  - component: {fileID: 651499826}
   m_Layer: 0
   m_Name: Floating_Bowls
   m_TagString: Untagged
@@ -3137,18 +3136,6 @@ Transform:
   m_Father: {fileID: 1219990903}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &651499826
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 651499824}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ccb38606f913bc469ebaee5dc0a6757, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -3876,7 +3863,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tavernaListener: {fileID: 0}
-  tavernaLight: {fileID: 0}
 --- !u!4 &1024077445
 Transform:
   m_ObjectHideFlags: 0
@@ -3925,7 +3911,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d33a83e66e916b49b8a003e7a5a52ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AnimArm: {fileID: 1108679569}
+  animArm: {fileID: 1108679569}
 --- !u!1 &1034440197
 GameObject:
   m_ObjectHideFlags: 0
@@ -8208,7 +8194,7 @@ PrefabInstance:
     - target: {fileID: 5574293400811807695, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: -0.000061035156
       objectReference: {fileID: 0}
     - target: {fileID: 5574293400811807695, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}

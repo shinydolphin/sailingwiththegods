@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //Move camera to similate uncoordinated movement
-public class CamSway : MonoBehaviour
+public class KottabosCamSway : MonoBehaviour
 {
     //amplitude that controls the rate at which camera bobs
 	[SerializeField]

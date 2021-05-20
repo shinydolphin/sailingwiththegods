@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 //ISSUE: PowerIndiacator when activated stops the Menu buttons from being pressed
-public class KottaboasManager : MonoBehaviour
+public class KottabosManager : MonoBehaviour
 {
 	GameVars GameVars => Globals.GameVars;
 
@@ -13,14 +13,14 @@ public class KottaboasManager : MonoBehaviour
 	private Rigidbody playerRb;
 	private Vector3 playerStartPos;
 
-	//Used to reset the targets on kottaboas stand
+	//Used to reset the targets on kottabos stand
 	public GameObject randomPlacement;
 	public Transform[] childPos;
 
-	//Used to reset the top target on kottaboas stand because of rigidbody attachment
+	//Used to reset the top target on kottabos stand because of rigidbody attachment
 	private Vector3 topTargetStartPos;
 	private Quaternion topTargetStartRot;
-	private Throw tr;
+	private KottabosThrow tr;
 
 	private static int score = 0;
 	[SerializeField]
@@ -33,7 +33,7 @@ public class KottaboasManager : MonoBehaviour
 	/// <summary>
 	/// Reset Kotaboas varibles after a game is played
 	/// </summary>
-	private void KotabosReset() {
+	private void KottabosReset() {
 		score = 0;
 		tries = 5;
 
@@ -55,13 +55,13 @@ public class KottaboasManager : MonoBehaviour
 		topTargetStartPos = childPos[5].position;
 		topTargetStartRot = childPos[5].rotation;
 
-		tr = playerPos.GetComponent<Throw>();
+		tr = playerPos.GetComponent<KottabosThrow>();
 	}
 
 	// Update is called once per frame
 	void Update() {
 
-		KotabosPauseAndUnPause();
+		KottabosPauseAndUnPause();
 
 		if (ContinueRound) {
 			Debug.Log("C or B");
@@ -69,7 +69,7 @@ public class KottaboasManager : MonoBehaviour
 			//Debug.Log(tries);
 			if (Input.GetKeyDown(KeyCode.C)) {
 				tr.animate.SetBool("isFlinged", false);
-				gameObject.GetComponent<ArmController>().ArmReset();
+				gameObject.GetComponent<KottabosArmController>().ArmReset();
 				playerPos.SetActive(true);
 				//Reset
 				ResetRound();
@@ -137,7 +137,7 @@ public class KottaboasManager : MonoBehaviour
 	}
 
 	private void ResetTargetPosition() {
-		randomPlacement.GetComponent<RandomPlacement>().PlaceRandomPosition();
+		randomPlacement.GetComponent<KottabosRandomPlacement>().PlaceRandomPosition();
 		//Stop velocity angular velocity
 		childPos[5].localPosition = topTargetStartPos;
 		childPos[5].rotation = topTargetStartRot;
@@ -158,34 +158,34 @@ public class KottaboasManager : MonoBehaviour
 	}
 
 	public void LeaveKotaboas() {
-		KotabosReset();
+		KottabosReset();
 		TavernaController.BackToTavernaMenu();
 	}
 
-	public void RestartKotabos()	{
-		KotabosReset();
-		TavernaController.ReloadTavernaGame("Kottaboas_Game");
+	public void RestartKottabos()	{
+		KottabosReset();
+		TavernaController.ReloadTavernaGame("Kottabos");
 	}
 
-	public void KotabosPauseMenu() {
+	public void KottabosPauseMenu() {
 		mgscreen.gameObject.SetActive(true);
 		Time.timeScale = 0;
-		mgscreen.DisplayText("Kotabos", "Taverna Game", "Kotaboas is paused, here's where the controls will go", null, MiniGameInfoScreen.MiniGame.TavernaPause);
+		mgscreen.DisplayText("Kottabos", "Taverna Game", "Kottabos is paused, here's where the controls will go", null, MiniGameInfoScreen.MiniGame.TavernaPause);
 	}
 
-	public void KotabosUnPauseMenu() {
+	public void KottabosUnPauseMenu() {
 		mgscreen.gameObject.SetActive(false);
 		Time.timeScale = 1;
 		mgscreen.CloseDialog();
 	}
 
-	private void KotabosPauseAndUnPause() {
+	private void KottabosPauseAndUnPause() {
 		if (Input.GetKeyDown(KeyCode.Escape)) {
 			if (Time.timeScale == 1) {
-				KotabosPauseMenu();
+				KottabosPauseMenu();
 			}
 			else {
-				KotabosUnPauseMenu();
+				KottabosUnPauseMenu();
 			}
 		}
 	}

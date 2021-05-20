@@ -4,31 +4,31 @@ using UnityEngine;
 
 namespace Nav
 {
-	public class city
+	public class NavCity
 	{
-		private Dictionary<string, Vector3> DictCity;
+		private Dictionary<string, Vector3> dictCity;
 		private GameObject tmp;
 		// Start is called before the first frame update
-		public city() {
+		public NavCity() {
 			var tmp = GameObject.Find("Settlement Master List");
 			do {
 				if (tmp == null) {
 					Debug.Log("Can't find the object");
 				}
 				else {
-					DictCity = new Dictionary<string, Vector3>();
+					dictCity = new Dictionary<string, Vector3>();
 					foreach (Transform child in tmp.transform) {
-						DictCity[child.name] = child.transform.position;
+						dictCity[child.name] = child.transform.position;
 					}
-					Debug.Log(DictCity.Count);
+					Debug.Log(dictCity.Count);
 					break;
 				}
 			} while (tmp = null);
 			
 		}
 
-		public Vector3 GetCityLocation(string CityName) {
-			return DictCity[CityName];
+		public Vector3 GetCityLocation(string cityName) {
+			return dictCity[cityName];
 		}
 	}
 }

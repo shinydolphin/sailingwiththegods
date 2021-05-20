@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //Controls the placement and chances of placement for the kottabos stand and table
-public class RandomPlacement : MonoBehaviour
+public class KottabosRandomPlacement : MonoBehaviour
 {
-	public KottaboasManager gm;
+	public KottabosManager gm;
 
 	public Transform[] pos;
 	private Vector3 startPosLekane, startPosKottabosStand;
 
-	//Limit the how far the table and kottaboas stand will be displaced
+	//Limit the how far the table and kottabos stand will be displaced
 	private float xMaxRange = 4.25f;
 	private float xMinRange = -4.25f;
 	private float zMaxRange = 4.25f;

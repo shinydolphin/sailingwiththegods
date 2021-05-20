@@ -1896,7 +1896,7 @@ GameObject:
   - component: {fileID: 934843544248112877}
   - component: {fileID: 934843544248112876}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: SongManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1930,6 +1930,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da8bb3d4fd21b3d4cb9c47872d1d2d2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  victory: {fileID: 0}
+  failure: {fileID: 0}
   party_list:
   - {fileID: 934843545821539246}
   - {fileID: 934843545366951001}
@@ -1940,6 +1942,7 @@ MonoBehaviour:
   Wisdom_list:
   - {fileID: 934843545150580680}
   - {fileID: 934843544957506429}
+  am: {fileID: 0}
   win: {fileID: 934843545202673489}
   lose: {fileID: 934843544502886889}
   gameEndTimerValue: 120

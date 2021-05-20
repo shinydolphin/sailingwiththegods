@@ -4,12 +4,12 @@ using TMPro;
 using UnityEngine;
 
 //Controls the way liquid drips are thrown and animation
-public class Throw : MonoBehaviour
+public class KottabosThrow : MonoBehaviour
 {
 	public TextMeshProUGUI PowerIndicator;
 
 	private Vector3 pointToTravel;
-	private ThrowRadius tr;
+	private KottabosThrowRadius tr;
 
     public Animator animate;
 
@@ -24,7 +24,7 @@ public class Throw : MonoBehaviour
     {
 		PowerIndicator.text = "Power: " + ((power / 4.0f) * 100.0f).ToString();
 
-		tr = gameObject.GetComponent<ThrowRadius>();
+		tr = gameObject.GetComponent<KottabosThrowRadius>();
         Rb = gameObject.GetComponent<Rigidbody>();
     }
 

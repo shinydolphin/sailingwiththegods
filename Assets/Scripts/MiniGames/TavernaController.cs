@@ -24,11 +24,11 @@ public class TavernaController : MonoBehaviour
 	}
 
 	public void StartSong() {
-		StartCoroutine(LoadTavernaGame("SongCompMainMenu"));
+		StartCoroutine(LoadTavernaGame("SongGame"));
 	}
 	
-	public void StartKottaboas() {
-		StartCoroutine(LoadTavernaGame("Kottaboas_Game"));
+	public void StartKottabos() {
+		StartCoroutine(LoadTavernaGame("Kottabos"));
 	}
 
 	public void StartTavernaConvo() {

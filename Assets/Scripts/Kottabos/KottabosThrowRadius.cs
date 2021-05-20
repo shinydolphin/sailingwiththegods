@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //The UI display for the trajectory system
-public class ThrowRadius : MonoBehaviour
+public class KottabosThrowRadius : MonoBehaviour
 {
     public LineRenderer horizontalAxis, verticalAxis, trajectory;
     public Material lineMat;

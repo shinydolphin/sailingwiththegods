@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 
 
-public class text_scale : MonoBehaviour
+public class SongTextScale : MonoBehaviour
 {
 	public TMP_Text text;
 	public Vector2 padding;

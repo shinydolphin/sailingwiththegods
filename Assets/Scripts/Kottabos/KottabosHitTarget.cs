@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //What happens when you land a shot on the kottboas stand targets or inside the cups
-public class HitTarget : MonoBehaviour
+public class KottabosHitTarget : MonoBehaviour
 {
-    public KottaboasManager gm;
+    public KottabosManager gm;
 
 	/// <summary>
 	/// Find if the collision is with the targets do something

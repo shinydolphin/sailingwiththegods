@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class arrowButtonController : MonoBehaviour
+public class ArrowButtonController : MonoBehaviour
 {
 
     //so that arrow keys work when a key input is pressed

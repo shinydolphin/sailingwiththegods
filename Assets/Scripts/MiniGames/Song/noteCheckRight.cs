@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class noteCheckRight : MonoBehaviour
+public class NoteCheckRight : MonoBehaviour
 {
     public bool canBePressed;
 
