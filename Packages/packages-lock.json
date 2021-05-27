@@ -99,6 +99,13 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.yasirkula.assetusagedetector": {
+      "version": "1.9.4",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "nuget.mono-cecil": {
       "version": "0.1.6-preview",
       "depth": 1,
