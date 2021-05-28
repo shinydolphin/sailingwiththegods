@@ -3841,7 +3841,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1024077445}
   - component: {fileID: 1024077446}
-  - component: {fileID: 1024077444}
   - component: {fileID: 1024077447}
   m_Layer: 0
   m_Name: GameManagerObject
@@ -3850,19 +3849,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1024077444
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1024077443}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29bfa5e0e1a331540aff2be46ee32fa0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tavernaListener: {fileID: 0}
 --- !u!4 &1024077445
 Transform:
   m_ObjectHideFlags: 0
@@ -3890,6 +3876,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mgscreen: {fileID: 1701521200}
+  gameIcon: {fileID: 21300000, guid: c32cb99efeb35db4caeb5dcfc97289e9, type: 3}
   playerPos: {fileID: 1951047697}
   randomPlacement: {fileID: 1041556226}
   childPos:
