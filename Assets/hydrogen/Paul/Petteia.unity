@@ -15822,6 +15822,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI Elements
       objectReference: {fileID: 0}
+    - target: {fileID: 5220106615039641139, guid: 7bddbb20614417b4d982059e874b4a90,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5220106615222859197, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_Text
@@ -15883,6 +15888,16 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 685686257}
+    - target: {fileID: 5263005830987271507, guid: 7bddbb20614417b4d982059e874b4a90,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7065216673112236909, guid: 7bddbb20614417b4d982059e874b4a90,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7398002513987589330, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_AnchoredPosition.x

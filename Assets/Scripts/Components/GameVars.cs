@@ -560,11 +560,11 @@ public class GameVars : MonoBehaviour
 
 	void DebugHotkeys() {
 #if UNITY_EDITOR
-		if(Input.GetKeyUp(KeyCode.E)) {
-			var storm = new StormAtSea();
-			storm.Init(this, playerShipVariables.ship, new ShipSpeedModifiers(), playerShip.transform, 1);
-			storm.Execute();
-		}
+		//if(Input.GetKeyUp(KeyCode.E)) {
+		//	var storm = new StormAtSea();
+		//	storm.Init(this, playerShipVariables.ship, new ShipSpeedModifiers(), playerShip.transform, 1);
+		//	storm.Execute();
+		//}
 #endif
 	}
 
