@@ -269,7 +269,6 @@ public class script_player_controls : MonoBehaviour
 						//Debug.Log ("Quest Seg start new game: " + ship.mainQuest.currentQuestSegment);
 						//Turn off title screen camera
 						GameVars.camera_titleScreen.SetActive(false);
-						GameVars.bg_startScreen.SetActive(false);
 
 						//Turn on the environment fog
 						RenderSettings.fog = true;
