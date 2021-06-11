@@ -31,7 +31,8 @@ public class TavernCityView : ViewBehaviour<CityViewModel>
 				//CityModel.GUI_BuyHint
 				ds.Storage.SetValue("$known_city", Model.PortName);
 				ds.Storage.SetValue("$known_city_ID", Model.City.settlementID);
-				Debug.Log("We have clicked on button.");
+				ds.Storage.SetValue("$known_city_type", Model.City.typeOfSettlement);
+				ds.yarnOnComplete();
 				Globals.UI.Hide<TavernView>();
 			}
 		})) ;
@@ -46,7 +47,7 @@ public class TavernCityView : ViewBehaviour<CityViewModel>
 		base.Refresh(sender, propertyChanged);
 
 		// setup a hint button if it's a city. If it's not a city, then there is no trading and nothign to ask about
-		Ask.gameObject.SetActive(Model.City.typeOfSettlement == 1);
+		//Ask.gameObject.SetActive(Model.City.typeOfSettlement == 1);
 	}
 }
 

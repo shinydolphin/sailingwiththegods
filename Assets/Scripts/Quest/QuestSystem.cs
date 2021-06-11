@@ -66,8 +66,13 @@ public class QuestSystem : MonoBehaviour
 		//Add any new crew members if the questline calls for it
 		foreach (int crewID in thisQuest.crewmembersToAdd) {
 			//Make sure the crew ID values are not -1(a null value which means no changes)
-			if (crewID != -1)
-				playerShipVariables.ship.crewRoster.Add(gameVars.GetCrewMemberFromID(crewID));
+			//Also make sure they aren't already in your crew or Jason himself
+			if (crewID != -1) {
+				CrewMember cm = gameVars.GetCrewMemberFromID(crewID);
+				if (!cm.isJason && !playerShipVariables.ship.crewRoster.Contains(cm)) {
+					playerShipVariables.ship.crewRoster.Add(cm);
+				}
+			}
 		}
 
 		//Then increment the questline to the in succession and update the player captains log with the new information for the next quest line
@@ -90,11 +95,13 @@ public class QuestSystem : MonoBehaviour
 
 			//Now add the city name of the next journey quest to the players known settlements
 			// this is only valid for city destinations, obviously
+			Debug.Log("Adding known city from next quest destination: " + Globals.GameVars.currentSettlement.name);
 			playerShipVariables.ship.playerJournal.AddNewSettlementToLog(cityTrigger2.DestinationId);
 			Debug.Log("next seg: " + cityTrigger2.DestinationId);
 		}
 		else {
 			// TODO: until we have a better idea, show the description as a message box for quest segments that aren't targeting a specific city (and so can't use the usual captain's log entry system which depends on city ids)
+			//if (segmentId != 0) { gameVars.ShowANotificationMessage(QuestMessageIntro + nextSegment.descriptionOfQuest); }
 			gameVars.ShowANotificationMessage(QuestMessageIntro + nextSegment.descriptionOfQuest);
 		}
 
@@ -102,8 +109,11 @@ public class QuestSystem : MonoBehaviour
 		foreach (int i in nextSegment.mentionedPlaces) {
 			Debug.Log("mentioning: " + i);
 			//Make sure we don't add any null values--a -1 represents no mentions of any settlements
-			if (i != -1)
+			if (i != -1) {
+				Debug.Log("Adding known city from quest: " + Globals.GameVars.currentSettlement.name);
 				playerShipVariables.ship.playerJournal.AddNewSettlementToLog(i);
+			}
+
 		}
 
 		playerShipVariables.ship.objective = nextSegment.objective;
