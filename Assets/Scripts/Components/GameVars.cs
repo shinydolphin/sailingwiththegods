@@ -214,6 +214,12 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public List<FoodText> foodDialogText = new List<FoodText>();
 	[HideInInspector] public List<string> tavernaGameInsults;
 	[HideInInspector] public List<string> tavernaGameBragging;
+	[HideInInspector] public List<string> petteiaGameFlavor;
+	[HideInInspector] public List<string> petteiaGameBragging;
+	[HideInInspector] public List<string> petteiaGameInsults;
+	[HideInInspector] public List<string> petteiaGameWin;
+	[HideInInspector] public List<string> petteiaGameLost;
+	[HideInInspector] public List<string> petteiaGameBlocked;
 
 
 	// high level game systems
@@ -296,6 +302,7 @@ public class GameVars : MonoBehaviour
 		portDialogText = CSVLoader.LoadPortDialog();
 
 		CSVLoader.LoadTavernaGameBarks(out tavernaGameInsults, out tavernaGameBragging);
+		CSVLoader.LoadPetteiaText(out petteiaGameFlavor, out petteiaGameInsults, out petteiaGameBragging, out petteiaGameWin, out petteiaGameLost, out petteiaGameBlocked);
 
 		// Mylo's Addition
 		networkDialogText = CSVLoader.LoadNetworkDialog();

@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class TavernaMiniGameDialog : MonoBehaviour
 {
+	public enum MinigameType { Petteia, Ur }
+	public MinigameType gameType;
 	public GameObject textBackground;
 	public Text dialog;
 
@@ -15,37 +17,53 @@ public class TavernaMiniGameDialog : MonoBehaviour
 	{
 		textBackground.SetActive(false);
 
-		//Will be replaced with pulling texts from a CSV
-		braggingTexts = new List<string> { "Player brag 1", "Player brag 2" };
-		insultingTexts = new List<string> { "Player insult 1", "Player insult 2" };
+		SetTextLists();
+	}
+
+	protected void SetTextLists() 
+	{
+		if (gameType == MinigameType.Petteia) 
+		{
+			//petteia brag/insult
+			if (Globals.GameVars != null) {
+				insultingTexts = Globals.GameVars.petteiaGameInsults;
+				braggingTexts = Globals.GameVars.petteiaGameBragging;
+			}
+			else {
+				insultingTexts = new List<string> { "Petteia insult 1", "Petteia insult 2", "Petteia insult 3" };
+				braggingTexts = new List<string> { "Petteia brag 1", "Petteia brag 2", "Petteia brag 3" };
+			}
+		}
+		else 
+		{
+			//ur brag/insult
+			if (Globals.GameVars != null) {
+				insultingTexts = Globals.GameVars.tavernaGameInsults;
+				braggingTexts = Globals.GameVars.tavernaGameBragging;
+			}
+			else {
+				insultingTexts = new List<string> { "Ur insult 1", "Ur insult 2", "Ur insult 3" };
+				braggingTexts = new List<string> { "Ur brag 1", "Ur brag 2", "Ur brag 3" };
+			}
+		}
 	}
 
 	/// <summary>
-	/// Displays an insult from the opponent to the player - that is, the opponent is upset with the player
+	/// Displays an insult
 	/// </summary>
 	public void DisplayInsult() {
 		Time.timeScale = 0;
 		textBackground.SetActive(true);
-		if (Globals.GameVars != null) {
-			dialog.text = insultingTexts.RandomElement();
-		}
-		else {
-			dialog.text = "Insult goes here";
-		}
+		dialog.text = insultingTexts.RandomElement();
 	}
 
 	/// <summary>
-	/// Displays a brag from the opponent - that is, the opponent is happy
+	/// Displays a brag
 	/// </summary>
 	public void DisplayBragging() {
 		Time.timeScale = 0;
 		textBackground.SetActive(true);
-		if (Globals.GameVars != null) {
-			dialog.text = braggingTexts.RandomElement();
-		}
-		else {
-			dialog.text = "Bragging goes here";
-		}
+		dialog.text = braggingTexts.RandomElement();
 	}
 
 	public void CloseDialog() {

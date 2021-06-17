@@ -547,6 +547,52 @@ public static class CSVLoader
 
 	}
 
+	public static void LoadPetteiaText(out List<string> flavor, out List<string> insults, out List<string> bragging, out List<string> win, out List<string> lose, out List<string> blocked) 
+	{
+		flavor = new List<string>();
+		insults = new List<string>();
+		bragging = new List<string>();
+		win = new List<string>();
+		lose = new List<string>();
+		blocked = new List<string>();
+
+		char[] lineDelimiter = new char[] { '@' };
+		char newline = '%';
+		string filename = "petteia_text";
+
+		string[] fileByLine = TryLoadListFromGameFolder(filename);
+
+		for (int i = 0; i < fileByLine.Length; i++) 
+		{
+			string[] texts = fileByLine[i].Split(lineDelimiter);
+			string content = StripAndAddNewlines(texts[0], newline);
+			switch (texts[1]) {
+				case "flavor":
+					flavor.Add(content);
+					break;
+				case "insult":
+					insults.Add(content);
+					break;
+				case "brag":
+					bragging.Add(content);
+					break;
+				case "blocked":
+					blocked.Add(content);
+					break;
+				case "win":
+					win.Add(content);
+					break;
+				case "lose":
+					lose.Add(content);
+					break;
+				default:
+					Debug.Log($"Petteia text line {i} not marked correctly: {texts[1]}!");
+					break;
+			}
+		}
+
+	}
+
 	//Mylo's Addition
 	public static List<DialogText> LoadNetworkDialog() 
 	{

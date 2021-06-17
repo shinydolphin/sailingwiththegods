@@ -369,7 +369,11 @@ MonoBehaviour:
   enemyBarks: {fileID: 5220106615405182563}
   gameIcon: {fileID: 21300000, guid: bc1b4e5108619994fb400220fb761c71, type: 3}
   barkChance: 0.25
-  introText: This is the intro to Petteia.
+  introText: You approach a sailor sitting at a table with a game board before him.
+    He grins and says, "Come to try your hand at Petteia, eh? It looks simple - just
+    8 pieces each - but it's an excellent show of strategy! A talented player is
+    a talented leader, and surely your fame will grow if you can beat me. I'll even
+    throw in some supplies if you can win!"
   instructions: 'Click and drag your pieces to move them. Pieces can move in horizontal
     lines in any direction.
 
@@ -378,9 +382,25 @@ MonoBehaviour:
     pieces, either vertically or horizontally.
 
     When moving a piece into a mutual
-    capture, the player is at disadvantage'
-  winText: You won the game!
-  loseText: You lost the game!
+    capture, the player is at disadvantage.'
+  history: "Petteia (sometimes called Pessoi) is a strategy game, played against
+    an opponent who seeks to capture your pieces as you seek to capture theirs. Greeks
+    considered it a valuable way to teach military strategy, comparable in its importance
+    to the invention of numbers and letters, an engaging enough to distract players
+    from their growling bellies or the long boredom of holding a city at siege. Its
+    inventor, Palamedes, also invented the craft of measuring the stars, military
+    tactics, and eating three meals a day (Sophokles Nauplus, fr.; Aeschylus, Palamedes,
+    fr.). Eventually Petteia became, for the Romans, Ludus Latrunculorum, 'the game
+    of the brigands.' The game could be found all over the empire, and may have been
+    something shared between the Romans and those they ruled. In Stanway, England,
+    a Druid tomb includes the remains of a rotted game board, the pieces arranged
+    all ready to play in the afterlife - this could have been a Celtic game or Ludus
+    Latrunculorum.\r"
+  winText: Across the table, your opponent wrinkles his nose in disappointment. "Well
+    played, I suppose. A deal's a deal, so I'll hand over some supplies for your
+    ship."
+  loseText: Your opponent smirks at you across the table. "A good try, to be sure,
+    but not good enough! Care to try again?"
   debugPiecePositions: 
 --- !u!4 &4099228
 Transform:

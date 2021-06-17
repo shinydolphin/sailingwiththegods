@@ -35,22 +35,47 @@ public class PetteiaGameController : MonoBehaviour
 	public float barkChance = 0.25f;
 
 	[Header("Text")]
+	[TextArea(2, 30)]
 	public string introText;
 	[TextArea(2, 30)]
 	public string instructions;
+	[TextArea(2, 30)]
+	public string history;
+	[TextArea(2, 30)]
 	public string winText;
+	[TextArea(2, 30)]
 	public string loseText;
 	
+	[Header("Debug")]
 	[TextArea(1, 8)]
 	public string debugPiecePositions;
 	
 	private bool playerTurn;
 	private bool gameOver = false;
+	private List<string> flavor;
+	private List<string> winFlavor;
+	private List<string> loseFlavor;
+	private List<string> blockedFlavor;
 	
 	void Start() 
 	{
+		if (Globals.GameVars != null) 
+		{
+			flavor = Globals.GameVars.petteiaGameFlavor;
+			winFlavor = Globals.GameVars.petteiaGameWin;
+			loseFlavor = Globals.GameVars.petteiaGameLost;
+			blockedFlavor = Globals.GameVars.petteiaGameBlocked;
+		}
+		else 
+		{
+			flavor = new List<string> { "Petteia flavor 1", "Petteia flavor 2", "Petteia flavor 3" };
+			winFlavor = new List<string> { "Petteia win flavor 1", "Petteia win flavor 2", "Petteia win flavor 3" };
+			loseFlavor = new List<string> { "Petteia lose flavor 1", "Petteia lose flavor 2", "Petteia lose flavor 3" };
+			blockedFlavor = new List<string> { "Petteia blocked flavor 1", "Petteia blocked flavor 2", "Petteia blocked flavor 3" };
+		}
+
 		mgScreen.gameObject.SetActive(true);
-		string text = introText + "\n\n" + instructions + "\n\n" + "flavor";
+		string text = introText + "\n\n" + instructions + "\n\n" + flavor.RandomElement();
 		mgScreen.DisplayText("Petteia", "Taverna game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaStart);
 		enemyAI = GetComponent<PetteiaEnemyAI>();
 		playerTurn = true;
@@ -86,7 +111,7 @@ public class PetteiaGameController : MonoBehaviour
 	{
 		mgScreen.gameObject.SetActive(true);
 		Time.timeScale = 0;
-		mgScreen.DisplayText("Petteia", "Taverna game", instructions, gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
+		mgScreen.DisplayText("Petteia", "Taverna game", instructions + "\n\n" + history, gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
 	}
 
 	public void UnpauseMinigame() 
@@ -251,7 +276,7 @@ public class PetteiaGameController : MonoBehaviour
 			float newRange = rewardAmts.y - rewardAmts.x;			
 			int reward = Mathf.CeilToInt(((playerPieces.Count - 2) * (newRange * 1.0f) / oldRange) + rewardAmts.x);
 
-			string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!";
+			string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!" + "\n\n" + winFlavor.RandomElement();
 
 			if (Globals.GameVars != null) 
 			{
@@ -265,7 +290,7 @@ public class PetteiaGameController : MonoBehaviour
 		//Player loss
 		if (playerPieces.Count <= 1) {
 			mgScreen.gameObject.SetActive(true);
-			string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!";
+			string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseFlavor.RandomElement();
 			mgScreen.DisplayText("Petteia Loss", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
 			gameOver = true;
 		}
@@ -277,7 +302,7 @@ public class PetteiaGameController : MonoBehaviour
 			//player can't move, has therefore lost
 			Debug.Log("Player is blocked in");
 			mgScreen.gameObject.SetActive(true);
-			string text = "Lost because of blocking" + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!";
+			string text = blockedFlavor.RandomElement() + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseFlavor.RandomElement();
 			mgScreen.DisplayText("Petteia Loss", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
 			gameOver = true;
 		}
