@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 // used for tavern minigame menu
@@ -120,6 +121,13 @@ public class TavernaController : MonoBehaviour
 	IEnumerator LoadTavernaGame(string sceneName) {
 		yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
 		ToggleTavernaObjects(false);
+
+		//Here we deselect the button to the taverna game. This is important because if we don't, the player can press space and do the button again
+		//This means that if you load into a game and press space, it loads the game again. And again. And again.
+		//Having that many scenes open at once lags the game like crazy and will probably crash it eventually
+		//I think I probably fixed it in the inspector too (Button Navigation > None) but just in case I'll do this here too
+		EventSystem.current.SetSelectedGameObject(null);
+
 		Scene scene = SceneManager.GetSceneByName(sceneName);
 		SceneManager.SetActiveScene(scene);
 

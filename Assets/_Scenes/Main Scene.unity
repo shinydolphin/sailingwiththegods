@@ -46623,8 +46623,16 @@ MonoBehaviour:
   showNonPortDockButton: 0
   showNonPortDockingNotification: 0
   updatePlayerCloutMeter: 0
+  guideDialogText: []
+  foodDialogText: []
   tavernaGameInsults: []
   tavernaGameBragging: []
+  petteiaGameFlavor: []
+  petteiaGameBragging: []
+  petteiaGameInsults: []
+  petteiaGameWin: []
+  petteiaGameLost: []
+  petteiaGameBlocked: []
   activeSettlementInfluenceSphereList: 
   stormTitles: []
   stormSubtitles: []

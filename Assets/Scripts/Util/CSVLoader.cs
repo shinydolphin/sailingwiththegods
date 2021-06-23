@@ -593,188 +593,259 @@ public static class CSVLoader
 
 	}
 
-	//Mylo's Addition
-	public static List<DialogText> LoadNetworkDialog() 
+	public static void LoadTavernaDialog(out List<DialogPair> network, out List<DialogPair> pirates, out List<DialogPair> myths, out List<string> guide, 
+		out List<string> foodQuotes, out List<FoodText> foods, out List<FoodText> wines) 
 	{
-		List<DialogText> textList = new List<DialogText>();
+		network = new List<DialogPair>();
+		pirates = new List<DialogPair>();
+		myths = new List<DialogPair>();
+		guide = new List<string>();
+		foodQuotes = new List<string>();
+		foods = new List<FoodText>();
+		wines = new List<FoodText>();
 
-		char[] lineDelimeter = new char[] { '@' };
+		char[] lineDelimiter = new char[] { '@' };
 		char newline = '%';
-		string filename = "taverna_network_questions";
+		string filename = "taverna_text";
 
 		string[] fileByLine = TryLoadListFromGameFolder(filename);
 
-		for (int i = 1; i < fileByLine.Length; i++) 
+		for (int i = 0; i < fileByLine.Length; i++) 
 		{
-			string[] texts = fileByLine[i].Split(lineDelimeter);
-			string content = StripAndAddNewlines(texts[2], newline);
-			DialogText t = new DialogText(texts[0], new string[] { texts[1], content });
-			textList.Add(t);
+			string[] texts = fileByLine[i].Split(lineDelimiter);
+			string content;
+			string cityName;
+			string question;
+			string answer;
+			DialogPair dialogText;
+			FoodText foodText;
+
+			switch (texts[0]) 
+			{
+				case "network":
+					cityName = texts[1];
+					question = StripAndAddNewlines(texts[2], newline);
+					answer = StripAndAddNewlines(texts[3], newline);
+					dialogText = new DialogPair(cityName, question, answer);
+					network.Add(dialogText);
+					break;
+				case "pirate":
+					cityName = texts[1];
+					question = StripAndAddNewlines(texts[2], newline);
+					answer = StripAndAddNewlines(texts[3], newline);
+					dialogText = new DialogPair(cityName, question, answer);
+					pirates.Add(dialogText);
+					break;
+				case "myth":
+					cityName = texts[1];
+					question = StripAndAddNewlines(texts[2], newline);
+					answer = StripAndAddNewlines(texts[3], newline);
+					dialogText = new DialogPair(cityName, question, answer);
+					myths.Add(dialogText);
+					break;
+				case "guide":
+					content = StripAndAddNewlines(texts[1], newline);
+					guide.Add(content);
+					break;
+				case "food quote":
+					content = StripAndAddNewlines(texts[1], newline);
+					foodQuotes.Add(content);
+					break;
+				case "food":
+					content = StripAndAddNewlines(texts[2], newline);
+					foodText = new FoodText(texts[1], content, FoodText.Type.Food);
+					foods.Add(foodText);
+					break;
+				case "wine":
+					content = StripAndAddNewlines(texts[2], newline);
+					foodText = new FoodText(texts[1], content, FoodText.Type.Wine);
+					wines.Add(foodText);
+					break;
+				default:
+					Debug.Log($"Taverna text line {i} not marked correctly: {texts[0]}");
+					break;
+			}
 		}
-
-		//Debug.Log("CITY: " + textList[2].CityType);
-		//Debug.Log("Q " + textList[2].TextQA[0]);
-		//Debug.Log("A " + textList[2].TextQA[1]);
-
-		return textList;
-
 	}
 
-	public static List<DialogText> LoadPirateDialog() {
-		List<DialogText> textList = new List<DialogText>();
+	//Mylo's Addition
+	//public static List<DialogText> LoadNetworkDialog() {
+	//	List<DialogText> textList = new List<DialogText>();
 
-		char[] lineDelimeter = new char[] { '@' };
-		char newline = '%';
-		string filename = "taverna_pirate_questions";
+	//	char[] lineDelimeter = new char[] { '@' };
+	//	char newline = '%';
+	//	string filename = "taverna_network_questions";
 
-		string[] fileByLine = TryLoadListFromGameFolder(filename);
+	//	string[] fileByLine = TryLoadListFromGameFolder(filename);
 
-		for (int i = 1; i < fileByLine.Length; i++) {
-			string[] texts = fileByLine[i].Split(lineDelimeter);
-			string content = StripAndAddNewlines(texts[2], newline);
-			DialogText t = new DialogText(texts[0], new string[] { texts[1], content });
-			textList.Add(t);
-		}
+	//	for (int i = 1; i < fileByLine.Length; i++) {
+	//		string[] texts = fileByLine[i].Split(lineDelimeter);
+	//		string content = StripAndAddNewlines(texts[2], newline);
+	//		//DialogText t = new DialogText(texts[0], new string[] { texts[1], content });
+	//		DialogText t = new DialogText(texts[0], new string[] { texts[1], content });
+	//		textList.Add(t);
+	//	}
 
-		//Debug.Log("Pirate: " + textList[2].CityType);
-		//Debug.Log("Q " + textList[2].TextQA[0]);
-		//Debug.Log("A " + textList[2].TextQA[1]);
+	//	//Debug.Log("CITY: " + textList[2].CityType);
+	//	//Debug.Log("Q " + textList[2].TextQA[0]);
+	//	//Debug.Log("A " + textList[2].TextQA[1]);
 
-		return textList;
+	//	return textList;
 
-	}
+	//}
 
-	public static List<DialogText> LoadMythDialog() {
-		List<DialogText> textList = new List<DialogText>();
+	//public static List<DialogText> LoadPirateDialog() {
+	//	List<DialogText> textList = new List<DialogText>();
 
-		char[] lineDelimeter = new char[] { '@' };
-		char newline = '%';
-		string filename = "taverna_myth_questions";
+	//	char[] lineDelimeter = new char[] { '@' };
+	//	char newline = '%';
+	//	string filename = "taverna_pirate_questions";
 
-		string[] fileByLine = TryLoadListFromGameFolder(filename);
+	//	string[] fileByLine = TryLoadListFromGameFolder(filename);
 
-		for (int i = 1; i < fileByLine.Length; i++) {
-			string[] texts = fileByLine[i].Split(lineDelimeter);
-			string content = StripAndAddNewlines(texts[2], newline);
-			DialogText t = new DialogText(texts[0], new string[] { texts[1], content });
-			textList.Add(t);
-		}
+	//	for (int i = 1; i < fileByLine.Length; i++) {
+	//		string[] texts = fileByLine[i].Split(lineDelimeter);
+	//		string content = StripAndAddNewlines(texts[2], newline);
+	//		DialogText t = new DialogText(texts[0], new string[] { texts[1], content });
+	//		textList.Add(t);
+	//	}
 
-		//Debug.Log("Myth: " + textList[2].CityType);
-		//Debug.Log("Q " + textList[2].TextQA[0]);
-		//Debug.Log("A " + textList[2].TextQA[1]);
+	//	//Debug.Log("Pirate: " + textList[2].CityType);
+	//	//Debug.Log("Q " + textList[2].TextQA[0]);
+	//	//Debug.Log("A " + textList[2].TextQA[1]);
 
-		return textList;
+	//	return textList;
 
-	}
+	//}
 
-	public static List<DialogText> LoadHireGuideDialog() {
-		List<DialogText> textList = new List<DialogText>();
+	//public static List<DialogText> LoadMythDialog() {
+	//	List<DialogText> textList = new List<DialogText>();
 
-		char[] lineDelimeter = new char[] { '@' };
-		char newline = '%';
-		string filename = "taverna_guide_hire";
+	//	char[] lineDelimeter = new char[] { '@' };
+	//	char newline = '%';
+	//	string filename = "taverna_myth_questions";
 
-		string[] fileByLine = TryLoadListFromGameFolder(filename);
+	//	string[] fileByLine = TryLoadListFromGameFolder(filename);
 
-		for (int i = 1; i < fileByLine.Length; i++) {
-			string[] texts = fileByLine[i].Split(lineDelimeter);
-			string content = StripAndAddNewlines(texts[0], newline);
-			DialogText t = new DialogText(content, new string[] { texts[1], texts[2] });
-			textList.Add(t);
-		}
+	//	for (int i = 1; i < fileByLine.Length; i++) {
+	//		string[] texts = fileByLine[i].Split(lineDelimeter);
+	//		string content = StripAndAddNewlines(texts[2], newline);
+	//		DialogText t = new DialogText(texts[0], new string[] { texts[1], content });
+	//		textList.Add(t);
+	//	}
 
-		return textList;
+	//	//Debug.Log("Myth: " + textList[2].CityType);
+	//	//Debug.Log("Q " + textList[2].TextQA[0]);
+	//	//Debug.Log("A " + textList[2].TextQA[1]);
 
-	}
+	//	return textList;
 
-	// Food Items load
-	public static List<FoodText> LoadFoodItemsList() {
-		List<FoodText> foodList = new List<FoodText>();
+	//}
 
-		char[] lineDelimeter = new char[] { '@' };
-		char newline = '%';
-		string filename = "taverna_food_list";
+	//public static List<DialogText> LoadHireGuideDialog() {
+	//	List<DialogText> textList = new List<DialogText>();
 
-		string[] fileByLine = TryLoadListFromGameFolder(filename);
+	//	char[] lineDelimeter = new char[] { '@' };
+	//	char newline = '%';
+	//	string filename = "taverna_guide_hire";
 
-		for (int i = 2; i < fileByLine.Length-1; i++)
-		{
-			string[] texts = fileByLine[i].Split(lineDelimeter);
-			string content = StripAndAddNewlines(texts[3], newline);
-			FoodText f = new FoodText();
+	//	string[] fileByLine = TryLoadListFromGameFolder(filename);
 
-			f.Source = texts[0];
-			f.Chapter = texts[1];
-			f.Item = texts[2];
-			f.Quote = content;
-			f.Speaker = texts[4];
+	//	for (int i = 1; i < fileByLine.Length; i++) {
+	//		string[] texts = fileByLine[i].Split(lineDelimeter);
+	//		string content = StripAndAddNewlines(texts[0], newline);
+	//		DialogText t = new DialogText(content, new string[] { texts[1], texts[2] });
+	//		textList.Add(t);
+	//	}
 
+	//	return textList;
 
-			foodList.Add(f);
-		}
+	//}
 
-		return foodList;
+	//// Food Items load
+	//public static List<FoodText> LoadFoodItemsList() {
+	//	List<FoodText> foodList = new List<FoodText>();
 
-	}
+	//	char[] lineDelimeter = new char[] { '@' };
+	//	char newline = '%';
+	//	string filename = "taverna_food_list";
 
-	// Food Dialogue load
-	public static List<FoodText> LoadFoodDialogList() {
-		List<FoodText> foodList = new List<FoodText>();
+	//	string[] fileByLine = TryLoadListFromGameFolder(filename);
 
-		char[] lineDelimeter = new char[] { '@' };
-		char newline = '%';
-		string filename = "taverna_food_dialog";
+	//	for (int i = 2; i < fileByLine.Length - 1; i++) {
+	//		string[] texts = fileByLine[i].Split(lineDelimeter);
+	//		string content = StripAndAddNewlines(texts[3], newline);
+	//		FoodText f = new FoodText();
 
-		string[] fileByLine = TryLoadListFromGameFolder(filename);
-
-		for (int i = 2; i < fileByLine.Length - 1 ; i++) 
-		{
-			string[] texts = fileByLine[i].Split(lineDelimeter);
-			string content = StripAndAddNewlines(texts[2], newline);
-			FoodText f = new FoodText();
-
-			f.Source = texts[0];
-			f.Chapter = texts[1];
-			f.Quote = content;
-			f.Speaker = texts[3];
-			f.Scenario = texts[4];
+	//		//f.Source = texts[0];
+	//		//f.Chapter = texts[1];
+	//		f.Item = texts[2];
+	//		f.Quote = content;
+	//		//f.Speaker = texts[4];
 
 
-			foodList.Add(f);
-		}
+	//		foodList.Add(f);
+	//	}
 
-		return foodList;
+	//	return foodList;
 
-	}
+	//}
 
-	// Wine Info load
-	public static List<FoodText> LoadWineInfoList() {
-		List<FoodText> foodList = new List<FoodText>();
+	//// Food Dialogue load
+	//public static List<FoodText> LoadFoodDialogList() {
+	//	List<FoodText> foodList = new List<FoodText>();
 
-		char[] lineDelimeter = new char[] { '@' };
-		char newline = '%';
-		string filename = "taverna_wine_list";
+	//	char[] lineDelimeter = new char[] { '@' };
+	//	char newline = '%';
+	//	string filename = "taverna_food_dialog";
 
-		string[] fileByLine = TryLoadListFromGameFolder(filename);
+	//	string[] fileByLine = TryLoadListFromGameFolder(filename);
 
-		for (int i = 1; i < fileByLine.Length-1; i++) 
-		{
-			string[] texts = fileByLine[i].Split(lineDelimeter);
-			string content = StripAndAddNewlines(texts[3], newline);
-			FoodText f = new FoodText();
+	//	for (int i = 2; i < fileByLine.Length - 1; i++) {
+	//		string[] texts = fileByLine[i].Split(lineDelimeter);
+	//		string content = StripAndAddNewlines(texts[2], newline);
+	//		FoodText f = new FoodText();
 
-			f.Source = texts[0];
-			f.Chapter = texts[1];
-			f.Item = texts[2];
-			f.Quote = content;
+	//		//f.Source = texts[0];
+	//		//f.Chapter = texts[1];
+	//		f.Quote = content;
+	//		//f.Speaker = texts[3];
+	//		//f.Scenario = texts[4];
 
-			foodList.Add(f);
-		}
 
-		return foodList;
+	//		foodList.Add(f);
+	//	}
 
-	}
+	//	return foodList;
+
+	//}
+
+	//// Wine Info load
+	//public static List<FoodText> LoadWineInfoList() {
+	//	List<FoodText> foodList = new List<FoodText>();
+
+	//	char[] lineDelimeter = new char[] { '@' };
+	//	char newline = '%';
+	//	string filename = "taverna_wine_list";
+
+	//	string[] fileByLine = TryLoadListFromGameFolder(filename);
+
+	//	for (int i = 1; i < fileByLine.Length - 1; i++) {
+	//		string[] texts = fileByLine[i].Split(lineDelimeter);
+	//		string content = StripAndAddNewlines(texts[3], newline);
+	//		FoodText f = new FoodText();
+
+	//		//f.Source = texts[0];
+	//		//f.Chapter = texts[1];
+	//		f.Item = texts[2];
+	//		f.Quote = content;
+
+	//		foodList.Add(f);
+	//	}
+
+	//	return foodList;
+
+	//}
 	// End Mylo's Addition
 
 

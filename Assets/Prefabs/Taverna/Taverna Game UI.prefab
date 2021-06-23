@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 960, y: 600}
+  m_AnchoredPosition: {x: 970, y: 610}
   m_SizeDelta: {x: 1920, y: 1200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1193633761768357738
@@ -108,8 +108,8 @@ MonoBehaviour:
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 14
-    m_MaxSize: 60
-    m_Alignment: 0
+    m_MaxSize: 50
+    m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -421,7 +421,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.92549026, g: 0.9176471, b: 0.8000001, a: 1}
+  m_Color: {r: 0.9607843, g: 0.9490196, b: 0.8235294, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1608,6 +1608,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73daefd557da2aa41b0187b2b460d77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameType: 0
   textBackground: {fileID: 6381315553496771664}
   dialog: {fileID: 5397886871801476738}
 --- !u!114 &7340884585700011751
@@ -1622,6 +1623,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de057dfc13254ae47a6cfb040f919f69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameType: 0
   textBackground: {fileID: 5220106615513474842}
   dialog: {fileID: 5220106615631579443}
   enemyName: {fileID: 5220106614942016691}
@@ -2195,7 +2197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.92549026, g: 0.9176471, b: 0.8000001, a: 1}
+  m_Color: {r: 0.9607843, g: 0.9490196, b: 0.8235294, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2445,8 +2447,8 @@ MonoBehaviour:
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 14
-    m_MaxSize: 60
-    m_Alignment: 2
+    m_MaxSize: 50
+    m_Alignment: 5
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -3768,7 +3770,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 960, y: 600}
+  m_AnchoredPosition: {x: 950, y: 590}
   m_SizeDelta: {x: 1920, y: 1200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &5220106616481455664
@@ -6714,6 +6716,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 4479213564003615846, guid: 92606e32ee4dea9479179e36fc9f1618,
+        type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4987761382866086169, guid: 92606e32ee4dea9479179e36fc9f1618,
         type: 3}

@@ -204,16 +204,26 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public List<DialogText> portDialogText = new List<DialogText>();
 
 	//Taverna
-	[HideInInspector] public List<DialogText> networkDialogText = new List<DialogText>();
-	[HideInInspector] public List<DialogText> pirateDialogText = new List<DialogText>();
-	[HideInInspector] public List<DialogText> mythDialogText = new List<DialogText>();
-	[HideInInspector] public List<DialogText> guideDialogText = new List<DialogText>(); 
-	[HideInInspector] public List<DialogText> tradingDialogText = new List<DialogText>(); // Perhaps
-	[HideInInspector] public List<FoodText> foodItemText= new List<FoodText>();
-	[HideInInspector] public List<FoodText> wineInfoText = new List<FoodText>();
-	[HideInInspector] public List<FoodText> foodDialogText = new List<FoodText>();
+	//[HideInInspector] public List<DialogText> networkDialogText = new List<DialogText>();
+	//[HideInInspector] public List<DialogText> pirateDialogText = new List<DialogText>();
+	//[HideInInspector] public List<DialogText> mythDialogText = new List<DialogText>();
+	//[HideInInspector] public List<DialogText> guideDialogText = new List<DialogText>(); 
+	//[HideInInspector] public List<FoodText> foodItemText= new List<FoodText>();
+	//[HideInInspector] public List<FoodText> wineInfoText = new List<FoodText>();
+	//[HideInInspector] public List<FoodText> foodDialogText = new List<FoodText>();
+
+	[HideInInspector] public List<DialogPair> networkDialogText;
+	[HideInInspector] public List<DialogPair> pirateDialogText;
+	[HideInInspector] public List<DialogPair> mythDialogText;
+	[HideInInspector] public List<string> guideDialogText;
+	[HideInInspector] public List<string> foodDialogText;
+	[HideInInspector] public List<FoodText> wineInfoText;
+	[HideInInspector] public List<FoodText> foodItemText;
+
+
 	[HideInInspector] public List<string> tavernaGameInsults;
 	[HideInInspector] public List<string> tavernaGameBragging;
+
 	[HideInInspector] public List<string> petteiaGameFlavor;
 	[HideInInspector] public List<string> petteiaGameBragging;
 	[HideInInspector] public List<string> petteiaGameInsults;
@@ -302,17 +312,18 @@ public class GameVars : MonoBehaviour
 		portDialogText = CSVLoader.LoadPortDialog();
 
 		CSVLoader.LoadTavernaGameBarks(out tavernaGameInsults, out tavernaGameBragging);
+		CSVLoader.LoadTavernaDialog(out networkDialogText, out pirateDialogText, out mythDialogText, out guideDialogText, out foodDialogText, out foodItemText, out wineInfoText);
 		CSVLoader.LoadPetteiaText(out petteiaGameFlavor, out petteiaGameInsults, out petteiaGameBragging, out petteiaGameWin, out petteiaGameLost, out petteiaGameBlocked);
 
 		// Mylo's Addition
-		networkDialogText = CSVLoader.LoadNetworkDialog();
-		pirateDialogText = CSVLoader.LoadPirateDialog();
-		mythDialogText = CSVLoader.LoadMythDialog();
-		guideDialogText = CSVLoader.LoadHireGuideDialog();
-		// trading goods here
-		foodItemText = CSVLoader.LoadFoodItemsList();
-		foodDialogText = CSVLoader.LoadFoodDialogList();
-		wineInfoText = CSVLoader.LoadWineInfoList();
+		//networkDialogText = CSVLoader.LoadNetworkDialog();
+		//pirateDialogText = CSVLoader.LoadPirateDialog();
+		//mythDialogText = CSVLoader.LoadMythDialog();
+		//guideDialogText = CSVLoader.LoadHireGuideDialog();
+		//// trading goods here
+		//foodItemText = CSVLoader.LoadFoodItemsList();
+		//foodDialogText = CSVLoader.LoadFoodDialogList();
+		//wineInfoText = CSVLoader.LoadWineInfoList();
 
 
 		// end Mylo's Addition

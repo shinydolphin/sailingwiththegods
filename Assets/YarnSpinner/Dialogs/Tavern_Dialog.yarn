@@ -44,13 +44,13 @@ Tell me about the connections and networks surrounding {$known_city}.
 
 << setspeaker DialogScreen other>> 
 << setend DialogScreen>> 
-I could tell you, but would be happier with {$random_food} (cost {$drachma_cost} dr).
+I could tell you, but would be happier with {$random_food} (cost {$generated_cost} dr).
 << set $first_time to true >> 
 
-<< checkafford DialogScreen $drachma_cost>> 
+<< checkafford DialogScreen $generated_cost >> 
 
 << if $can_afford>> 
-    [[ Sure, tell me about this city's networks. (Pay {$drachma_cost}) |Network_Response]]
+    [[ Sure, tell me about this city's networks. (Pay {$generated_cost}) |Network_Response]]
 <<endif>> 
 [[ How greedy! (Do not pay) |City_Questions]]
 ===
@@ -68,13 +68,13 @@ What can you tell me of the pirates in these waters?
 
 << setspeaker DialogScreen other>> 
 << setend DialogScreen>> 
-It's risky to speak of pirates! I would talk more easily if I had {$random_food} (cost {$drachma_cost} dr).
+It's risky to speak of pirates! I would talk more easily if I had {$random_food} (cost {$generated_cost} dr).
 
-<< checkafford DialogScreen $drachma_cost>> 
+<< checkafford DialogScreen $generated_cost>> 
 << set $first_time to true >> 
 
 << if $can_afford>> 
-    [[ Tell me about the pirates in these waters. (Pay {$drachma_cost}) |Pirate_Response]]
+    [[ Tell me about the pirates in these waters. (Pay {$generated_cost}) |Pirate_Response]]
 <<endif>> 
 [[ I will face these waters myself, then! (Do not pay) |City_Questions]]
 ===
@@ -92,14 +92,14 @@ What myths are told about this area?
 
 << setspeaker DialogScreen other>>
 << setend DialogScreen>> 
-I know many things, but {$random_food} would loosen my tongue (cost {$drachma_cost} dr).
+I know many things, but {$random_food} would loosen my tongue (cost {$generated_cost} dr).
 
-<< checkafford DialogScreen $drachma_cost>>
+<< checkafford DialogScreen $generated_cost>>
 
 << set $first_time to true >> 
 
 << if $can_afford>> 
-    [[ Sure, tell me your tales. (Pay {$drachma_cost}) |Myth_Response]]
+    [[ Sure, tell me your tales. (Pay {$generated_cost}) |Myth_Response]]
 <<endif>> 
 [[ How greedy! I will not pay to hear your stories. (Do not pay) |City_Questions]]
 ===
@@ -120,20 +120,19 @@ position: -369,495
 << randomfood DialogScreen>> 
 << randomguide DialogScreen>> 
 
-
 << setspeaker DialogScreen Jason>> 
 I'm eager to sail to {$known_city}, but need to find the way!
 << setspeaker DialogScreen other>>
+A guide is what you want! {$flavor_text1}
 << setend DialogScreen>> 
-A guide is what you want! {$flavor_text1} 
-I know a man I can recommend to you. His rate is {$drachma_cost} dr.
+I know a man I can recommend to you. His rate is {$generated_cost} dr.
 
-<< checkafford DialogScreen $drachma_cost>> 
+<< checkafford DialogScreen $generated_cost>> 
 << set $first_time to true >> 
 
 
 << if $can_afford>> 
-    [[ If I must hire a guide to find my way, then so be it! (Pay {$drachma_cost}) |Guide_Set]]
+    [[ If I must hire a guide to find my way, then so be it! (Pay {$generated_cost}) |Guide_Set]]
 <<endif>> 
     [[No, no, I will find my way myself! (Do not pay) |City_Questions]]
 ===
@@ -142,7 +141,7 @@ tags:
 colorID: 0
 position: -1255,-642
 ---
-<< pay DialogScreen $drachma_cost >> 
+<< pay DialogScreen $generated_cost >> 
 
 << setspeaker DialogScreen Jason >>
 There, your meal.
@@ -163,7 +162,7 @@ tags:
 colorID: 0
 position: -1153,32
 ---
-<< pay DialogScreen $drachma_cost >> 
+<< pay DialogScreen $generated_cost >> 
 
 << setspeaker DialogScreen Jason >>
 Here's your meal!
@@ -185,7 +184,7 @@ tags:
 colorID: 0
 position: -78,-597
 ---
-<< pay DialogScreen $drachma_cost >> 
+<< pay DialogScreen $generated_cost >> 
 
 << setspeaker DialogScreen Jason >>
 I'll buy you some food. So tell me -

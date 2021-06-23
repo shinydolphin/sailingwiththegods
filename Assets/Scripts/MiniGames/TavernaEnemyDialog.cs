@@ -27,4 +27,15 @@ public class TavernaEnemyDialog : TavernaMiniGameDialog
 		SetTextLists();
 
 	}
+
+	//private void Update() {
+	//	if (Input.GetKeyDown(KeyCode.Space)) {
+	//		if (Random.Range(1, 3) % 2 == 0) {
+	//			DisplayInsult();
+	//		}
+	//		else {
+	//			DisplayBragging();
+	//		}
+	//	}
+	//}
 }
