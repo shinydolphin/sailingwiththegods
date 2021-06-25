@@ -894,69 +894,6 @@ public class GameVars : MonoBehaviour
 
 	}
 
-	// TODO: Apparently this isn't hooked up anymore. Need to fix this tool so we can adjust current directions in the editor
-	// REFERENCED IN BUTTON CLICK UNITYEVENT
-	public void SaveWaterCurrentZones() {
-
-		string waterRoseData = "";
-		int rowCounter = 0;
-		Transform waterZone;
-
-		//Loop through all of the child objects of the current zone parent object
-		//The parent stores them in a sequential list so every 40 objects represents a new line in the spread sheet csv file
-		//The coordinate for the zones is 0,0 for the top left, ending with 39,39 on the bottom right
-		for (int currentZone = 0; currentZone < currentZoneParent.transform.childCount; currentZone++) {
-			waterZone = currentZoneParent.transform.GetChild(currentZone);
-			waterRoseData += waterZone.GetChild(0).transform.localRotation.eulerAngles.y;
-			waterRoseData += ",";
-			waterRoseData += waterZone.GetChild(0).GetComponent<script_WaterWindCurrentVector>().currentMagnitude;
-			rowCounter++;
-			//If we've hit 40 objects, it's time to start a new row in the csv file
-			if (rowCounter == 40) {
-				rowCounter = 0;
-				waterRoseData += "\n";
-			}
-			//only write a comma if we aren't at the last entry for the row
-			else
-				waterRoseData += ",";
-		}
-		//Debug.Log(waterRoseData);
-		StreamWriter sw = new StreamWriter(@Application.persistentDataPath + "/" + "waterzones_january.txt");
-		sw.Write(waterRoseData);
-		sw.Close();
-
-
-	}
-
-	// TODO: Apparently this isn't hooked up anymore. Need to fix this tool so we can adjust the settlement unity position offsets in the editor
-	// REFERENCED IN BUTTON CLICK UNITYEVENT
-	public void Tool_SaveCurrentSettlementPositionsToFile() {
-		string ID = "";
-		string unityX = "";
-		string unityY = "";
-		string unityZ = "";
-		string unityEulerY = "";
-		string writeToFile = "";
-		for (int i = 0; i < settlement_masterList_parent.transform.childCount; i++) {
-			ID = settlement_masterList_parent.transform.GetChild(i).GetComponent<script_settlement_functions>().thisSettlement.settlementID.ToString();
-			//if(ID == "309"){Debug.Log ("We At 309!!!!!!");}
-			unityX = settlement_masterList_parent.transform.GetChild(i).transform.position.x.ToString();
-			unityY = settlement_masterList_parent.transform.GetChild(i).transform.position.y.ToString();
-			unityZ = settlement_masterList_parent.transform.GetChild(i).transform.position.z.ToString();
-			unityEulerY = settlement_masterList_parent.transform.GetChild(i).transform.eulerAngles.y.ToString();
-			string test = ((ID + "," + unityX + "," + unityY + "," + unityZ + "," + unityEulerY));
-			//perform a quick check to make sure we aren't at the end of the file: if we are don't add a new line
-			if (i != settlement_masterList_parent.transform.childCount - 1)
-				test += "\n";
-			writeToFile += test;
-		}
-
-		//Write the string to file now
-		StreamWriter sw = new StreamWriter(@"H:\sailingwiththegods\Assets\Resources\settlement_unity_position_offsets.txt");
-		sw.Write(writeToFile);
-		sw.Close();
-	}
-
 	//====================================================================================================
 	//      PLAYER INITIALIZATION FUNCTIONS
 	//====================================================================================================

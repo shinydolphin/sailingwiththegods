@@ -66,6 +66,14 @@ public static class Utils
 		return list.ElementAtOrDefault(UnityEngine.Random.Range(0, list.Count()));
 	}
 
+	public static IEnumerable<Transform> GetChildren(this Transform self) {
+		var result = new List<Transform>();
+		for (var i = 0; i < self.childCount; i++) {
+			result.Add(self.GetChild(i));
+		}
+		return result;
+	}
+
 	// Based on: https://stackoverflow.com/questions/11883469/takewhile-but-get-the-element-that-stopped-it-also
 	public static IEnumerable<T> TakeUntil<T>(this IEnumerable<T> data, Func<T, bool> predicate) {
 		foreach (var item in data) {

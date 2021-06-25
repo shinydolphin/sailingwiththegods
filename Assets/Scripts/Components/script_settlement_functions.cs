@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using NaughtyAttributes;
 using System.Collections;
+
 
 // TODO: Rename to SettlementComponent or something
 public class script_settlement_functions : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
@@ -11,6 +13,9 @@ public class script_settlement_functions : MonoBehaviour, IPointerEnterHandler, 
 	public Transform anchor;
 	public Settlement thisSettlement;
 	GameVars GameVars;
+
+	// debug display of settlement id so you can easily find them
+	[ShowNativeProperty] int SettlementId => thisSettlement != null ? thisSettlement.settlementID : -1;
 
 	
 	void Start() {
