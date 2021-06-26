@@ -18,21 +18,6 @@
 //
 //======================================================================================================================================
 
-/*
- * TODO:
- * These are all getting modified on every play through. Need to instance them before changing the material at runtime.
- *  modified:   Assets/Materials/mat_blue.mat
- *  modified:   Assets/Materials/mat_cursor_ring.mat
- *  modified:   Assets/Materials/mat_skybox_clouds_trans 1.mat
- *  modified:   Assets/Materials/mat_skybox_moon.mat
- *  modified:   Assets/Materials/mat_skybox_skycolor.mat
- *  modified:   Assets/Materials/mat_skybox_sun.mat
- *  modified:   Assets/Materials/mat_water.mat
- *  modified:   Assets/Materials/mat_water_sprite.mat
- */
-
-
-
 using UnityEngine;
 using System.Collections;
 using System.Text;
@@ -105,7 +90,6 @@ public class GameVars : MonoBehaviour
 	public GameObject skybox_moon;
 
 	[Header("Material Asset Refs")]
-	// TODO: instance these before modifying so they don't change on disk
 	public Material mat_waterCurrents;
 	public Material mat_water;
 
@@ -280,6 +264,10 @@ public class GameVars : MonoBehaviour
 		playerGhostRoute = GameObject.FindGameObjectWithTag("playerGhostRoute").GetComponent<LineRenderer>();
 		playerTrajectory = GameObject.FindGameObjectWithTag("playerTrajectory");
 		mainLightSource = GameObject.FindGameObjectWithTag("main_light_source").GetComponent<Light>();
+
+		// instance to avoid changing material on disk
+		mat_water = new Material(mat_water);
+		mat_waterCurrents = new Material(mat_waterCurrents);
 
 		playerShipVariables = playerShip.GetComponent<script_player_controls>();
 
