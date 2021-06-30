@@ -891,9 +891,11 @@ public static class CSVLoader
 
 	static string StripAndAddNewlines(string modify, char newline) {
 		string s = modify.Replace(newline, '\n');
-		if (s[0] == '\"') {
+		if (s[0] == '\"') 
+		{
 			s = s.Substring(1, s.Length - 2);
 		}
+		
 		return s;
 	}
 }

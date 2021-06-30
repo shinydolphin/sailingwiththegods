@@ -132,7 +132,10 @@ public class script_player_controls : MonoBehaviour
 		UpdatePlayerGhostRouteLineRenderer(GameVars.IS_NEW_GAME);
 
 		// setup teleport debug tool options (see inspector)
-		teleportToSettlementOptions = GameVars.settlement_masterList.Select(s => s.name).ToList();
+		if (GameVars.settlement_masterList == null) {
+			Debug.Log("Settlement masterList didn't load in properly");
+		}
+		teleportToSettlementOptions = Globals.GameVars.settlement_masterList.Select(s => s.name).ToList();
 	}
 
 	// Use this for initialization
@@ -225,7 +228,6 @@ public class script_player_controls : MonoBehaviour
 
 
 		// TODO: Make a game state system instead of all these booleans
-
 		//TODO: need to update all references to controlsLocked to the MGV.controlsLocked
 		//controlsLocked = MGV.controlsLocked;
 		//If NOT Game Over then go with the regular logic
@@ -513,8 +515,7 @@ public class script_player_controls : MonoBehaviour
 	public void TravelToSelectedTarget(Vector3 destination) {
 		//Let's slowly rotate the ship towards the direction it's traveling and then allow the ship to move
 		if (!shipTravelStartRotationFinished) {
-
-
+			
 			destination = new Vector3(destination.x, shipTransform.position.y, destination.z);
 			Vector3 temprot = Vector3.RotateTowards(shipTransform.forward, Vector3.Normalize(destination - shipTransform.position), .1f, 0.0F);
 			Vector3 targetDirection = Vector3.Normalize(destination - shipTransform.position);
