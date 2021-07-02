@@ -131,10 +131,7 @@ public class script_player_controls : MonoBehaviour
 		//initialize players ghost route
 		UpdatePlayerGhostRouteLineRenderer(GameVars.IS_NEW_GAME);
 
-		// setup teleport debug tool options (see inspector)
-		if (GameVars.settlement_masterList == null) {
-			Debug.Log("Settlement masterList didn't load in properly");
-		}
+		// setup teleport debug tool options (see inspector)s
 		teleportToSettlementOptions = Globals.GameVars.settlement_masterList.Select(s => s.name).ToList();
 	}
 

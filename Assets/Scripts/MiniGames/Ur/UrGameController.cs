@@ -26,8 +26,8 @@ public class UrGameController : MonoBehaviour
 	private Animator playerArms;
 	public int playerScore = 0;
 	public int enemyScore = 0;
-	public Text playerScoreText;
-	public Text enemyScoreText;
+	//public Text playerScoreText;
+	//public Text enemyScoreText;
 
 	public void Awake() {
 		playerArms = dice.playerAnimator;
@@ -227,11 +227,11 @@ public class UrGameController : MonoBehaviour
 	public void PointScored(bool player) {
 		if (player) {
 			playerScore++;
-			playerScoreText.text = "" + playerScore;
+			//playerScoreText.text = "" + playerScore;
 		}
 		else {
 			enemyScore++;
-			enemyScoreText.text = "" + enemyScore;
+			//enemyScoreText.text = "" + enemyScore;
 		}
 		if(playerScore == 7) {
 			Debug.Log("You win.");
