@@ -172,13 +172,13 @@ public class script_player_controls : MonoBehaviour
 		if (hotkeysOn) {
 			//TODO: Remove - this is just here as an initial test of minigames
 			if (Input.GetKeyUp(KeyCode.B)) {
-				Globals.MiniGames.Enter("Pirate Game/Pirate Game");
+				Globals.MiniGames.Enter("Pirate Game");
 			}
 			if (Input.GetKeyUp(KeyCode.L)) {
 				Globals.UI.Show<DialogScreen>().StartDialog("Start_Taverna", "taverna");
 			}
 			if (Input.GetKeyUp(KeyCode.N)) {
-				Globals.MiniGames.Enter("Storm MG/Storm Game");
+				Globals.MiniGames.Enter("Storm Game");
 			}
             if (Input.GetKeyUp(KeyCode.Z))
             {
@@ -269,7 +269,6 @@ public class script_player_controls : MonoBehaviour
 						//Debug.Log ("Quest Seg start new game: " + ship.mainQuest.currentQuestSegment);
 						//Turn off title screen camera
 						GameVars.camera_titleScreen.SetActive(false);
-						GameVars.bg_startScreen.SetActive(false);
 
 						//Turn on the environment fog
 						RenderSettings.fog = true;

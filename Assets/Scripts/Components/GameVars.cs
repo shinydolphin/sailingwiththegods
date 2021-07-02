@@ -76,8 +76,6 @@ public class GameVars : MonoBehaviour
 
 	[Header("GUI Scene Refs")]
 	public script_GUI MasterGUISystem;
-	public GameObject GUI_PortMenu;
-	public GameObject GUI_GameHUD;
 	public GameObject selection_ring;
 
 	[Header("Skybox Scene Refs")]
@@ -161,8 +159,6 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public bool isTitleScreen = true;
 	[HideInInspector] public bool isStartScreen = false;
 	[HideInInspector] public GameObject camera_titleScreen;
-	[HideInInspector] public GameObject bg_titleScreen;
-	[HideInInspector] public GameObject bg_startScreen;
 	[HideInInspector] public bool isLoadedGame = false;
 
 	//###################################
@@ -556,11 +552,11 @@ public class GameVars : MonoBehaviour
 
 	void DebugHotkeys() {
 #if UNITY_EDITOR
-		if(Input.GetKeyUp(KeyCode.E)) {
-			var storm = new StormAtSea();
-			storm.Init(this, playerShipVariables.ship, new ShipSpeedModifiers(), playerShip.transform, 1);
-			storm.Execute();
-		}
+		//if(Input.GetKeyUp(KeyCode.E)) {
+		//	var storm = new StormAtSea();
+		//	storm.Init(this, playerShipVariables.ship, new ShipSpeedModifiers(), playerShip.transform, 1);
+		//	storm.Execute();
+		//}
 #endif
 	}
 
@@ -933,12 +929,7 @@ public class GameVars : MonoBehaviour
 
 		//clear captains log
 		currentCaptainsLog = "";
-
-		GUI_PortMenu.SetActive(false);
-		GUI_GameHUD.SetActive(false);
-
-
-
+		
 	}
 
 	public void UpgradeShip(int costToBuyUpgrade) {

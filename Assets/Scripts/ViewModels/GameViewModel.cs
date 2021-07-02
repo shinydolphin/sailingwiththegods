@@ -18,7 +18,6 @@ public class GameViewModel : Model
 	// happens once crew is selected and we're putting the player in game
 	public void GUI_startMainGame() {
 		GameVars.camera_titleScreen.SetActive(false);
-		GameVars.bg_startScreen.SetActive(false);
 
 		//Turn on the environment fog
 		RenderSettings.fog = true;
