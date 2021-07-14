@@ -1162,7 +1162,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1959031028}
-        m_MethodName: StartKottaboas
+        m_MethodName: StartKottabos
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

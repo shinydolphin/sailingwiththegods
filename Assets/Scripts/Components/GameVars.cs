@@ -18,21 +18,6 @@
 //
 //======================================================================================================================================
 
-/*
- * TODO:
- * These are all getting modified on every play through. Need to instance them before changing the material at runtime.
- *  modified:   Assets/Materials/mat_blue.mat
- *  modified:   Assets/Materials/mat_cursor_ring.mat
- *  modified:   Assets/Materials/mat_skybox_clouds_trans 1.mat
- *  modified:   Assets/Materials/mat_skybox_moon.mat
- *  modified:   Assets/Materials/mat_skybox_skycolor.mat
- *  modified:   Assets/Materials/mat_skybox_sun.mat
- *  modified:   Assets/Materials/mat_water.mat
- *  modified:   Assets/Materials/mat_water_sprite.mat
- */
-
-
-
 using UnityEngine;
 using System.Collections;
 using System.Text;
@@ -91,8 +76,6 @@ public class GameVars : MonoBehaviour
 
 	[Header("GUI Scene Refs")]
 	public script_GUI MasterGUISystem;
-	public GameObject GUI_PortMenu;
-	public GameObject GUI_GameHUD;
 	public GameObject selection_ring;
 
 	[Header("Skybox Scene Refs")]
@@ -105,7 +88,6 @@ public class GameVars : MonoBehaviour
 	public GameObject skybox_moon;
 
 	[Header("Material Asset Refs")]
-	// TODO: instance these before modifying so they don't change on disk
 	public Material mat_waterCurrents;
 	public Material mat_water;
 
@@ -177,8 +159,6 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public bool isTitleScreen = true;
 	[HideInInspector] public bool isStartScreen = false;
 	[HideInInspector] public GameObject camera_titleScreen;
-	[HideInInspector] public GameObject bg_titleScreen;
-	[HideInInspector] public GameObject bg_startScreen;
 	[HideInInspector] public bool isLoadedGame = false;
 
 	//###################################
@@ -280,6 +260,10 @@ public class GameVars : MonoBehaviour
 		playerGhostRoute = GameObject.FindGameObjectWithTag("playerGhostRoute").GetComponent<LineRenderer>();
 		playerTrajectory = GameObject.FindGameObjectWithTag("playerTrajectory");
 		mainLightSource = GameObject.FindGameObjectWithTag("main_light_source").GetComponent<Light>();
+
+		// instance to avoid changing material on disk
+		mat_water = new Material(mat_water);
+		mat_waterCurrents = new Material(mat_waterCurrents);
 
 		playerShipVariables = playerShip.GetComponent<script_player_controls>();
 
@@ -568,11 +552,11 @@ public class GameVars : MonoBehaviour
 
 	void DebugHotkeys() {
 #if UNITY_EDITOR
-		if(Input.GetKeyUp(KeyCode.E)) {
-			var storm = new StormAtSea();
-			storm.Init(this, playerShipVariables.ship, new ShipSpeedModifiers(), playerShip.transform, 1);
-			storm.Execute();
-		}
+		//if(Input.GetKeyUp(KeyCode.E)) {
+		//	var storm = new StormAtSea();
+		//	storm.Init(this, playerShipVariables.ship, new ShipSpeedModifiers(), playerShip.transform, 1);
+		//	storm.Execute();
+		//}
 #endif
 	}
 
@@ -894,69 +878,6 @@ public class GameVars : MonoBehaviour
 
 	}
 
-	// TODO: Apparently this isn't hooked up anymore. Need to fix this tool so we can adjust current directions in the editor
-	// REFERENCED IN BUTTON CLICK UNITYEVENT
-	public void SaveWaterCurrentZones() {
-
-		string waterRoseData = "";
-		int rowCounter = 0;
-		Transform waterZone;
-
-		//Loop through all of the child objects of the current zone parent object
-		//The parent stores them in a sequential list so every 40 objects represents a new line in the spread sheet csv file
-		//The coordinate for the zones is 0,0 for the top left, ending with 39,39 on the bottom right
-		for (int currentZone = 0; currentZone < currentZoneParent.transform.childCount; currentZone++) {
-			waterZone = currentZoneParent.transform.GetChild(currentZone);
-			waterRoseData += waterZone.GetChild(0).transform.localRotation.eulerAngles.y;
-			waterRoseData += ",";
-			waterRoseData += waterZone.GetChild(0).GetComponent<script_WaterWindCurrentVector>().currentMagnitude;
-			rowCounter++;
-			//If we've hit 40 objects, it's time to start a new row in the csv file
-			if (rowCounter == 40) {
-				rowCounter = 0;
-				waterRoseData += "\n";
-			}
-			//only write a comma if we aren't at the last entry for the row
-			else
-				waterRoseData += ",";
-		}
-		//Debug.Log(waterRoseData);
-		StreamWriter sw = new StreamWriter(@Application.persistentDataPath + "/" + "waterzones_january.txt");
-		sw.Write(waterRoseData);
-		sw.Close();
-
-
-	}
-
-	// TODO: Apparently this isn't hooked up anymore. Need to fix this tool so we can adjust the settlement unity position offsets in the editor
-	// REFERENCED IN BUTTON CLICK UNITYEVENT
-	public void Tool_SaveCurrentSettlementPositionsToFile() {
-		string ID = "";
-		string unityX = "";
-		string unityY = "";
-		string unityZ = "";
-		string unityEulerY = "";
-		string writeToFile = "";
-		for (int i = 0; i < settlement_masterList_parent.transform.childCount; i++) {
-			ID = settlement_masterList_parent.transform.GetChild(i).GetComponent<script_settlement_functions>().thisSettlement.settlementID.ToString();
-			//if(ID == "309"){Debug.Log ("We At 309!!!!!!");}
-			unityX = settlement_masterList_parent.transform.GetChild(i).transform.position.x.ToString();
-			unityY = settlement_masterList_parent.transform.GetChild(i).transform.position.y.ToString();
-			unityZ = settlement_masterList_parent.transform.GetChild(i).transform.position.z.ToString();
-			unityEulerY = settlement_masterList_parent.transform.GetChild(i).transform.eulerAngles.y.ToString();
-			string test = ((ID + "," + unityX + "," + unityY + "," + unityZ + "," + unityEulerY));
-			//perform a quick check to make sure we aren't at the end of the file: if we are don't add a new line
-			if (i != settlement_masterList_parent.transform.childCount - 1)
-				test += "\n";
-			writeToFile += test;
-		}
-
-		//Write the string to file now
-		StreamWriter sw = new StreamWriter(@"H:\sailingwiththegods\Assets\Resources\settlement_unity_position_offsets.txt");
-		sw.Write(writeToFile);
-		sw.Close();
-	}
-
 	//====================================================================================================
 	//      PLAYER INITIALIZATION FUNCTIONS
 	//====================================================================================================
@@ -1008,12 +929,7 @@ public class GameVars : MonoBehaviour
 
 		//clear captains log
 		currentCaptainsLog = "";
-
-		GUI_PortMenu.SetActive(false);
-		GUI_GameHUD.SetActive(false);
-
-
-
+		
 	}
 
 	public void UpgradeShip(int costToBuyUpgrade) {

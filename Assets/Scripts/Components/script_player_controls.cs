@@ -147,7 +147,7 @@ public class script_player_controls : MonoBehaviour
 		transform.position = new Vector3(1702.414f, transform.position.y, 2168.358f);
 
 		//Setup the Cursor Ring Material for Animation
-		cursorRingMaterial = cursorRing.GetComponent<MeshRenderer>().sharedMaterial;
+		cursorRingMaterial = cursorRing.GetComponent<MeshRenderer>().material;
 
 		//DEBUG
 		GameVars.DEBUG_currentQuestLeg = ship.mainQuest.currentQuestSegment;
@@ -172,13 +172,13 @@ public class script_player_controls : MonoBehaviour
 		if (hotkeysOn) {
 			//TODO: Remove - this is just here as an initial test of minigames
 			if (Input.GetKeyUp(KeyCode.B)) {
-				Globals.MiniGames.Enter("Pirate Game/Pirate Game");
+				Globals.MiniGames.Enter("Pirate Game");
 			}
 			if (Input.GetKeyUp(KeyCode.L)) {
 				Globals.UI.Show<DialogScreen>().StartDialog("Start_Taverna", "taverna");
 			}
 			if (Input.GetKeyUp(KeyCode.N)) {
-				Globals.MiniGames.Enter("Storm MG/Storm Game");
+				Globals.MiniGames.Enter("Storm Game");
 			}
             if (Input.GetKeyUp(KeyCode.Z))
             {
@@ -269,7 +269,6 @@ public class script_player_controls : MonoBehaviour
 						//Debug.Log ("Quest Seg start new game: " + ship.mainQuest.currentQuestSegment);
 						//Turn off title screen camera
 						GameVars.camera_titleScreen.SetActive(false);
-						GameVars.bg_startScreen.SetActive(false);
 
 						//Turn on the environment fog
 						RenderSettings.fog = true;
@@ -1043,7 +1042,7 @@ public class script_player_controls : MonoBehaviour
 		//First set things to default if it's a new game we've started
 		//	--This ensures any editor changes are reset. Since it sets to '0' the blends will not activate 
 		if (restartCycle) {
-			GameVars.skybox_clouds.GetComponent<MeshRenderer>().sharedMaterial.SetFloat("_Blend", 1f);
+			GameVars.skybox_clouds.GetComponent<MeshRenderer>().material.SetFloat("_Blend", 1f);
 			//RenderSettings.skybox.SetFloat("_Blend", 0);
 			RenderSettings.ambientIntensity = .53f;
 			GameVars.mainLightSource.intensity = .78f;
@@ -1052,12 +1051,12 @@ public class script_player_controls : MonoBehaviour
 			GameVars.mat_waterCurrents.color = Color.white;
 			testAngle = GameVars.skybox_MAIN_CELESTIAL_SPHERE.transform.localRotation.y;
 			Debug.Log("Initial Angle " + initialAngle + "*********************");
-			GameVars.skybox_horizonColor.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, 1f, 1f, 1f);
-			GameVars.skybox_clouds.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, 1f, 1f);
-			GameVars.skybox_sun.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, 1f, 1f);
-			GameVars.skybox_moon.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, 1f, 1f, .5f);
+			GameVars.skybox_horizonColor.GetComponent<MeshRenderer>().material.color = new Color(1f, 1f, 1f, 1f);
+			GameVars.skybox_clouds.GetComponent<MeshRenderer>().material.color = new Color(1f, 1f, 1f);
+			GameVars.skybox_sun.GetComponent<MeshRenderer>().material.color = new Color(1f, 1f, 1f);
+			GameVars.skybox_moon.GetComponent<MeshRenderer>().material.color = new Color(1f, 1f, 1f, .5f);
 			RenderSettings.fogColor = new Color(203f / 255f, 239f / 255f, 254f / 255f);
-			fogWall.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(203f / 255f, 239f / 255f, 254f / 255f);
+			fogWall.GetComponent<MeshRenderer>().material.color = new Color(203f / 255f, 239f / 255f, 254f / 255f);
 
 		}
 
@@ -1065,7 +1064,7 @@ public class script_player_controls : MonoBehaviour
 		Color brightSky = new Color(203f / 255f, 239f / 255f, 254f / 255f);
 		//Blending Day to Night
 		if (timeOfDay >= .25f && timeOfDay <= 0.5f) {
-			GameVars.skybox_clouds.GetComponent<MeshRenderer>().sharedMaterial.SetFloat("_Blend", Utils.GetRange(timeOfDay, .5f, .25f, 0, 1f));
+			GameVars.skybox_clouds.GetComponent<MeshRenderer>().material.SetFloat("_Blend", Utils.GetRange(timeOfDay, .5f, .25f, 0, 1f));
 			RenderSettings.ambientIntensity = Utils.GetRange(timeOfDay, .25f, .5f, .53f, .16f);
 			GameVars.mainLightSource.intensity = Utils.GetRange(timeOfDay, .25f, .5f, .78f, .16f);
 			GameVars.mainLightSource.color = Color.Lerp(colorDay, colorNight, Utils.GetRange(timeOfDay, .5f, .25f, 1, 0));
@@ -1074,29 +1073,29 @@ public class script_player_controls : MonoBehaviour
 			//Fade Out Water Current Sprite Colors to Black
 			GameVars.mat_waterCurrents.color = Color.Lerp(Color.white, currentColorNight, Utils.GetRange(timeOfDay, .5f, .25f, 1f, 0));
 			//Fade Out Sky/Atmosphere Color
-			GameVars.skybox_horizonColor.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, Utils.GetRange(timeOfDay, .5f, .25f, 0, 1f), 1f, Utils.GetRange(timeOfDay, .5f, .25f, 0, 1f));
+			GameVars.skybox_horizonColor.GetComponent<MeshRenderer>().material.color = new Color(1f, Utils.GetRange(timeOfDay, .5f, .25f, 0, 1f), 1f, Utils.GetRange(timeOfDay, .5f, .25f, 0, 1f));
 			//Fade Out Sun Color
-			GameVars.skybox_sun.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, Utils.GetRange(timeOfDay, .5f, .25f, 70f / 255f, 1f), Utils.GetRange(timeOfDay, .5f, .25f, 0, 1f));
+			GameVars.skybox_sun.GetComponent<MeshRenderer>().material.color = new Color(1f, Utils.GetRange(timeOfDay, .5f, .25f, 70f / 255f, 1f), Utils.GetRange(timeOfDay, .5f, .25f, 0, 1f));
 			//Fade Out Clouds
-			GameVars.skybox_clouds.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(Utils.GetRange(timeOfDay, .5f, .25f, 30f / 255f, 1f), Utils.GetRange(timeOfDay, .5f, .25f, 30f / 255f, 1f), Utils.GetRange(timeOfDay, .5f, .25f, 50f / 255f, 1f));
+			GameVars.skybox_clouds.GetComponent<MeshRenderer>().material.color = new Color(Utils.GetRange(timeOfDay, .5f, .25f, 30f / 255f, 1f), Utils.GetRange(timeOfDay, .5f, .25f, 30f / 255f, 1f), Utils.GetRange(timeOfDay, .5f, .25f, 50f / 255f, 1f));
 			//Fade In Moon(transparency to opaque)
-			GameVars.skybox_moon.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, 1f, 1f, Utils.GetRange(timeOfDay, .5f, .25f, 1f, 28f / 255f));
+			GameVars.skybox_moon.GetComponent<MeshRenderer>().material.color = new Color(1f, 1f, 1f, Utils.GetRange(timeOfDay, .5f, .25f, 1f, 28f / 255f));
 			//Fade in Dark Fog: This breaks up the fog colro fade into two shades to better match the sunset
 			if (timeOfDay >= .25f && timeOfDay <= 0.35f) {
 				RenderSettings.fogColor = Color.Lerp(brightSky, deepPurple, Utils.GetRange(timeOfDay, .35f, .25f, 1f, 0));
-				fogWall.GetComponent<MeshRenderer>().sharedMaterial.color = Color.Lerp(brightSky, deepPurple, Utils.GetRange(timeOfDay, .35f, .25f, 1f, 0));
+				fogWall.GetComponent<MeshRenderer>().material.color = Color.Lerp(brightSky, deepPurple, Utils.GetRange(timeOfDay, .35f, .25f, 1f, 0));
 			}
 			else {
 				//Also we';; turn on the city lights here right as sunset
 				GameVars.cityLightsParent.SetActive(true);
 				RenderSettings.fogColor = Color.Lerp(deepPurple, waterColorNight, Utils.GetRange(timeOfDay, .5f, .35f, 1f, 0));
-				fogWall.GetComponent<MeshRenderer>().sharedMaterial.color = Color.Lerp(deepPurple, waterColorNight, Utils.GetRange(timeOfDay, .5f, .35f, 1f, 0));
+				fogWall.GetComponent<MeshRenderer>().material.color = Color.Lerp(deepPurple, waterColorNight, Utils.GetRange(timeOfDay, .5f, .35f, 1f, 0));
 			}
 
 		}
 		//Blending Night to Day
 		if (timeOfDay > 0.75f && timeOfDay <= 1f) {
-			GameVars.skybox_clouds.GetComponent<MeshRenderer>().sharedMaterial.SetFloat("_Blend", Utils.GetRange(timeOfDay, 1f, .75f, 1f, 0));
+			GameVars.skybox_clouds.GetComponent<MeshRenderer>().material.SetFloat("_Blend", Utils.GetRange(timeOfDay, 1f, .75f, 1f, 0));
 			RenderSettings.ambientIntensity = Utils.GetRange(timeOfDay, .75f, 1f, .16f, .53f);
 			GameVars.mainLightSource.intensity = Utils.GetRange(timeOfDay, .75f, 1f, .16f, .78f);
 			GameVars.mainLightSource.color = Color.Lerp(colorNight, colorDay, Utils.GetRange(timeOfDay, 1f, .75f, 1, 0));
@@ -1105,23 +1104,23 @@ public class script_player_controls : MonoBehaviour
 			//Fade Out Water Current Sprite Colors to Black
 			GameVars.mat_waterCurrents.color = Color.Lerp(currentColorNight, Color.white, Utils.GetRange(timeOfDay, 1f, .75f, 1f, 0));
 			//Fade In Sky/Atmosphere Color
-			GameVars.skybox_horizonColor.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, Utils.GetRange(timeOfDay, 1f, .75f, 1f, 0), 1f, Utils.GetRange(timeOfDay, 1f, .75f, 1f, 0));
+			GameVars.skybox_horizonColor.GetComponent<MeshRenderer>().material.color = new Color(1f, Utils.GetRange(timeOfDay, 1f, .75f, 1f, 0), 1f, Utils.GetRange(timeOfDay, 1f, .75f, 1f, 0));
 			//Fade In Sun Color
-			GameVars.skybox_sun.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, Utils.GetRange(timeOfDay, 1f, .75f, 1f, 70f / 255f), Utils.GetRange(timeOfDay, 1f, .75f, 1f, 0));
+			GameVars.skybox_sun.GetComponent<MeshRenderer>().material.color = new Color(1f, Utils.GetRange(timeOfDay, 1f, .75f, 1f, 70f / 255f), Utils.GetRange(timeOfDay, 1f, .75f, 1f, 0));
 			//Fade In Clouds
-			GameVars.skybox_clouds.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(Utils.GetRange(timeOfDay, 1f, .75f, 1f, 30f / 255f), Utils.GetRange(timeOfDay, 1f, .75f, 1f, 30f / 255f), Utils.GetRange(timeOfDay, 1f, .75f, 1f, 50f / 255f));
+			GameVars.skybox_clouds.GetComponent<MeshRenderer>().material.color = new Color(Utils.GetRange(timeOfDay, 1f, .75f, 1f, 30f / 255f), Utils.GetRange(timeOfDay, 1f, .75f, 1f, 30f / 255f), Utils.GetRange(timeOfDay, 1f, .75f, 1f, 50f / 255f));
 			//Fade out Moon(opaque to transparency)
-			GameVars.skybox_moon.GetComponent<MeshRenderer>().sharedMaterial.color = new Color(1f, 1f, 1f, Utils.GetRange(timeOfDay, 1f, .75f, 28f / 255f, 1f));
+			GameVars.skybox_moon.GetComponent<MeshRenderer>().material.color = new Color(1f, 1f, 1f, Utils.GetRange(timeOfDay, 1f, .75f, 28f / 255f, 1f));
 			//Fade in Normal Fog: This breaks up the fog colro fade into two shades to better match the sunrise
 			if (timeOfDay >= .75f && timeOfDay <= 0.85f) {
 				RenderSettings.fogColor = Color.Lerp(waterColorNight, deepPurple, Utils.GetRange(timeOfDay, .85f, .75f, 1f, 0));
-				fogWall.GetComponent<MeshRenderer>().sharedMaterial.color = Color.Lerp(waterColorNight, deepPurple, Utils.GetRange(timeOfDay, .85f, .75f, 1f, 0));
+				fogWall.GetComponent<MeshRenderer>().material.color = Color.Lerp(waterColorNight, deepPurple, Utils.GetRange(timeOfDay, .85f, .75f, 1f, 0));
 			}
 			else {
 				//Also we';; turn off the city lights here right as sun rises
 				GameVars.cityLightsParent.SetActive(false);
 				RenderSettings.fogColor = Color.Lerp(deepPurple, brightSky, Utils.GetRange(timeOfDay, 1f, .85f, 1f, 0));
-				fogWall.GetComponent<MeshRenderer>().sharedMaterial.color = Color.Lerp(deepPurple, brightSky, Utils.GetRange(timeOfDay, 1f, .85f, 1f, 0));
+				fogWall.GetComponent<MeshRenderer>().material.color = Color.Lerp(deepPurple, brightSky, Utils.GetRange(timeOfDay, 1f, .85f, 1f, 0));
 			}
 		}
 		//------------------------ Rotate the sky for day night cycle

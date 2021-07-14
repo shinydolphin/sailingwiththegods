@@ -20,6 +20,6 @@ public class PirateAttack : RandomEvents.NegativeEvent
 		else { return false; }
 	}
 	public override void Execute() {		
-		Globals.MiniGames.Enter("Pirate Game/Pirate Game");
+		Globals.MiniGames.Enter("Pirate Game");
 	}
 }
