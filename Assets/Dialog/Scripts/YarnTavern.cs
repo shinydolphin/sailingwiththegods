@@ -10,6 +10,7 @@ using Yarn.Unity;
 public class YarnTavern : MonoBehaviour
 {
 	private DialogScreen ds;
+	public Navigation nav;
 
 	void Start() 
 	{
@@ -196,14 +197,16 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("hirenavigator")]
 	public void SetSettlementWaypoint()
 	{
-		int cityID = (int)ds.Storage.GetValue("$known_city_ID").AsNumber;
-		Vector3 location = Vector3.zero;
-		for (int x = 0; x < Globals.GameVars.settlement_masterList_parent.transform.childCount; x++)
-			if (Globals.GameVars.settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == cityID)
-				location = Globals.GameVars.settlement_masterList_parent.transform.GetChild(x).position;
-		Globals.GameVars.ActivateNavigatorBeacon(Globals.GameVars.navigatorBeacon, location);
-		Globals.GameVars.playerShipVariables.ship.currentNavigatorTarget = cityID;
+		//int cityID = (int)ds.Storage.GetValue("$known_city_ID").AsNumber;
+		//Vector3 location = Vector3.zero;
+		//for (int x = 0; x < Globals.GameVars.settlement_masterList_parent.transform.childCount; x++)
+		//	if (Globals.GameVars.settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == cityID)
+		//		location = Globals.GameVars.settlement_masterList_parent.transform.GetChild(x).position;
+		//Globals.GameVars.ActivateNavigatorBeacon(Globals.GameVars.navigatorBeacon, location);
+		//Globals.GameVars.playerShipVariables.ship.currentNavigatorTarget = cityID;
 		//Globals.GameVars.ShowANotificationMessage("You hired a navigator to " + City.name + " for " + CostToHire + " drachma.");		
+
+		nav.SetDestination(ds.Storage.GetValue("$known_city").AsString, Globals.GameVars.currentSettlement.availableCrew.RandomElement().ID);
 	}
 	#endregion
 
