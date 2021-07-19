@@ -22,81 +22,82 @@ public class UrGameController : MonoBehaviour
 	public bool selectingBoardPosition = false;
 	public UrCounter selectedCounter;
 	public GameObject rollDiceButton;
-	public Animator aiAnim;
-	private Animator playerArms;
-	public int playerScore = 0;
-	public int enemyScore = 0;
+	//public Animator aiAnim;
+	//private Animator playerArms;
+	//public int playerScore = 0;
+	//public int enemyScore = 0;
 	//public Text playerScoreText;
 	//public Text enemyScoreText;
 
 	public void Awake() {
-		playerArms = dice.playerAnimator;
+		//playerArms = dice.playerAnimator;
 	}
 
 	public void Update() {
-		if(Input.GetKeyDown("p")) {
-			EnemyTurn();
-		}
-		if(!isPlaying(playerArms, "RollDiceLoop")) { 
-			if (selectingObject) {
-				if (Input.GetMouseButtonDown(0) && diceValue > 0) {
-					foreach (UrCounter c in counters) {
-						c.GetComponent<CapsuleCollider>().enabled = true;
-					}
-					Ray ray;
-					RaycastHit hit;
-					ray = cam.ScreenPointToRay(Input.mousePosition);
+		//if(Input.GetKeyDown("p")) {
+		//	EnemyTurn();
+		//}
+		//if(!isPlaying(playerArms, "RollDiceLoop")) { 
+		//	if (selectingObject) {
+		//		if (Input.GetMouseButtonDown(0) && diceValue > 0) {
+		//			foreach (UrCounter c in counters) {
+		//				c.GetComponent<CapsuleCollider>().enabled = true;
+		//			}
+		//			Ray ray;
+		//			RaycastHit hit;
+		//			ray = cam.ScreenPointToRay(Input.mousePosition);
 
-					if (Physics.Raycast(ray, out hit, 50)) {
-						if (hit.collider.GetComponent<UrCounter>() != null && hit.collider.tag == "PlayerTile") {
-							//if(hit.)
-							CounterSelected(hit.collider.GetComponent<UrCounter>());
-						}
-					}
-				}
+		//			if (Physics.Raycast(ray, out hit, 50)) {
+		//				if (hit.collider.GetComponent<UrCounter>() != null && hit.collider.tag == "PlayerTile") {
+		//					//if(hit.)
+		//					CounterSelected(hit.collider.GetComponent<UrCounter>());
+		//				}
+		//			}
+		//		}
 
-			}
-			//Does this need to be in update or can it be called less frequently?
-			if (selectingBoardPosition) {
-				Debug.Log("Selecting Board Position");
-				if (Input.GetMouseButtonDown(0)) {
-					//foreach (Counter c in counters) {
-					//	c.GetComponent<CapsuleCollider>().enabled = false;
-					//}
-					Ray ray;
-					RaycastHit hit;
-					ray = cam.ScreenPointToRay(Input.mousePosition);
+		//	}
+		//	//Does this need to be in update or can it be called less frequently?
+		//	if (selectingBoardPosition) {
+		//		Debug.Log("Selecting Board Position");
+		//		if (Input.GetMouseButtonDown(0)) {
+		//			//foreach (Counter c in counters) {
+		//			//	c.GetComponent<CapsuleCollider>().enabled = false;
+		//			//}
+		//			Ray ray;
+		//			RaycastHit hit;
+		//			ray = cam.ScreenPointToRay(Input.mousePosition);
 
-					if (Physics.Raycast(ray, out hit, 50)) {
-						if (hit.collider.tag == "GameBoard") {
-							if (!selectedCounter.onBoard) {
-								countersOffBoard--;
-								countersOnBoard++;
-							}
-							Debug.Log("Gameboard Hit");
-							CounterSelected(selectedCounter);
-							if (boardPositions.IndexOf(hit.collider.transform.parent.GetComponent<UrGameTile>()) == 19) { PointScored(true); selectedCounter.PlaceOnBoard(hit.collider.transform.parent.GetComponent<UrGameTile>(), true, false, true); /*selectedCounter.enabled = false;*/ }
-							else {
-								if (boardPositions.IndexOf(hit.collider.transform.parent.GetComponent<UrGameTile>()) >= 13) { selectedCounter.PlaceOnBoard(hit.collider.transform.parent.GetComponent<UrGameTile>(), true, false, false); if (IsEnemySpaceOccupied(hit.collider.transform.parent.GetComponent<UrGameTile>())){ IsEnemySpaceOccupiedCounter(hit.collider.transform.parent.GetComponent<UrGameTile>()).transform.position = IsEnemySpaceOccupiedCounter(hit.collider.transform.parent.GetComponent<UrGameTile>()).initPosit; IsEnemySpaceOccupiedCounter(hit.collider.transform.parent.GetComponent<UrGameTile>()).currentTile = null; enemyCountersOnBoard--; } }
-								else { selectedCounter.PlaceOnBoard(hit.collider.transform.parent.GetComponent<UrGameTile>(), false, false, false); }
-							}
-							selectingBoardPosition = false;
-							diceValue = 0;
-							//EnemyTurn();
+		//			if (Physics.Raycast(ray, out hit, 50)) {
+		//				if (hit.collider.tag == "GameBoard") {
+		//					if (!selectedCounter.onBoard) {
+		//						countersOffBoard--;
+		//						countersOnBoard++;
+		//					}
+		//					Debug.Log("Gameboard Hit");
+		//					CounterSelected(selectedCounter);
+		//					if (boardPositions.IndexOf(hit.collider.transform.parent.GetComponent<UrGameTile>()) == 19) { PointScored(true); selectedCounter.PlaceOnBoard(hit.collider.transform.parent.GetComponent<UrGameTile>(), true, false, true); /*selectedCounter.enabled = false;*/ }
+		//					else {
+		//						if (boardPositions.IndexOf(hit.collider.transform.parent.GetComponent<UrGameTile>()) >= 13) { selectedCounter.PlaceOnBoard(hit.collider.transform.parent.GetComponent<UrGameTile>(), true, false, false); if (IsEnemySpaceOccupied(hit.collider.transform.parent.GetComponent<UrGameTile>())){ IsEnemySpaceOccupiedCounter(hit.collider.transform.parent.GetComponent<UrGameTile>()).transform.position = IsEnemySpaceOccupiedCounter(hit.collider.transform.parent.GetComponent<UrGameTile>()).initPosit; IsEnemySpaceOccupiedCounter(hit.collider.transform.parent.GetComponent<UrGameTile>()).currentTile = null; enemyCountersOnBoard--; } }
+		//						else { selectedCounter.PlaceOnBoard(hit.collider.transform.parent.GetComponent<UrGameTile>(), false, false, false); }
+		//					}
+		//					selectingBoardPosition = false;
+		//					diceValue = 0;
+		//					//EnemyTurn();
 
-						}
-					}
-				}
-				//if(Input.GetMouseButtonDown(1)) {
-				//	selectingBoardPosition = false;
-				//	selectingObject = true;
-				//	CounterSelected(selectedCounter);
-				}
-			}
+		//				}
+		//			}
+		//		}
+		//		//if(Input.GetMouseButtonDown(1)) {
+		//		//	selectingBoardPosition = false;
+		//		//	selectingObject = true;
+		//		//	CounterSelected(selectedCounter);
+		//		}
+		//	}
 		
 	}
+
 	public void RollDice() {
-		dice.StartDiceRoll();
+		dice.RollDice();
 	}
 
 	public void CounterSelected(UrCounter c) {
@@ -184,7 +185,7 @@ public class UrGameController : MonoBehaviour
 	}
 
 	public void SetDiceValue(int val) {
-		diceValue = dice.DiceResult(val);
+		//diceValue = dice.DiceResult(val);
 		rollDiceButton.SetActive(false);
 		Debug.Log(diceValue);
 		dvText.text = "" + diceValue;
@@ -200,14 +201,14 @@ public class UrGameController : MonoBehaviour
 				counters[countersOffBoard - 1].PlaceOnBoard(boardPositions[0], false, false, false);
 				countersOffBoard--;
 				countersOnBoard++;
-				aiAnim.SetTrigger("Angry");
+				//aiAnim.SetTrigger("Angry");
 				//EnemyTurn();
 			}
 			else if (diceValue == 5 && countersOffBoard > 0 && countersOnBoard == 0) {
 				counters[countersOffBoard - 1].PlaceOnBoard(boardPositions[4], false, false, false);
 				countersOffBoard--;
 				countersOnBoard++;
-				aiAnim.SetTrigger("Angry");
+				//aiAnim.SetTrigger("Angry");
 				//EnemyTurn();
 			}
 			else {
@@ -226,19 +227,19 @@ public class UrGameController : MonoBehaviour
 
 	public void PointScored(bool player) {
 		if (player) {
-			playerScore++;
+			//playerScore++;
 			//playerScoreText.text = "" + playerScore;
 		}
 		else {
-			enemyScore++;
+			//enemyScore++;
 			//enemyScoreText.text = "" + enemyScore;
 		}
-		if(playerScore == 7) {
-			Debug.Log("You win.");
-		}
-		if (enemyScore == 7) {
-			Debug.Log("You lose.");
-		}
+		//if(playerScore == 7) {
+		//	Debug.Log("You win.");
+		//}
+		//if (enemyScore == 7) {
+		//	Debug.Log("You lose.");
+		//}
 	}
 
 
