@@ -12,19 +12,37 @@ public class DiceRoller : MonoBehaviour
 	public Vector3[] markUpPositions;
 	public Vector3[] blankUpPositions;
 
-	public int RollDice() {
-		//Odd is a blank, even is a mark
-		int die1 = Random.Range(0, 3);
-		int die2 = Random.Range(0, 3);
-		int die3 = Random.Range(0, 3);
+	public int RollDice()
+	{
+		//1 is a blank, 2 is a mark
+		int[] diceRolls = new int[diceModels.Length];
+
+		for (int i = 0; i < diceRolls.Length; i++) {
+			diceRolls[i] = Random.Range(1, 3);
+		}
 
 		//Rotate the dice to show the appropriate mark/blank
+		for (int i = 0; i < diceRolls.Length; i++) {
+			if (diceRolls[i] % 2 == 0) {
+				diceModels[i].transform.eulerAngles = markUpPositions.RandomElement();
+			}
+			else {
+				diceModels[i].transform.eulerAngles = blankUpPositions.RandomElement();
+			}
+			diceModels[i].transform.eulerAngles += Vector3.up * Random.Range(0f, 360f);
+		}
 
-		//Calculate 
-		int marks = (die1 % 2 == 0 ? 1 : 0) + (die2 % 2 == 0 ? 1 : 0) + (die3 % 2 == 0 ? 1 : 0);
+		//Calculate - we're hard-coding it to 3 because there's not really a nice formula for the roll
+		int marks = (diceRolls[0] % 2 == 0 ? 1 : 0) + (diceRolls[1] % 2 == 0 ? 1 : 0) + (diceRolls[2] % 2 == 0 ? 1 : 0);
 		int roll = marks == 3 ? 5 : marks;
 		diceRoll.text = roll.ToString();
+
 		return roll;
+	}
+
+	private void DiceRotate(GameObject dice) 
+	{
+
 	}
 	//	public Rigidbody[] dice;
 	//	public Transform[] diceToRotate;
