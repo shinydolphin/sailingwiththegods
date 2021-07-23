@@ -7,10 +7,12 @@ using UnityEngine.UI;
 
 public class DiceRoller : MonoBehaviour
 {
-	public Text diceRoll;
-	public GameObject[] diceModels;
+	public Text diceResultText;
+	public Transform[] diceModels;
 	public Vector3[] markUpPositions;
 	public Vector3[] blankUpPositions;
+	public Vector2 diceSpinTime;
+	public float diceSpeed;
 
 	public int RollDice()
 	{
@@ -21,29 +23,51 @@ public class DiceRoller : MonoBehaviour
 			diceRolls[i] = Random.Range(1, 3);
 		}
 
-		//Rotate the dice to show the appropriate mark/blank
-		for (int i = 0; i < diceRolls.Length; i++) {
-			if (diceRolls[i] % 2 == 0) {
-				diceModels[i].transform.eulerAngles = markUpPositions.RandomElement();
-			}
-			else {
-				diceModels[i].transform.eulerAngles = blankUpPositions.RandomElement();
-			}
-			diceModels[i].transform.eulerAngles += Vector3.up * Random.Range(0f, 360f);
-		}
-
 		//Calculate - we're hard-coding it to 3 because there's not really a nice formula for the roll
 		int marks = (diceRolls[0] % 2 == 0 ? 1 : 0) + (diceRolls[1] % 2 == 0 ? 1 : 0) + (diceRolls[2] % 2 == 0 ? 1 : 0);
 		int roll = marks == 3 ? 5 : marks;
-		diceRoll.text = roll.ToString();
-
+		
+		StartCoroutine(VisualDiceRoll(diceRolls, roll));
+		
 		return roll;
 	}
 
-	private void DiceRotate(GameObject dice) 
+	private IEnumerator VisualDiceRoll(int[] diceRolls, int resultRoll) 
 	{
+		//Visually rotate the dice so they look like they're rolling
+		float spinTime = Random.Range(diceSpinTime.x, diceSpinTime.y);
 
+		float totalRot = diceSpeed * spinTime;
+		float rotPerFrame = totalRot * Time.deltaTime;
+
+		for (float t = 0; t <= spinTime; t += Time.deltaTime)
+		{
+			for (int i = 0; i < diceModels.Length; i++) 
+			{
+				diceModels[i].Rotate(Vector3.one * rotPerFrame);
+			}
+			yield return null;
+		}
+
+		//Rotate the dice to show the appropriate mark/blank
+		for (int i = 0; i < diceRolls.Length; i++) 
+		{
+			if (diceRolls[i] % 2 == 0) 
+			{
+				diceModels[i].eulerAngles = markUpPositions.RandomElement();
+			}
+			else 
+			{
+				diceModels[i].eulerAngles = blankUpPositions.RandomElement();
+			}
+
+			diceModels[i].eulerAngles += Vector3.up * Random.Range(0f, 360f);
+		}
+
+		diceResultText.text = resultRoll.ToString();
 	}
+
+
 	//	public Rigidbody[] dice;
 	//	public Transform[] diceToRotate;
 	//#pragma warning disable 0649

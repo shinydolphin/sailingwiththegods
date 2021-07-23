@@ -21,7 +21,7 @@ public class UrGameController : MonoBehaviour
 	public bool isPlayerTurn;
 	public bool selectingBoardPosition = false;
 	public UrCounter selectedCounter;
-	public GameObject rollDiceButton;
+	public Button rollDiceButton;
 	//public Animator aiAnim;
 	//private Animator playerArms;
 	//public int playerScore = 0;
@@ -29,11 +29,18 @@ public class UrGameController : MonoBehaviour
 	//public Text playerScoreText;
 	//public Text enemyScoreText;
 
+	private int currentRoll;
+
 	public void Awake() {
 		//playerArms = dice.playerAnimator;
 	}
 
 	public void Update() {
+
+		if (!rollDiceButton.interactable && Input.GetKeyDown(KeyCode.Space)) {
+			rollDiceButton.interactable = true;
+		}
+		
 		//if(Input.GetKeyDown("p")) {
 		//	EnemyTurn();
 		//}
@@ -97,7 +104,8 @@ public class UrGameController : MonoBehaviour
 	}
 
 	public void RollDice() {
-		dice.RollDice();
+		currentRoll = dice.RollDice();
+		//rollDiceButton.interactable = false;
 	}
 
 	public void CounterSelected(UrCounter c) {
@@ -186,7 +194,7 @@ public class UrGameController : MonoBehaviour
 
 	public void SetDiceValue(int val) {
 		//diceValue = dice.DiceResult(val);
-		rollDiceButton.SetActive(false);
+		//rollDiceButton.SetActive(false);
 		Debug.Log(diceValue);
 		dvText.text = "" + diceValue;
 		if(diceValue == 0) { EnemyTurn(); }
@@ -332,6 +340,6 @@ public class UrGameController : MonoBehaviour
 				}
 			}
 		}
-		rollDiceButton.SetActive(true);
+		//rollDiceButton.SetActive(true);
 	}
 }
