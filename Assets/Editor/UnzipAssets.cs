@@ -7,8 +7,8 @@ using ICSharpCode.SharpZipLib.Zip;
 
 public class UnzipAssets : AssetPostprocessor
 {
-	static readonly (string, string)[] _knownZips = new[] {
-		("Assets/_Scenes/Main Scene/NavMesh.zip", "Assets/_Scenes/Main Scene/NavMesh.asset")
+	static readonly (string, string, string)[] _knownZips = new[] {
+		("Assets/_Scenes/Main Scene/NavMesh.zip", "Assets/_Scenes/Main Scene/NavMesh.asset", "b0f7be0c2511a2b43967d4790f69b935")
 	};
 
 	[MenuItem("SWTG/Unzip Assets")]
@@ -32,11 +32,16 @@ public class UnzipAssets : AssetPostprocessor
 		}
 	}
 
-	static void UnzipAll(IEnumerable<(string, string)> zips) {
-		foreach (var (zip, dest) in zips) {
+	static void UnzipAll(IEnumerable<(string, string, string)> zips) {
+		foreach (var (zip, dest, guid) in zips) {
 			EditorUtility.DisplayProgressBar("Unzip Assets", zip, 0.5f);
 			UnzipFile(zip, dest);
 			AssetDatabase.ImportAsset(dest);
+
+			// ensure the expected guid is used to preserve project references since these files are ignored from git
+			var importGuid = AssetDatabase.AssetPathToGUID(dest);
+			ReplaceInFile(dest + ".meta", importGuid, guid);
+
 			Debug.Log(zip + " unzipped to " + dest);
 			EditorUtility.ClearProgressBar();
 		}
@@ -51,5 +56,11 @@ public class UnzipAssets : AssetPostprocessor
 			var zipStream = unzipped.GetInputStream(0);
 			zipStream.CopyTo(output);
 		}
+	}
+
+	static void ReplaceInFile(string filename, string orig, string replaceWith) {
+		string text = File.ReadAllText(filename);
+		text = text.Replace(orig, replaceWith);
+		File.WriteAllText(filename, text);
 	}
 }
