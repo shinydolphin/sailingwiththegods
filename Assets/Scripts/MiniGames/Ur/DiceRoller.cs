@@ -35,6 +35,10 @@ public class DiceRoller : MonoBehaviour
 	private IEnumerator VisualDiceRoll(int[] diceRolls, int resultRoll) 
 	{
 		//Visually rotate the dice so they look like they're rolling
+		//I tried using Euler angles, but ran into issues because they're not unique - 0 == 180, for example
+		//Was also running into problems with gimble locking at 90 degrees X
+		//It all added up to some weird behaior with 110 degrees switching to 70 and the whole die rotating weirdly
+		//So instead, we take how far it's going to rotate in total, then how much it should rotate per frame, then just rotate that amount per frame
 		float spinTime = Random.Range(diceSpinTime.x, diceSpinTime.y);
 
 		float totalRot = diceSpeed * spinTime;
@@ -61,6 +65,7 @@ public class DiceRoller : MonoBehaviour
 				diceModels[i].eulerAngles = blankUpPositions.RandomElement();
 			}
 
+			//Rotate randomly on the Y axis so dice that roll the same don't *look* the same
 			diceModels[i].eulerAngles += Vector3.up * Random.Range(0f, 360f);
 		}
 
