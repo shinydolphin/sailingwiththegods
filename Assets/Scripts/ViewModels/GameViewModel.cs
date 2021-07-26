@@ -18,7 +18,6 @@ public class GameViewModel : Model
 	// happens once crew is selected and we're putting the player in game
 	public void GUI_startMainGame() {
 		GameVars.camera_titleScreen.SetActive(false);
-		GameVars.bg_startScreen.SetActive(false);
 
 		//Turn on the environment fog
 		RenderSettings.fog = true;
@@ -110,7 +109,8 @@ public class GameViewModel : Model
 
 		// TODO: For now, skip straight to starting the game since i turned off crew selection
 		GUI_startMainGame();
-
+		//play the intro for the game
+		//time_Line_controll.play();//start the intro seen
 		// TODO: Turned off crew selection because it's too overwhelming. Needs to be reworked.
 		//title_crew_select.SetActive(true);
 		//GUI_SetupStartScreenCrewSelection();

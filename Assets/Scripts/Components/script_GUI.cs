@@ -46,7 +46,7 @@ public class script_GUI : MonoBehaviour
 	//======================================================================================================================================================================
 	public enum Intention {Water, Trading, Tavern, All };
 
-	public bool useDialog = true;
+	//public bool useDialog = true;
 	public bool useDebugDialog = false;
 	public string debugDialogNode = "Start_Debug";
 	public string dialogNode = "Start_Tax";
@@ -74,7 +74,7 @@ public class script_GUI : MonoBehaviour
 	//-----------------------------------------------------------
 	[Header("Port Notifications")]
 	public GameObject port_dialog;
-	public GameObject port_info_main;
+	//public GameObject port_info_main;
 	public GameObject port_info_name;
 	public GameObject port_info_notification;
 	public GameObject port_info_enter;
@@ -93,21 +93,12 @@ public class script_GUI : MonoBehaviour
 	public GameObject port_info_coinImage;
 	public GameObject port_info_population;
 	public GameObject port_info_portImage;
-
-
-	//-----------------------------------------------------------
-	// Player Notification Variables
-	//-----------------------------------------------------------
-	[Header("Player Notification")]
-	public GameObject notice_notificationParent;
-	public GameObject notice_notificationSystem;
+	
 
 	//-----------------------------------------------------------
 	// Player HUD Variables
 	//-----------------------------------------------------------
 	[Header("Player HUD")]
-	public GameObject player_hud_parent;
-
 	public GameObject hud_waterStores;
 	public GameObject hud_provisions;
 	public GameObject hud_crewmember_count;
@@ -187,9 +178,7 @@ public class script_GUI : MonoBehaviour
 	//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 	void OnGUI() {
-
-
-
+		
 		//This is NEW--This is a quick/easy way to make sure the necessary labels are constantly updated without too much
 		//	--overhead to worry about.
 		updateLabelsForPlayerVariables();
@@ -401,48 +390,48 @@ public class script_GUI : MonoBehaviour
 			GameVars.DeactivateNavigatorBeacon(GameVars.navigatorBeacon);
 		}
 
-		if (useDialog) {
-			port_dialog.SetActive(true);
-			Debug.Log("GameVars.CurrentSettlement: " + (GameVars.currentSettlement == null ? "null" : GameVars.currentSettlement.name));
-			port_dialog.GetComponent<DialogScreen>().StartDialog(GameVars.currentSettlement, useDebugDialog ? debugDialogNode : dialogNode, "port");
-		}
-		else {
-			//Show the port notification pop up
-			port_info_main.SetActive(true);
-			//Set the title
-			port_info_name.GetComponent<Text>().text = GameVars.currentSettlement.name;
-			//Setup the message for the scroll view
-			string portMessage = "";
-			portMessage += GameVars.currentSettlement.description;
-			portMessage += "\n\n";
-			if (GameVars.isInNetwork) {
-				var crewMemberWithNetwork = GameVars.Network.CrewMemberWithNetwork(GameVars.currentSettlement);
-				portMessage += "This Port is part of your network!\n";
-				if (crewMemberWithNetwork != null)
-					portMessage += "Your crewman, " + crewMemberWithNetwork.name + " assures you their connections here are strong! They should welcome you openly and waive your port taxes on entering!";
-				else
-					portMessage += "You know this port as captain very well! You expect that your social connections here will soften the port taxes in your favor!";
-			}
-			else {
-				portMessage += "This port is outside your social network!\n";
-			}
+		//if (useDialog) {
+		port_dialog.SetActive(true);
+		Debug.Log("GameVars.CurrentSettlement: " + (GameVars.currentSettlement == null ? "null" : GameVars.currentSettlement.name));
+		port_dialog.GetComponent<DialogScreen>().StartDialog(GameVars.currentSettlement, useDebugDialog ? debugDialogNode : dialogNode, "port");
+		//}
+		//else {
+		//	//Show the port notification pop up
+		//	port_info_main.SetActive(true);
+		//	//Set the title
+		//	port_info_name.GetComponent<Text>().text = GameVars.currentSettlement.name;
+		//	//Setup the message for the scroll view
+		//	string portMessage = "";
+		//	portMessage += GameVars.currentSettlement.description;
+		//	portMessage += "\n\n";
+		//	if (GameVars.isInNetwork) {
+		//		var crewMemberWithNetwork = GameVars.Network.CrewMemberWithNetwork(GameVars.currentSettlement);
+		//		portMessage += "This Port is part of your network!\n";
+		//		if (crewMemberWithNetwork != null)
+		//			portMessage += "Your crewman, " + crewMemberWithNetwork.name + " assures you their connections here are strong! They should welcome you openly and waive your port taxes on entering!";
+		//		else
+		//			portMessage += "You know this port as captain very well! You expect that your social connections here will soften the port taxes in your favor!";
+		//	}
+		//	else {
+		//		portMessage += "This port is outside your social network!\n";
+		//	}
 
-			if (GameVars.currentPortTax != 0) {
-				portMessage += "If you want to dock here, your tax for entering will be " + GameVars.currentPortTax + " drachma. \n";
-				//If the port tax will make the player go negative--alert them as they enter
-				if (GameVars.playerShipVariables.ship.currency - GameVars.currentPortTax < 0)
-					portMessage += "Docking here will put you in debt for " + (GameVars.playerShipVariables.ship.currency - GameVars.currentPortTax) + "drachma, and you may lose your ship!\n";
-			}
-			else {
-				portMessage += "You only have food and water stores on board, with no taxable goods. Thankfully you will dock for free!";
-			}
+		//	if (GameVars.currentPortTax != 0) {
+		//		portMessage += "If you want to dock here, your tax for entering will be " + GameVars.currentPortTax + " drachma. \n";
+		//		//If the port tax will make the player go negative--alert them as they enter
+		//		if (GameVars.playerShipVariables.ship.currency - GameVars.currentPortTax < 0)
+		//			portMessage += "Docking here will put you in debt for " + (GameVars.playerShipVariables.ship.currency - GameVars.currentPortTax) + "drachma, and you may lose your ship!\n";
+		//	}
+		//	else {
+		//		portMessage += "You only have food and water stores on board, with no taxable goods. Thankfully you will dock for free!";
+		//	}
 
-			port_info_notification.GetComponent<Text>().text = portMessage;
-			port_info_enter.GetComponent<Button>().onClick.RemoveAllListeners();
-			port_info_leave.GetComponent<Button>().onClick.RemoveAllListeners();
-			port_info_enter.GetComponent<Button>().onClick.AddListener(() => GUI_EnterPort());
-			port_info_leave.GetComponent<Button>().onClick.AddListener(() => GUI_ExitPortNotification());
-		}
+		//	port_info_notification.GetComponent<Text>().text = portMessage;
+		//	port_info_enter.GetComponent<Button>().onClick.RemoveAllListeners();
+		//	port_info_leave.GetComponent<Button>().onClick.RemoveAllListeners();
+		//	port_info_enter.GetComponent<Button>().onClick.AddListener(() => GUI_EnterPort());
+		//	port_info_leave.GetComponent<Button>().onClick.AddListener(() => GUI_ExitPortNotification());
+		//}
 
 
 	}
@@ -452,7 +441,7 @@ public class script_GUI : MonoBehaviour
 
 	public void GUI_ExitPortNotification() {
 		//Turn off both nonport AND port notification windows
-		port_info_main.SetActive(false);
+		//port_info_main.SetActive(false);
 		GameVars.showPortDockingNotification = false;
 		nonport_info_main.SetActive(false);
 		GameVars.showNonPortDockingNotification = false;
@@ -464,7 +453,7 @@ public class script_GUI : MonoBehaviour
 	{
 		//Turn off port welcome screen
 		GameVars.showPortDockingNotification = false;
-		port_info_main.SetActive(false);
+		//port_info_main.SetActive(false);
 		port_info_taxes.GetComponent<Text>().text = GameVars.currentPortTax.ToString();
 		//Check if current Settlement is part of the main quest line
 		Globals.Quests.CheckCityTriggers(GameVars.currentSettlement.settlementID);
