@@ -1,18 +1,13 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class UrAIController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	public UrGameController gc;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public void EnemyTurn() {
+		gc.RollDice();
+		StartCoroutine(gc.WaitToSwitchTurn(true, 1.75f));
+	}
 }

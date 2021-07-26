@@ -6,11 +6,15 @@ using UnityEngine.UI;
 
 public class UrGameController : MonoBehaviour
 {
+	public GameObject playerPathImage;
+	public GameObject enemyPathImage;
+	public UrAIController enemyAI;
+
 	public List<UrGameTile> boardPositions;
 	public List<UrGameTile> eBoardPositions;
 	public List<UrCounter> counters;
 	public List<UrCounter> eCounters;
-	public DiceRoller dice;
+	public UrDiceRoller dice;
 	public Text dvText;
 	private int diceValue = 0;
 	public int countersOffBoard = 7;
@@ -18,7 +22,7 @@ public class UrGameController : MonoBehaviour
 	public int enemyCountersOnBoard;
 	public Camera cam;
 	public bool selectingObject = false;
-	public bool isPlayerTurn;
+
 	public bool selectingBoardPosition = false;
 	public UrCounter selectedCounter;
 	public Button rollDiceButton;
@@ -30,17 +34,15 @@ public class UrGameController : MonoBehaviour
 	//public Text enemyScoreText;
 
 	private int currentRoll;
+	private bool isPlayerTurn = true;
+
 
 	public void Awake() {
 		//playerArms = dice.playerAnimator;
 	}
 
-	public void Update() {
-
-		if (!rollDiceButton.interactable && Input.GetKeyDown(KeyCode.Space)) {
-			rollDiceButton.interactable = true;
-		}
-		
+	public void Update() 
+	{
 		//if(Input.GetKeyDown("p")) {
 		//	EnemyTurn();
 		//}
@@ -104,8 +106,28 @@ public class UrGameController : MonoBehaviour
 	}
 
 	public void RollDice() {
+		rollDiceButton.interactable = false;
 		currentRoll = dice.RollDice();
+		if (isPlayerTurn) {
+			StartCoroutine(WaitToSwitchTurn(false, 1.75f));
+		}
 		//rollDiceButton.interactable = false;
+	}
+
+	public void SwitchTurn(bool playerTurn) {
+		Debug.Log("Switching turn");
+		isPlayerTurn = playerTurn;
+		rollDiceButton.interactable = isPlayerTurn;
+		playerPathImage.SetActive(isPlayerTurn);
+		enemyPathImage.SetActive(!isPlayerTurn);
+		if (!isPlayerTurn) {
+			enemyAI.EnemyTurn();
+		}
+	}
+
+	public IEnumerator WaitToSwitchTurn(bool playerTurn, float waitTime) {
+		yield return new WaitForSeconds(waitTime);
+		SwitchTurn(playerTurn);
 	}
 
 	public void CounterSelected(UrCounter c) {
@@ -184,6 +206,7 @@ public class UrGameController : MonoBehaviour
 		}
 		return false;
 	}
+
 	public bool CanEnemyMove(int val, UrCounter c) {
 
 		if (c.currentTile != null && (eBoardPositions.IndexOf(c.currentTile) + val) < 19) { return true; }
@@ -249,7 +272,6 @@ public class UrGameController : MonoBehaviour
 		//	Debug.Log("You lose.");
 		//}
 	}
-
 
 	public void EnemyTurn() {
 		int[] i = { 0, 1, 4, 5 };

@@ -5,7 +5,7 @@ using System.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DiceRoller : MonoBehaviour
+public class UrDiceRoller : MonoBehaviour
 {
 	public Text diceResultText;
 	public Transform[] diceModels;
