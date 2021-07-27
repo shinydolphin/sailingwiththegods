@@ -32,7 +32,7 @@ public class Game
 	public bool isGameOver { get; set; } = false;
 	public bool menuControlsLock { get; set; } = false;
 	public bool gameIsFinished { get; set; } = false;
-
+	
 
 	#region UI Triggered functions
 
@@ -172,7 +172,7 @@ public class Game
 			Debug.Log(Application.persistentDataPath);
 
 			// secretly save a JSON version of the save data to prep for a move to make that the canonical save file - but it's not hooked up to be loaded yet
-			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(session.playerShipVariables.ship));
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(session.data));
 		}
 		catch (Exception e) {
 			Notifications.ShowANotificationMessage("ERROR: a backup wasn't saved at: " + Application.persistentDataPath + "  - which means it may not have uploaded either: " + e.Message);
@@ -234,6 +234,32 @@ public class Game
 			Notifications.ShowANotificationMessage("Sorry! No load game 'player_save_game.txt' was found in the game directory '" + Application.persistentDataPath + "' or the save file is corrupt!\nError Code: " + error);
 			return false;
 		}
+
+		// load new JSON data, but throw most of it out for now
+		// TODO: move all save data to this structure so we can load in one line
+		try {
+			// TODO: Migrate all save data loading to load from JSON. for now most of this data is thrown away (see TODOs in the GameData class)
+			session.data = JsonUtility.FromJson<GameData>(System.IO.File.ReadAllText(Application.persistentDataPath + "/save.json"));
+
+			// TODO: this is temporary until we make all data actually live on the data object
+			// this allows us to start saving new ship data only to json without needing to add it to the CSV
+			// data comes from JSON first, then is overwritten by the values in the CSV
+			session.playerShipVariables.ship = session.data.Current.ship;
+			session.playerShipVariables.journey = session.data.journey;
+			ship = session.data.Current.ship;
+			loadedJourney = session.data.journey;
+
+			if (session.data.Version < GameData.LatestVersion) {
+				Notifications.ShowANotificationMessage("JSON save data was on an old breaking version number. Was: " + session.data.Version + " Now: " + GameData.LatestVersion + ". JSON save data reset.");
+				session.ResetGameData();
+
+			}
+		}
+		catch (Exception) {
+			Notifications.ShowANotificationMessage("JSON save data incompatible with latest version. Now: " + GameData.LatestVersion + ". JSON save data reset.");
+			session.ResetGameData();
+		}
+
 		//	TextAsset saveGame = (TextAsset)Resources.Load("player_save_game", typeof(TextAsset));
 		string[] fileByLine = saveText.Split(splitFile, StringSplitOptions.None);
 		Debug.Log("file://" + Application.persistentDataPath + "/player_save_game.txt");
@@ -243,6 +269,10 @@ public class Game
 		//start at index 1 to skip the record headers we have to then subtract 
 		//one when adding NEW entries to the list to ensure we start at ZERO and not ONE
 		//all past routes will be stored as text, but the last route(last line of file) will also be done this way, but will additionally be parsed out for editing in-game values
+		// the values from the csv completely replace the values from JSON to avoid double adding. TODO: load entirely from JSON instead
+		loadedJourney.routeLog.Clear();
+		loadedJourney.cargoLog.Clear();
+		loadedJourney.otherAttributes.Clear();
 		for (int lineCount = 1; lineCount < fileByLine.Length; lineCount++) {
 			string[] records = fileByLine[lineCount].Split(lineDelimiter, StringSplitOptions.None);
 
@@ -358,6 +388,7 @@ public class Game
 
 		string[] parsedKnowns = playerVars[38].Split(recordDelimiter, StringSplitOptions.None);
 		//Debug.Log ("PARSED KNOWNS: " + playerVars[38]);
+		ship.playerJournal.knownSettlements.Clear();    // TODO: completely move to JSON. For now the JSON values are replaced with the CSV values.
 		foreach (string settlementID in parsedKnowns) {
 			//Debug.Log ("PARSED KNOWNS: " + settlementID);
 			ship.playerJournal.knownSettlements.Add(int.Parse(settlementID));
