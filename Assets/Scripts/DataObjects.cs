@@ -16,12 +16,12 @@ public class GameData
 {
 	public const int LatestVersion = 2;
 
-	public static GameData New() => new GameData() { 
+	public static GameData New(Ship ship, PlayerJourneyLog journey) => new GameData() { 
 		_version = LatestVersion,
 		Current = new GameState {
-			ship = Globals.GameVars.playerShipVariables.ship
+			ship = ship
 		},
-		journey = Globals.GameVars.playerShipVariables.journey,
+		journey = journey,
 		History = new List<Snapshot>()
 	};
 
@@ -455,7 +455,7 @@ public class Ship : Model
 
 	[Serializable] public class CrewRosterList : SerializableObservableCollection<CrewMember, int>
 	{
-		public CrewRosterList() : base(crew => crew.ID, id => Globals.GameVars.GetCrewMemberFromID(id)) { }
+		public CrewRosterList() : base(crew => crew.ID, id => Globals.Database.GetCrewMemberFromID(id)) { }
 	}
 	public CrewRosterList crewRoster;
 

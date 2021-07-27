@@ -354,10 +354,10 @@ public class CrewMember
 	}
 
 	void InitChangeOnHire() {
-		var gameVars = Globals.GameVars;
+		var session = Globals.Game.Session;
 
 		_changeOnHire = new SkillModifiers {
-			CitiesInNetwork = gameVars.Network.GetCrewMemberNetwork(this).Count(s => !gameVars.Network.MyCompleteNetwork.Contains(s)),
+			CitiesInNetwork = session.Network.GetCrewMemberNetwork(this).Count(s => !session.Network.MyCompleteNetwork.Contains(s)),
 			BattlePercentChance = typeOfCrew == CrewType.Warrior ? 5 : 0,
 			Navigation = typeOfCrew == CrewType.Sailor ? 1 : 0,
 			PositiveEvent = typeOfCrew == CrewType.Guide ? 10 : 0
@@ -365,11 +365,11 @@ public class CrewMember
 	}
 
 	void InitChangeOnFire() {
-		var gameVars = Globals.GameVars;
+		var session = Globals.Game.Session;
 
 		// the cities in network calculation is too expensive right now. disabled temporarily
 		_changeOnFire = new SkillModifiers {
-			CitiesInNetwork = -gameVars.Network.GetCrewMemberNetwork(this).Count(s => !gameVars.Network.CrewMembersWithNetwork(s).Any(crew => crew != this) && !gameVars.Network.MyImmediateNetwork.Contains(s)),
+			CitiesInNetwork = -session.Network.GetCrewMemberNetwork(this).Count(s => !session.Network.CrewMembersWithNetwork(s).Any(crew => crew != this) && !session.Network.MyImmediateNetwork.Contains(s)),
 			BattlePercentChance = typeOfCrew == CrewType.Warrior ? -5 : 0,
 			Navigation = typeOfCrew == CrewType.Sailor ? -1 : 0,
 			PositiveEvent = typeOfCrew == CrewType.Guide ? -10 : 0
@@ -377,11 +377,11 @@ public class CrewMember
 	}
 
 	void InitCurrentContribution() {
-		var gameVars = Globals.GameVars;
+		var session = Globals.Game.Session;
 
 		// very similar to changeOnFire, but shows it as positives. this is their contribution to your team, not what you'll lose if you fire them (but it's basically the same).
 		_currentContribution = new SkillModifiers {
-			CitiesInNetwork = gameVars.Network.GetCrewMemberNetwork(this).Count(s => !gameVars.Network.CrewMembersWithNetwork(s).Any(crew => crew != this) && !gameVars.Network.MyImmediateNetwork.Contains(s)),
+			CitiesInNetwork = session.Network.GetCrewMemberNetwork(this).Count(s => !session.Network.CrewMembersWithNetwork(s).Any(crew => crew != this) && !session.Network.MyImmediateNetwork.Contains(s)),
 			BattlePercentChance = typeOfCrew == CrewType.Warrior ? 5 : 0,
 			Navigation = typeOfCrew == CrewType.Sailor ? 1 : 0,
 			PositiveEvent = typeOfCrew == CrewType.Guide ? 10 : 0

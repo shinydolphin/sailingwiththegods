@@ -74,10 +74,11 @@ public class GameSession
 
 
 	public GameSession() {
-		ResetGameData();
-
 		playerShip = GameObject.FindGameObjectWithTag("playerShip");
 		playerShipVariables = playerShip.GetComponent<script_player_controls>();
+
+		// must be after playerShipVariables found
+		ResetGameData();
 
 		// must be after csv are loaded
 		Network = new Network();
@@ -99,7 +100,7 @@ public class GameSession
 	
 	// this pulls the references to the ship and journey log
 	public void ResetGameData() {
-		data = GameData.New();
+		data = GameData.New(playerShipVariables.ship, playerShipVariables.journey);
 	}
 
 	public void ActivateNavigatorBeacon(Beacon beacon, Vector3 location) {
