@@ -8,7 +8,11 @@ public static class Globals
 {
 	static Registry Registry = new Registry();
 
+	public static Database Database => Get<Database>();
+	public static Notifications Notifications => Get<Notifications>();
 	public static GameVars GameVars => Get<GameVars>();
+	public static MainState MainState => Get<MainState>();
+	public static GameSession Session => Get<GameSession>();
 	public static GameUISystem UI => Get<GameUISystem>();
 	public static QuestSystem Quests => Get<QuestSystem>();
 	public static MiniGames MiniGames => Get<MiniGames>();

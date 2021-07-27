@@ -28,20 +28,20 @@ public class YarnTavern : MonoBehaviour
 	
 	[YarnCommand("getcurrentsettlement")]
 	public void GetCurrentSettlement() {
-		ds.Storage.SetValue("$known_city", Globals.GameVars.currentSettlement.name);
-		ds.Storage.SetValue("$known_city_ID", Globals.GameVars.currentSettlement.settlementID);
-		ds.Storage.SetValue("$known_city_type", Globals.GameVars.currentSettlement.typeOfSettlement);
+		ds.Storage.SetValue("$known_city", Globals.Session.currentSettlement.name);
+		ds.Storage.SetValue("$known_city_ID", Globals.Session.currentSettlement.settlementID);
+		ds.Storage.SetValue("$known_city_type", Globals.Session.currentSettlement.typeOfSettlement);
 	}
 
 	//We need this so we can make sure not to let the player order a guide to the city they're currently at
 	[YarnCommand("checkifcurrent")]
 	public void CheckIfAskingAboutCurrentSettlement() {
-		ds.Storage.SetValue("$asking_current", ds.Storage.GetValue("$known_city_ID").AsNumber == Globals.GameVars.currentSettlement.settlementID);
+		ds.Storage.SetValue("$asking_current", ds.Storage.GetValue("$known_city_ID").AsNumber == Globals.Session.currentSettlement.settlementID);
 	}
 
 	[YarnCommand("getknownsettlementnumber")]
 	public void GetNumberOfKnownSettlements() {
-		ds.Storage.SetValue("$settlement_number", Globals.GameVars.playerShipVariables.ship.playerJournal.knownSettlements.Count);
+		ds.Storage.SetValue("$settlement_number", Globals.Session.playerShipVariables.ship.playerJournal.knownSettlements.Count);
 	}
 	#endregion
 
@@ -49,7 +49,7 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("randomfooddialog")]
 	public void GenerateRandomFoodDialog() {
 		// Begin pulling random food item.
-		List<FoodText> foodList = Globals.GameVars.foodDialogText;
+		List<FoodText> foodList = Globals.Database.foodDialogText;
 
 		int i = Random.Range(1, foodList.Count);
 
@@ -65,7 +65,7 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("randomwine")]
 	public void GenerateRandomWineInfo() {
 		// Begin pulling random wine items
-		List<FoodText> wineList = Globals.GameVars.wineInfoText;
+		List<FoodText> wineList = Globals.Database.wineInfoText;
 
 		int i = Random.Range(1, wineList.Count);
 
@@ -83,7 +83,7 @@ public class YarnTavern : MonoBehaviour
 	public void GenerateRandomFoodItem() 
 	{
 		// Begin pulling random food item.
-		List<FoodText> foodList =  Globals.GameVars.foodItemText;
+		List<FoodText> foodList =  Globals.Database.foodItemText;
 
 		int i = Random.Range(1, foodList.Count);
 
@@ -105,7 +105,7 @@ public class YarnTavern : MonoBehaviour
 		List<DialogText> matchingType = new List<DialogText>();
 
 		// Obtain the known settlements we can talk about! (NOTE: will change to display known settlements and we'll search our info based on selection)
-		Settlement[] settlementList = Globals.GameVars.settlement_masterList;
+		Settlement[] settlementList = Globals.Database.settlement_masterList;
 		Settlement targetSettlement = settlementList[0]; // Simple Assignment to ease compile errors.
 
 		// Finding the currentSettlement
@@ -118,12 +118,12 @@ public class YarnTavern : MonoBehaviour
 		switch (input) 
 		{
 			case "network":
-				e = Globals.GameVars.networkDialogText.Exists(x => x.CityType == e) ? e : "ALLOTHERS";
-				matchingType = Globals.GameVars.networkDialogText.FindAll(x => x.CityType == e);
+				e = Globals.Database.networkDialogText.Exists(x => x.CityType == e) ? e : "ALLOTHERS";
+				matchingType = Globals.Database.networkDialogText.FindAll(x => x.CityType == e);
 				break;
 			case "pirate":
-				e = Globals.GameVars.pirateDialogText.Exists(x => x.CityType == e) ? e : "ALLOTHERS";
-				matchingType = Globals.GameVars.pirateDialogText.FindAll(x => x.CityType == e);
+				e = Globals.Database.pirateDialogText.Exists(x => x.CityType == e) ? e : "ALLOTHERS";
+				matchingType = Globals.Database.pirateDialogText.FindAll(x => x.CityType == e);
 				break;
 			case "myth":
 				if (!e.Equals(ds.Storage.GetValue("$current_myth_city").AsString)) 
@@ -133,8 +133,8 @@ public class YarnTavern : MonoBehaviour
 				}
 				else
 					ds.Storage.SetValue("$current_myth_count", ds.Storage.GetValue("$current_myth_count").AsNumber + 1);
-				e = Globals.GameVars.mythDialogText.Exists(x => x.CityType == e) ? e : "ALLOTHERS";
-				matchingType = Globals.GameVars.mythDialogText.FindAll(x => x.CityType == e);
+				e = Globals.Database.mythDialogText.Exists(x => x.CityType == e) ? e : "ALLOTHERS";
+				matchingType = Globals.Database.mythDialogText.FindAll(x => x.CityType == e);
 				break;
 			default:
 				Debug.Log("Error, probaby because of a misspelling");
@@ -154,7 +154,7 @@ public class YarnTavern : MonoBehaviour
 				{
 					// Clean this up for readability.
 					ds.Storage.SetValue("$response", matchingType[(int)ds.Storage.GetValue("$current_myth_count").AsNumber].TextQA[1]);
-					Globals.GameVars.AddToCaptainsLog("Myth of " + e + ":\n" + ds.Storage.GetValue("$response").AsString);
+					Globals.Session.AddToCaptainsLog("Myth of " + e + ":\n" + ds.Storage.GetValue("$response").AsString);
 				}
 				else
 					ds.Storage.SetValue("$response", "There is nothing more for me to say!");
@@ -177,7 +177,7 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("randomguide")]
 	public void GenerateGuideDialogue() 
 	{
-		List<DialogText> guideText = Globals.GameVars.guideDialogText;
+		List<DialogText> guideText = Globals.Database.guideDialogText;
 
 		int i = Random.Range(1, guideText.Count);
 
@@ -198,7 +198,7 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("hirenavigator")]
 	public void SetSettlementWaypoint()
 	{
-		_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.GameVars.AllNonCrew.RandomElement().ID);		
+		_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.Session.AllNonCrew.RandomElement().ID);		
 	}
 	#endregion
 

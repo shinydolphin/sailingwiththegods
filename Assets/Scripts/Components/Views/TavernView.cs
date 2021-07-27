@@ -12,15 +12,15 @@ public class TavernCityViewModel : CityViewModel
 	private DialogScreen ds;
 	public int CostForHint {
 		get {
-			float initialCost = CoordinateUtil.GetDistanceBetweenTwoLatLongCoordinates(GameVars.currentSettlement.location_longXlatY, City.location_longXlatY) / 10000f;
-			return Mathf.RoundToInt(initialCost - (initialCost * GameVars.GetOverallCloutModifier(City.settlementID)));
+			float initialCost = CoordinateUtil.GetDistanceBetweenTwoLatLongCoordinates(Session.currentSettlement.location_longXlatY, City.location_longXlatY) / 10000f;
+			return Mathf.RoundToInt(initialCost - (initialCost * Session.GetOverallCloutModifier(City.settlementID)));
 		}
 	}
 
 	public int CostToHire {
 		get {
-			float initialCost = CoordinateUtil.GetDistanceBetweenTwoLatLongCoordinates(GameVars.currentSettlement.location_longXlatY, City.location_longXlatY) / 1000f;
-			return Mathf.RoundToInt(initialCost - (initialCost * GameVars.GetOverallCloutModifier(City.settlementID)));
+			float initialCost = CoordinateUtil.GetDistanceBetweenTwoLatLongCoordinates(Session.currentSettlement.location_longXlatY, City.location_longXlatY) / 1000f;
+			return Mathf.RoundToInt(initialCost - (initialCost * Session.GetOverallCloutModifier(City.settlementID)));
 		}
 	}
 	
@@ -46,12 +46,12 @@ public class TavernCityViewModel : CityViewModel
 	// User for Trading Goods. This is getting resource from city.
 	public void GUI_BuyHint() {
 
-		if (GameVars.playerShipVariables.ship.currency < CostForHint) {
-			GameVars.ShowANotificationMessage("Not enough money to buy this information!");
+		if (Session.playerShipVariables.ship.currency < CostForHint) {
+			Notifications.ShowANotificationMessage("Not enough money to buy this information!");
 		}
 		else {
-			GameVars.playerShipVariables.ship.currency -= CostForHint;
-			GameVars.ShowANotificationMessage(GetInfoOnNetworkedSettlementResource(City.cargo[UnityEngine.Random.Range(0, City.cargo.Length)]));
+			Session.playerShipVariables.ship.currency -= CostForHint;
+			Notifications.ShowANotificationMessage(GetInfoOnNetworkedSettlementResource(City.cargo[UnityEngine.Random.Range(0, City.cargo.Length)]));
 		}
 
 	}
@@ -59,21 +59,21 @@ public class TavernCityViewModel : CityViewModel
 	public void GUI_HireANavigator() {
 		//Do this if button pressed
 		//Check to see if player has enough money to hire
-		if (GameVars.playerShipVariables.ship.currency >= CostToHire) {
+		if (Session.playerShipVariables.ship.currency >= CostToHire) {
 			//subtract the cost from the players currency
-			GameVars.playerShipVariables.ship.currency -= (int)CostToHire;
+			Session.playerShipVariables.ship.currency -= (int)CostToHire;
 			//change location of beacon
 			Vector3 location = Vector3.zero;
 			for (int x = 0; x < GameVars.settlement_masterList_parent.transform.childCount; x++)
 				if (GameVars.settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == City.settlementID)
 					location = GameVars.settlement_masterList_parent.transform.GetChild(x).position;
-			GameVars.ActivateNavigatorBeacon(GameVars.navigatorBeacon, location);
-			GameVars.playerShipVariables.ship.currentNavigatorTarget = City.settlementID;
-			GameVars.ShowANotificationMessage("You hired a navigator to " + City.name + " for " + CostToHire + " drachma.");
+			Session.ActivateNavigatorBeacon(GameVars.navigatorBeacon, location);
+			Session.playerShipVariables.ship.currentNavigatorTarget = City.settlementID;
+			Notifications.ShowANotificationMessage("You hired a navigator to " + City.name + " for " + CostToHire + " drachma.");
 			//If not enough money, then let the player know
 		}
 		else {
-			GameVars.ShowANotificationMessage("You can't afford to hire a navigator to " + City.name + ".");
+			Notifications.ShowANotificationMessage("You can't afford to hire a navigator to " + City.name + ".");
 		}
 	}
 }
@@ -81,13 +81,15 @@ public class TavernCityViewModel : CityViewModel
 public class TavernViewModel : Model
 {
 	GameVars GameVars => Globals.GameVars;
+	GameSession Session => Globals.Session;
+	Database Database => Globals.Database;
 
 	public ICollectionModel<CityViewModel> Cities { get; private set; }
 
 	public TavernViewModel(DialogScreen d) {
-		Cities = ValueModel.Wrap(GameVars.playerShipVariables.ship.playerJournal.knownSettlements)
-			//.Where(id => id != GameVars.currentSettlement.settlementID)
-			.Select(id => new TavernCityViewModel(GameVars.GetSettlementFromID(id), d) as CityViewModel);
+		Cities = ValueModel.Wrap(Session.playerShipVariables.ship.playerJournal.knownSettlements)
+			//.Where(id => id != Session.currentSettlement.settlementID)
+			.Select(id => new TavernCityViewModel(Database.GetSettlementFromID(id), d) as CityViewModel);
 	}
 }
 

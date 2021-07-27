@@ -36,15 +36,14 @@ using System.Linq;
 
 public class GameVars : MonoBehaviour
 {
+	Notifications Notifications => Globals.Notifications;
+	Database Database => Globals.Database;
+
 	const int windZoneColumns = 64;
 	const int windZoneRows = 32;
 
 	const int currentZoneColumns = 128;
 	const int currentZoneRows = 64;
-
-	// TODO: Is this a bug? These never change.
-	public const bool IS_NEW_GAME = true;
-	public const bool IS_NOT_NEW_GAME = false;
 
 	// TODO: Is this a bug? These never change.
 	public const string TD_year = "2000";
@@ -54,29 +53,11 @@ public class GameVars : MonoBehaviour
 	public const string TD_minute = "0";
 	public const string TD_second = "0";
 
-	// TODO: These should be removed eventually in favor of using Globals.GameVars.Crew.Jason, so that GameVars isn't so overloaded with util functions
-	public CrewMember Jason => Crew.Jason;
-	public IEnumerable<CrewMember> StandardCrew => Crew.StandardCrew;
-	public IEnumerable<CrewMember> Pirates => Crew.Pirates;
-	public IEnumerable<PirateType> PirateTypes => Crew.PirateTypes;
-	public IEnumerable<CrewMember> AllNonCrew => Crew.AllNonCrew;
-
 	[Header("World Scene Refs")]
-	public GameObject FPVCamera;
-	public GameObject camera_Mapview;
 	public GameObject terrain;
-	public GameObject cityLightsParent;
-
-	[Header("Ship Scene Refs")]
-	public GameObject[] sails = new GameObject[6];
-	public GameObject[] shipLevels;
-
-	[Header("Ununorganized Scene Refs")]
-	public List<CrewMember> currentlyAvailableCrewMembersAtPort; // updated every time ship docks at port
 
 	[Header("GUI Scene Refs")]
 	public script_GUI MasterGUISystem;
-	public GameObject selection_ring;
 
 	[Header("Skybox Scene Refs")]
 	public GameObject skybox_celestialGrid;
@@ -91,9 +72,29 @@ public class GameVars : MonoBehaviour
 	public Material mat_waterCurrents;
 	public Material mat_water;
 
+	[Header("World Scene Refs")]
+	public GameObject FPVCamera;
+	public GameObject camera_Mapview;
+	public GameObject cityLightsParent;
+
+	[Header("Ship Scene Refs")]
+	public GameObject[] sails = new GameObject[6];
+	public GameObject[] shipLevels;
+
+	[Header("Ununorganized Scene Refs")]
+	public List<CrewMember> currentlyAvailableCrewMembersAtPort; // updated every time ship docks at port
+	[Header("GUI Scene Refs")]
+	public GameObject selection_ring;
+
 	[Header("Beacons")]
 	public Beacon navigatorBeacon;
 	public Beacon crewBeacon;
+
+	//###################################
+	//	DEBUG VARIABLES
+	//###################################
+	[ReadOnly] public int DEBUG_currentQuestLeg = 0;
+	[HideInInspector] public bool DEBUG_MODE_ON = false;
 
 	// TODO: unorganized variables
 	[HideInInspector] public GameObject mainCamera;
@@ -105,137 +106,27 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public CurrentRose[,] currentRose_January;
 	[HideInInspector] public GameObject currentZoneParent;
 
-	// settlements
-	[HideInInspector] public Region[] region_masterList;
-	[HideInInspector] public Settlement[] settlement_masterList;
 	[HideInInspector] public GameObject settlement_masterList_parent;
-	[HideInInspector] public GameObject currentSettlementGameObject;
-	[HideInInspector] public Settlement currentSettlement;
-	[HideInInspector] public int currentPortTax = 0;		// this is derived from the currentSettlement. could be a getter on settlement object
-
-	// ship
-	[HideInInspector] public GameObject playerShip;
-	[HideInInspector] public script_player_controls playerShipVariables;
-
-	// captain's log
-	private string currentCaptainsLog = "";
-	private CaptainsLogEntry[] captainsLogEntries;
-	private List<CaptainsLogEntry> currentLogPool = new List<CaptainsLogEntry>();
-	public string CaptainsLog => currentCaptainsLog;
-
-	public void AddToCaptainsLog(string message) {
-		currentCaptainsLog = message + "\n\n" + currentCaptainsLog;
-	}
-
-	// resources
-	[HideInInspector] public List<MetaResource> masterResourceList = new List<MetaResource>();
-
-	// game state
-	[HideInInspector] public bool controlsLocked = false;
-	[HideInInspector] public bool isGameOver = false;
-	[HideInInspector] public bool menuControlsLock = false;
-	[HideInInspector] public bool justLeftPort = false;
-	[HideInInspector] public bool gameIsFinished = false;
-	[HideInInspector] public bool isPerformingRandomEvent = false;
-	[HideInInspector] public bool isPassingTime = false;
-
-	// TODO: Should really make all this game state stuff an actual state machine at some point
-	public bool IsCutsceneMode = false;
-
-
-	// notifications
-	public bool NotificationQueued { get; private set; }
-	public string QueuedNotificationMessage { get; private set; }
-
-	public void ConsumeNotification() {
-		NotificationQueued = false;
-	}
 
 	// environment
 	[HideInInspector] public Light mainLightSource;
 
 	// title and start screens
 	[HideInInspector] public bool startGameButton_isPressed = false;
-	[HideInInspector] public bool isTitleScreen = true;
-	[HideInInspector] public bool isStartScreen = false;
 	[HideInInspector] public GameObject camera_titleScreen;
-	[HideInInspector] public bool isLoadedGame = false;
 
-	//###################################
-	//	Crew Member Variables
-	//###################################
-	List<PirateType> masterPirateTypeList = new List<PirateType>();
-	List<CrewMember> masterCrewList = new List<CrewMember>();
 
 	//###################################
 	//	GUI VARIABLES
 	//###################################
-	[HideInInspector] public bool runningMainGameGUI = false;
-	[HideInInspector] public bool showSettlementGUI = false;
-	[HideInInspector] public bool showSettlementTradeButton = false;
 	[HideInInspector] public bool[] newGameCrewSelectList = new bool[40];
 	[HideInInspector] public List<CrewMember> newGameAvailableCrew = new List<CrewMember>();
-	[HideInInspector] public bool showPortDockingNotification = false;
-	[HideInInspector] public bool gameDifficulty_Beginner = false;
-	[HideInInspector] public bool showNonPortDockButton = false;
-	[HideInInspector] public bool showNonPortDockingNotification = false;
-	[HideInInspector] public bool updatePlayerCloutMeter = false;
 
-	[HideInInspector] public List<DialogText> portDialogText = new List<DialogText>();
-
-	//Taverna
-	[HideInInspector] public List<DialogText> networkDialogText = new List<DialogText>();
-	[HideInInspector] public List<DialogText> pirateDialogText = new List<DialogText>();
-	[HideInInspector] public List<DialogText> mythDialogText = new List<DialogText>();
-	[HideInInspector] public List<DialogText> guideDialogText = new List<DialogText>(); 
-	[HideInInspector] public List<DialogText> tradingDialogText = new List<DialogText>(); // Perhaps
-	[HideInInspector] public List<FoodText> foodItemText= new List<FoodText>();
-	[HideInInspector] public List<FoodText> wineInfoText = new List<FoodText>();
-	[HideInInspector] public List<FoodText> foodDialogText = new List<FoodText>();
-	[HideInInspector] public List<string> tavernaGameInsults;
-	[HideInInspector] public List<string> tavernaGameBragging;
-
-
-	// high level game systems
-	public Trade Trade { get; private set; }
-	public Network Network { get; private set; }
-	public Icons Icons { get; private set; }
-	public Crew Crew { get; private set; }
-	public bool isInNetwork => Network.CheckIfCityIDIsPartOfNetwork(currentSettlement.settlementID);
 
 	//###################################
 	//	RANDOM EVENT VARIABLES
 	//###################################
 	[HideInInspector] public List<int> activeSettlementInfluenceSphereList = new List<int>();
-
-	//STORMS
-	[HideInInspector] public List<Ritual> stormRituals = new List<Ritual>();
-	[HideInInspector] public List<string> stormTitles;
-	[HideInInspector] public List<string> stormSubtitles;
-	[HideInInspector] public List<string> stormStartText;
-	[HideInInspector] public List<string> stormSeerText;
-	[HideInInspector] public List<string> stormNoSeerText;
-	[HideInInspector] public List<string> stormRitualResultsText;
-	[HideInInspector] public List<string> stormSuccessText;
-	[HideInInspector] public List<string> stormFailureText;
-
-	//PIRATES
-	[HideInInspector] public List<string> pirateTitles;
-	[HideInInspector] public List<string> pirateSubtitles;
-	[HideInInspector] public List<string> pirateStartText;
-	[HideInInspector] public List<string> pirateTypeIntroText;
-	[HideInInspector] public List<string> pirateNegotiateText;
-	[HideInInspector] public List<string> pirateRunSuccessText;
-	[HideInInspector] public List<string> pirateRunFailText;
-	[HideInInspector] public List<string> pirateSuccessText;
-	[HideInInspector] public List<string> pirateFailureText;
-
-	//###################################
-	//	DEBUG VARIABLES
-	//###################################
-	[ReadOnly] public int DEBUG_currentQuestLeg = 0;
-	[HideInInspector] public bool DEBUG_MODE_ON = false;
-
 
 
 
@@ -254,7 +145,6 @@ public class GameVars : MonoBehaviour
 		Globals.Register(this);
 
 		mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-		playerShip = GameObject.FindGameObjectWithTag("playerShip");
 		camera_titleScreen = GameObject.FindGameObjectWithTag("camera_titleScreen");
 		waterSurface = GameObject.FindGameObjectWithTag("waterSurface");
 		playerGhostRoute = GameObject.FindGameObjectWithTag("playerGhostRoute").GetComponent<LineRenderer>();
@@ -265,49 +155,9 @@ public class GameVars : MonoBehaviour
 		mat_water = new Material(mat_water);
 		mat_waterCurrents = new Material(mat_waterCurrents);
 
-		playerShipVariables = playerShip.GetComponent<script_player_controls>();
-
-		//Load all txt database files
-		masterPirateTypeList = CSVLoader.LoadMasterPirateTypes();
-		masterCrewList = CSVLoader.LoadMasterCrewRoster(masterPirateTypeList);
-		captainsLogEntries = CSVLoader.LoadCaptainsLogEntries();
-		masterResourceList = CSVLoader.LoadResourceList();
-		stormRituals = CSVLoader.LoadRituals();
-		CSVLoader.LoadStormText(out stormTitles, out stormSubtitles, out stormStartText, out stormSeerText, out stormNoSeerText, 
-			out stormRitualResultsText, out stormSuccessText, out stormFailureText);
-		CSVLoader.LoadPirateText(out pirateTitles, out pirateSubtitles, out pirateStartText, out pirateTypeIntroText, out pirateNegotiateText,
-			out pirateRunSuccessText, out pirateRunFailText, out pirateSuccessText, out pirateFailureText);
-		portDialogText = CSVLoader.LoadPortDialog();
-
-		CSVLoader.LoadTavernaGameBarks(out tavernaGameInsults, out tavernaGameBragging);
-
-		// Mylo's Addition
-		networkDialogText = CSVLoader.LoadNetworkDialog();
-		pirateDialogText = CSVLoader.LoadPirateDialog();
-		mythDialogText = CSVLoader.LoadMythDialog();
-		guideDialogText = CSVLoader.LoadHireGuideDialog();
-		// trading goods here
-		foodItemText = CSVLoader.LoadFoodItemsList();
-		foodDialogText = CSVLoader.LoadFoodDialogList();
-		wineInfoText = CSVLoader.LoadWineInfoList();
-
-
-		// end Mylo's Addition
-
-		region_masterList = CSVLoader.LoadRegionList();
-		settlement_masterList = CSVLoader.LoadSettlementList();     // depends on resource list, region list, and crew list
-
-		// must be after csv are loaded
-		Network = new Network(this);
-		Trade = new Trade(this);
-		Icons = new Icons(masterResourceList);
-		Crew = new Crew(masterCrewList, masterPirateTypeList, playerShipVariables.ship);
-
-		CreateSettlementsFromList();
-		currentSettlementGameObject = settlement_masterList_parent.transform.GetChild(0).gameObject;
-		currentSettlement = currentSettlementGameObject.GetComponent<script_settlement_functions>().thisSettlement;
-		//The lights are on at the start, so turn them off or they'll be on during the first day and no other day
-		cityLightsParent.SetActive(false);
+		Globals.Register(new Notifications());
+		Globals.Register(new MainState());
+		Globals.Register(new Database());
 
 		// wind and current init
 		BuildWindZoneGameObjects();
@@ -316,11 +166,6 @@ public class GameVars : MonoBehaviour
 		currentRose_January = CSVLoader.LoadWaterZonesFromFile(currentZoneColumns, currentZoneRows);
 		SetInGameWindZonesToWindRoseData();
 		SetInGameWaterZonesToCurrentRoseData();
-
-		//Load the basic log entries into the log pool
-		AddEntriesToCurrentLogPool(0);
-		StartPlayerShipAtOriginCity();
-		GenerateCityLights();
 	}
 
 
@@ -350,7 +195,7 @@ public class GameVars : MonoBehaviour
 			saveText = File.ReadAllText(Application.persistentDataPath + "/player_save_game.txt");
 		}
 		catch (Exception error) {
-			ShowANotificationMessage("Sorry! No load game 'player_save_game.txt' was found in the game directory '" + Application.persistentDataPath + "' or the save file is corrupt!\nError Code: " + error);
+			Notifications.ShowANotificationMessage("Sorry! No load game 'player_save_game.txt' was found in the game directory '" + Application.persistentDataPath + "' or the save file is corrupt!\nError Code: " + error);
 			return false;
 		}
 		//	TextAsset saveGame = (TextAsset)Resources.Load("player_save_game", typeof(TextAsset));
@@ -400,7 +245,7 @@ public class GameVars : MonoBehaviour
 		//Update in game Time
 		ship.totalNumOfDaysTraveled = float.Parse(playerVars[1]);
 		//Update Sky to match time
-		playerShipVariables.UpdateDayNightCycle(IS_NOT_NEW_GAME);
+		playerShipVariables.UpdateDayNightCycle(MainState.IS_NOT_NEW_GAME);
 
 		//Update all Cargo Holds
 		int fileStartIndex = 8;
@@ -413,7 +258,7 @@ public class GameVars : MonoBehaviour
 		List<CrewMember> updatedCrew = new List<CrewMember>();
 		string[] parsedCrew = playerVars[26].Split(recordDelimiter, StringSplitOptions.None);
 		foreach (string crewID in parsedCrew) {
-			updatedCrew.Add(GetCrewMemberFromID(int.Parse(crewID)));
+			updatedCrew.Add(Database.GetCrewMemberFromID(int.Parse(crewID)));
 		}
 		ship.crewRoster.Clear();
 		updatedCrew.ForEach(c => ship.crewRoster.Add(c));
@@ -495,69 +340,13 @@ public class GameVars : MonoBehaviour
 		// KDTODO: Once the save game routines are rewritten, need to save the crew available in each city instead of regenerating since this is exploitable
 		// it's just too much hassle to support saving this right now because the save format is limiting
 		// setup each city with 5 crew available and for now, they never regenerate.
-		foreach (var settlement in settlement_masterList) {
+		foreach (var settlement in Database.settlement_masterList) {
 			settlement.availableCrew.Clear();
 			GenerateRandomCrewMembers(5).ForEach(c => settlement.availableCrew.Add(c));
 		}
 
 		//If no errors then return true
 		return true;
-	}
-
-	public void ActivateNavigatorBeacon(Beacon beacon, Vector3 location) {
-		beacon.IsBeaconActive = true;
-		beacon.transform.position = location;
-		beacon.GetComponent<LineRenderer>().SetPosition(0, new Vector3(location.x, 0, location.z));
-		beacon.GetComponent<LineRenderer>().SetPosition(1, location + new Vector3(0, 400, 0));
-		playerShipVariables.UpdateNavigatorBeaconAppearenceBasedOnDistance(beacon);
-	}
-
-	public void DeactivateNavigatorBeacon(Beacon beacon) {
-		beacon.IsBeaconActive = false;
-	}
-
-	public void RotateCameraTowards(Vector3 target) {
-
-		// rotate the camera's parent to look at the target (which eliminates the need for RotateAround below)
-		// also rotate the 
-		//FPVCamera.transform.parent.parent.parent.DOLookAt(target, 1f);
-
-		CameraLookTarget = target;
-
-	}
-
-	public Vector3? CameraLookTarget;
-
-	void UpdateCameraRotation() {
-
-		if(CameraLookTarget.HasValue) {
-
-			var camToTarget = CameraLookTarget.Value - FPVCamera.transform.parent.parent.transform.position;
-			var angle = Vector3.SignedAngle(FPVCamera.transform.parent.parent.forward, camToTarget.normalized, Vector3.up);
-
-			FPVCamera.transform.parent.parent.RotateAround(FPVCamera.transform.parent.parent.position, FPVCamera.transform.parent.parent.up, angle * Time.deltaTime);
-
-			if(Mathf.Abs(angle) < 2f) {
-				CameraLookTarget = null;
-			}
-
-		}
-
-	}
-
-	private void Update() {
-		UpdateCameraRotation();
-		//DebugHotkeys();
-	}
-
-	void DebugHotkeys() {
-#if UNITY_EDITOR
-		//if(Input.GetKeyUp(KeyCode.E)) {
-		//	var storm = new StormAtSea();
-		//	storm.Init(this, playerShipVariables.ship, new ShipSpeedModifiers(), playerShip.transform, 1);
-		//	storm.Execute();
-		//}
-#endif
 	}
 
 	//====================================================================================================
@@ -567,7 +356,7 @@ public class GameVars : MonoBehaviour
 	public void CreateSettlementsFromList() {
 		settlement_masterList_parent = Instantiate(new GameObject(), Vector3.zero, transform.rotation) as GameObject;
 		settlement_masterList_parent.name = "Settlement Master List";
-		foreach (Settlement settlement in settlement_masterList) {
+		foreach (Settlement settlement in Database.settlement_masterList) {
 			GameObject currentSettlement;
 			//Here we add a model/prefab to the settlement based on it's
 			try {
@@ -778,7 +567,7 @@ public class GameVars : MonoBehaviour
 			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(playerShipVariables.ship));
 		}
 		catch (Exception e) {
-			ShowANotificationMessage("ERROR: a backup wasn't saved at: " + Application.persistentDataPath + "  - which means it may not have uploaded either: " + e.Message);
+			Notifications.ShowANotificationMessage("ERROR: a backup wasn't saved at: " + Application.persistentDataPath + "  - which means it may not have uploaded either: " + e.Message);
 		}
 		//Only upload to the server is the DebugMode is OFF
 		if (!DEBUG_MODE_ON) SaveUserGameDataToServer(filePath, fileNameServer);
@@ -852,12 +641,12 @@ public class GameVars : MonoBehaviour
 		}
 		catch (Exception e) {
 			Debug.LogError("Error uploading file: " + e.Message);
-			ShowANotificationMessage("ERROR: No Upload--The server timed out or you currently do not have a stable internet connection\n" + e.Message);
+			Notifications.ShowANotificationMessage("ERROR: No Upload--The server timed out or you currently do not have a stable internet connection\n" + e.Message);
 			return;
 		}
 
 		Debug.Log("Upload successful.");
-		ShowANotificationMessage("File: '" + localFile + "' successfully uploaded to the server!");
+		Notifications.ShowANotificationMessage("File: '" + localFile + "' successfully uploaded to the server!");
 	}
 
 	//TODO: This is an incredibly specific function that won't be needed later
@@ -878,25 +667,6 @@ public class GameVars : MonoBehaviour
 
 	}
 
-	//====================================================================================================
-	//      PLAYER INITIALIZATION FUNCTIONS
-	//====================================================================================================
-
-	void StartPlayerShipAtOriginCity() {
-		//first set the origin city to the first available as a default
-		GameObject originCity = settlement_masterList_parent.transform.GetChild(0).gameObject;
-		foreach (Transform child in settlement_masterList_parent.transform) {
-			//if the settlement we want exists, then use it as the default instead
-			if (child.name == "Samothrace") {
-				originCity = child.gameObject;
-				break;
-			}
-		}
-		//now set the player ship to the origin city coordinate
-		//!TODO This is arbotrarily set to samothrace right now
-		playerShip.transform.position = new Vector3(1702.414f, .23f, 2168.358f);
-		//mainCamera.transform.position = new Vector3(originCity.transform.position.x, 30f, originCity.transform.position.z);
-	}
 
 	public void RestartGame() {
 
@@ -918,43 +688,18 @@ public class GameVars : MonoBehaviour
 		Globals.UI.HideAll();
 		Globals.UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
 		controlsLocked = true;
-		isTitleScreen = true;
+		MainState.isTitleScreen = true;
 		RenderSettings.fog = false;
 		FPVCamera.SetActive(false);
 		camera_titleScreen.SetActive(true);
-		isTitleScreen = true;
-		runningMainGameGUI = false;
+		MainState.isTitleScreen = true;
+		MainState.runningMainGameGUI = false;
 
 		SetShipModel(playerShipVariables.ship.upgradeLevel);
 
 		//clear captains log
 		currentCaptainsLog = "";
 		
-	}
-
-	public void UpgradeShip(int costToBuyUpgrade) {
-		playerShipVariables.ship.upgradeLevel = 1;
-		playerShipVariables.ship.currency -= costToBuyUpgrade;
-
-		// TODO: These should be defined per uprade level, but until we have a better idea how upgrades will work long term, just hard here
-		playerShipVariables.ship.crewCapacity = 30;
-		playerShipVariables.ship.cargo_capicity_kg = 1200;
-
-		Globals.UI.Hide<RepairsView>();
-
-		// this will automatically add the story crew that was previously being added manually in a hack
-		Globals.Quests.CheckUpgradeShipTriggers();
-
-		// show the new ship model
-		SetShipModel(playerShipVariables.ship.upgradeLevel);
-		Globals.GameVars.controlsLocked = true;
-	}
-
-	void SetShipModel(int shipLevel) {
-		foreach (var upgradeLevel in shipLevels) {
-			upgradeLevel.SetActive(false);
-		}
-		shipLevels[shipLevel].SetActive(true);
 	}
 
 	public void FillNewGameCrewRosterAvailability() {
@@ -971,7 +716,7 @@ public class GameVars : MonoBehaviour
 
 		//Let's add all the optional crew from the Argonautica
 		foreach (int crewID in playerShipVariables.ship.mainQuest.questSegments[0].crewmembersToAdd) {
-			CrewMember currentMember = GetCrewMemberFromID(crewID);
+			CrewMember currentMember = Database.GetCrewMemberFromID(crewID);
 			if (currentMember.isKillable && !currentMember.isJason) {
 				newGameAvailableCrew.Add(currentMember);
 			}
@@ -1065,297 +810,6 @@ public class GameVars : MonoBehaviour
 			}
 		}
 	}
-
-	//====================================================================================================
-	//    LOOKUP / DICTIONARY FUNCTIONS
-	//====================================================================================================   
-
-	public string GetJobClassEquivalency(CrewType jobCode) {
-		//This function simply returns a predefined string based on the number code of a crewmembers job
-		//	--based on their constant values held in the global variables 
-		string title = "";
-		switch (jobCode) {
-			case CrewType.Sailor: title = "Sailor"; break;
-			case CrewType.Warrior: title = "Warrior"; break;
-			case CrewType.Slave: title = "Slave"; break;
-			case CrewType.Passenger: title = "Passenger"; break;
-			case CrewType.Navigator: title = "Navigator"; break;
-			case CrewType.Assistant: title = "Assistant"; break;
-			case CrewType.Guide: title = "Guide"; break;
-			case CrewType.Lawyer: title = "Lawyer"; break;
-			case CrewType.Royalty: title = "Royalty"; break;
-			case CrewType.Seer: title = "Seer"; break;
-		}
-		return title;
-	}
-
-
-
-	public string GetCloutTitleEquivalency(int clout) {
-		//This function simply returns a predefined string based on the number value of the clout provided
-		string title = "";
-		if (clout > 1 && clout <= 499) title = "Goatherd";
-		else if (clout > 500 && clout <= 999) title = "Farmer";
-		else if (clout > 1000 && clout <= 1499) title = "Merchant";
-		else if (clout > 1500 && clout <= 1999) title = "Mercenary";
-		else if (clout > 2000 && clout <= 2499) title = "Knight";
-		else if (clout > 2500 && clout <= 2999) title = "War Chief";
-		else if (clout > 3000 && clout <= 3499) title = "Boule Leader";
-		else if (clout > 3500 && clout <= 3999) title = "Ambassador";
-		else if (clout > 4000 && clout <= 4499) title = "Prince";
-		else if (clout > 4500 && clout <= 4999) title = "King";
-		else if (clout >= 5000) title = "The God";
-		else if (clout == 0) title = "Dead";
-		else title = "ERROR: clout is not between 0 and 100";
-		return title;
-	}
-
-	public Region GetRegionByName(string name) => region_masterList.FirstOrDefault(r => r.Name == name);
-	public Settlement GetSettlementByName(string name) => settlement_masterList.FirstOrDefault(s => s.name == name);
-
-	public Settlement GetSettlementFromID(int ID) {
-		//Debug.Log (settlement_masterList.Length);
-		foreach (Settlement city in settlement_masterList) {
-			//Debug.Log ("DEBUG: city: " + city.name);
-			if (city.settlementID == ID) {
-				return city;
-			}
-		}
-		//if no matches(this shouldn't be possible--return a fake settlement rather than a null
-		//	--this is more sophisticated than a null--it won't crash but the error is obvious.
-		Debug.Log("ERROR: DIDNT FIND ID MATCH IN GetSettlementFromID Function: Looking for settlement ID:  " + ID);
-		return new Settlement(-1, "ERROR", -1);
-	}
-
-	public CrewMember GetCrewMemberFromID(int ID) {
-		foreach (CrewMember crewman in masterCrewList) {
-			if (crewman.ID == ID)
-				return crewman;
-		}
-		return null;
-	}
-	
-	//====================================================================================================
-	//    PLAYER MODIFICATION FUNCTIONS
-	//====================================================================================================   
-
-	public void AdjustPlayerClout(int cloutAdjustment, bool useMod = true) {
-		int cloutModifier = useMod? 100 : 1; //We have a modifier to help link the new system in with the old functions.
-		int clout = (int)playerShipVariables.ship.playerClout;
-		//adjust the players clout by the given amount
-		playerShipVariables.ship.playerClout += (cloutAdjustment * cloutModifier);
-		//if the player's clout exceeds 100 after the adjustment, then reduce it back to 100 as a cap
-		if (playerShipVariables.ship.playerClout > 5000)
-			playerShipVariables.ship.playerClout = 5000;
-		//if the player's clout is reduced below 0 after the adjustment, then increase it to 0 again
-		if (playerShipVariables.ship.playerClout < 0)
-			playerShipVariables.ship.playerClout = 0;
-		Debug.Log("Clout " + playerShipVariables.ship.playerClout);
-		//First check if a player reaches a new clout level
-		//If the titles don't match after adjustment then we have a change!
-		if (GetCloutTitleEquivalency(clout) != GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout)) {
-			updatePlayerCloutMeter = true;
-			//Next we need to determine whether or not it was a level down or level up
-			//If it was an increase then show a positive message
-			if (clout < (clout + cloutAdjustment)) {
-				Debug.Log("Gained a level");
-				ShowANotificationMessage("Congratulations! You have reached a new level of influence! Before this day you were Jason, " + GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
-				//If it was a decrease then show a negative message to the player
-			}
-			else {
-				Debug.Log("Lost a level");
-				ShowANotificationMessage("Unfortunately you sunk to a new low level of respect in the world! Before this day you were Jason, " + GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
-			}
-			MasterGUISystem.GUI_UpdatePlayerCloutMeter();
-		}
-
-
-	}
-
-	public void AdjustCrewsClout(int cloutAdjustment) {
-		foreach (CrewMember crew in playerShipVariables.ship.crewRoster) {
-			//adjust the crews clout by the given amount
-			crew.clout += cloutAdjustment;
-			//if the crew's clout exceeds 100 after the increase, then reduce it back to 100 as a cap
-			if (crew.clout > 5000)
-				crew.clout = 5000;
-			//if the crew's clout is reduced below 0 after the adjustment, then increase it to 0 again
-			if (crew.clout < 0)
-				crew.clout = 0;
-		}
-
-	}
-
-	public void AdjustPlayerShipHealth(int healthAdjustment) {
-		//adjust the health by the given amount
-		playerShipVariables.ship.health += healthAdjustment;
-		//if the health exceeds 100 after the adjustment, then reduce it back to 100 as a cap
-		if (playerShipVariables.ship.health > 100)
-			playerShipVariables.ship.health = 100;
-		//if the health is reduced below 0 after the adjustment, then increase it back to 0
-		if (playerShipVariables.ship.health < 0)
-			playerShipVariables.ship.health = 0;
-	}
-
-	public void AddEntriesToCurrentLogPool(int logID) {
-		for (int i = 0; i < captainsLogEntries.Length; i++) {
-			if (captainsLogEntries[i].settlementID == logID) {
-				currentLogPool.Add(captainsLogEntries[i]);
-			}
-		}
-	}
-
-	public void RemoveEntriesFromCurrentLogPool(int logID) {
-		currentLogPool.RemoveAll(entry => entry.settlementID == logID);
-	}
-
-	public CaptainsLogEntry GetRandomCaptainsLogFromPool() => currentLogPool.RandomElement();
-
-
-
-	//====================================================================================================
-	//    OTHER FUNCTIONS
-	//====================================================================================================   
-	
-	public float GetOverallCloutModifier(int settlementID) {
-		//This is the main function that processes ALL clout-based modifiers and returns a floating point value 0-1
-		//	--to represent the influence level the player has at any particular moment in an interaction. This
-		//	--interaction might be through the buying and selling of goods, interactions with other settlements,
-		//	--or interactions with pirates and random events.
-		float finalModifier = 0;
-
-		float playerClout = 0;
-		float calculatedCrewClout = 0;
-		float playerNetworkModifier = 0;
-		float playerOriginNetworkModifier = 0;
-		float crewMembersNetworkModifier = 0;
-
-		//###### First get the player's clout and convert it to a 0-100 value
-		playerClout = playerShipVariables.ship.playerClout;
-
-		playerClout = (int)Math.Floor((playerClout / 5000) * 100); //5000 is the cap so we divide the current amount to get the 0/1 ratio
-
-		//###### Next we need to cycle through all the crew members and tally up the clout there
-		//	--This will be a 1 - 100 value that is a sum of of percentage of total possible clout
-		//	--e.g. if there are 10 crew members, the total possible clout is 50,000--if it adds
-		//	--up to 25,000, the returned clout is 50--or 50%
-		float sumOfCrewClout = 0;
-		foreach (CrewMember member in playerShipVariables.ship.crewRoster) {
-			sumOfCrewClout += member.clout;
-		}
-		//Here's where we divide the sum by the total possible clout on board the ship--clout will ALWAYS be between 1 - 100
-		calculatedCrewClout = sumOfCrewClout / (playerShipVariables.ship.crewRoster.Count * 100);
-
-		//###### Now we need to determine whether or not the current city (or representative thereof) 
-		//	--is part of the player's individual network--if it is the value is 100, otherwise it's 50.
-		//	--the player's individual network is ALL the settlements he/she knows of in their knowledgebase--not necessarily IN it's main attached network like the Samothrace network of influence
-		foreach (int playerNetworkID in playerShipVariables.ship.playerJournal.knownSettlements) {
-			if (playerNetworkID == settlementID) {
-				playerNetworkModifier = 100f;
-			}
-			else {
-				playerNetworkModifier = 0f;
-			}
-		}
-
-		//###### Now we need to determine whether or not the current city (or representative thereof) 
-		//	--is part of the player's hometown/main network(s), e.g. if the player and city is part of the Samothracian network
-		Debug.Log("DEBUG SETTLEMENT ID:  " + settlementID);
-		//If there is no city attached(settlementID == 0) then we are in open waters so return 0
-		if (settlementID != 0) {
-			foreach (int playerNetworkID in playerShipVariables.ship.networks) {
-				foreach (int settlementNetID in GetSettlementFromID(settlementID).networks) {
-					//If we find a network match through the network ID then return the city's population to represent its influence in the network
-					//	--if we don't find a match, a value of 0 is returned			
-					if (playerNetworkID == settlementNetID) {
-						playerOriginNetworkModifier = GetSettlementFromID(settlementID).population;
-					}
-					else {
-						playerOriginNetworkModifier = 0f;
-					}
-				}
-
-			}
-		}
-		else {
-			playerNetworkModifier = 0f;
-		}
-
-		//###### Now let's find out if ANY of the crewmembers' origin towns are connected with this settlement ID of interest
-		//	--If there is a member, then return a value of 50, otherwise a value of 0. This value (50) is less than the
-		//	--players home town/network(s), because the player is the captain--and assumedly has more influence in that sense.
-		//If there is no city attached(settlementID == 0) then we are in open waters so return 0
-		if (settlementID != 0) {
-			foreach (CrewMember member in playerShipVariables.ship.crewRoster) {
-				foreach (int crewNetworkID in GetSettlementFromID(member.originCity).networks) {
-					foreach (int settlementNetID in GetSettlementFromID(settlementID).networks) {
-						//If we find a network match through the network ID then return the city's population / 2 to represent its influence in the network
-						//	--if we don't find a match, a value of 0 is returned			
-						if (crewNetworkID == settlementNetID) {
-							crewMembersNetworkModifier = GetSettlementFromID(settlementID).population / 2f;
-						}
-						else {
-							crewMembersNetworkModifier = 0f;
-						}
-					}
-				}
-
-			}
-		}
-
-		//###### Now that we have all of our clout values, the sum total will be out of 500 possible points
-		//	--the player's own clout is weighted at double, the crew modifiers are weighted both at half, and the players network modifers are weighted as normal (1)
-		finalModifier = (playerClout * 2) + (calculatedCrewClout / 2) + playerNetworkModifier + playerOriginNetworkModifier + (crewMembersNetworkModifier / 2);
-		finalModifier /= 500;
-		//We return the final percentage point modifier. It will be between 0-1
-		return finalModifier;
-
-	}
-
-
-	public bool CheckIfShipBackAtLoanOriginPort() {
-		bool isAtPort = false;
-		if (playerShipVariables.ship.currentLoan.settlementOfOrigin == currentSettlement.settlementID) {
-			isAtPort = true;
-		}
-		else {
-			isAtPort = false;
-		}
-
-		return isAtPort;
-
-
-	}
-
-
-	public void ShowANotificationMessage(string message) {
-		//First check if we have a primary message going already
-		if (NotificationQueued) {
-			//if we do then queue up a secondary message
-			// KD: This secondary notif concept was never fully implemented so I'm just removing it for now. I think what this should really do is just pop up stacked modals on top of each other
-			// and you can click through each one, but i'm holding on that for now. It just won't show the second notification (which preserves what the code was doing before since they never showed)
-			//_showSecondaryNotification = true;
-			//_secondaryNotificationMessage = message;
-			//otherwise show a normal primary message
-		}
-		else {
-			NotificationQueued = true;
-			QueuedNotificationMessage = message;
-		}
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -255,7 +255,7 @@ public class PetteiaGameController : MonoBehaviour
 
 			if (Globals.GameVars != null) 
 			{
-				Globals.GameVars.playerShipVariables.ship.AddToFoodAndWater(reward);
+				Globals.Session.playerShipVariables.ship.AddToFoodAndWater(reward);
 			}
 
 			mgScreen.DisplayText("Petteia Victory", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);

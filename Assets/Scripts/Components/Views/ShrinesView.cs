@@ -9,18 +9,18 @@ using UnityEngine.UI;
 
 public class ShrinesViewModel : Model
 {
-	GameVars GameVars => Globals.GameVars;
+	GameSession Session => Globals.Session;
 
 	int BaseCost {
 		get {
 			int baseCost = 0;
 			//We need to do a clout check as well as a network checks
-			int baseModifier = Mathf.CeilToInt(1000 - (200 * GameVars.GetOverallCloutModifier(GameVars.currentSettlement.settlementID)));
-			if (GameVars.Network.CheckIfCityIDIsPartOfNetwork(GameVars.currentSettlement.settlementID)) {
-				baseCost = Mathf.CeilToInt(GameVars.currentSettlement.tax_network * baseModifier * 1);
+			int baseModifier = Mathf.CeilToInt(1000 - (200 * Session.GetOverallCloutModifier(Session.currentSettlement.settlementID)));
+			if (Session.Network.CheckIfCityIDIsPartOfNetwork(Session.currentSettlement.settlementID)) {
+				baseCost = Mathf.CeilToInt(Session.currentSettlement.tax_network * baseModifier * 1);
 			}
 			else {
-				baseCost = Mathf.CeilToInt(GameVars.currentSettlement.tax_neutral * baseModifier * 1);
+				baseCost = Mathf.CeilToInt(Session.currentSettlement.tax_neutral * baseModifier * 1);
 			}
 			return baseCost;
 		}

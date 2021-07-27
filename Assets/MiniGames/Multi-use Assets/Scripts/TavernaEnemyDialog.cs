@@ -18,14 +18,14 @@ public class TavernaEnemyDialog : TavernaMiniGameDialog
 
 		//These null checks are for testing purposes, so you can run this script in a scene without the main scene loaded additively in the background
 		if (Globals.GameVars != null) {
-			crew = Globals.GameVars.currentSettlement.availableCrew.RandomElement();
+			crew = Globals.Session.currentSettlement.availableCrew.RandomElement();
 			enemyName.text = crew.name;
 			enemyImage.sprite = Resources.Load<Sprite>(ResourcePath + "/" + crew.ID) ?? Resources.Load<Sprite>(DefaultPortrait);
 		}
 
 		if (Globals.GameVars != null) {
-			insultingTexts = Globals.GameVars.tavernaGameInsults;
-			braggingTexts = Globals.GameVars.tavernaGameBragging;
+			insultingTexts = Globals.Database.tavernaGameInsults;
+			braggingTexts = Globals.Database.tavernaGameBragging;
 		}
 		else {
 			braggingTexts = new List<string> { "Enemy brag 1", "Enemy brag 2" };

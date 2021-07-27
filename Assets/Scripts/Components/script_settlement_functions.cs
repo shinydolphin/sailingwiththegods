@@ -32,8 +32,8 @@ public class script_settlement_functions : MonoBehaviour, IPointerEnterHandler, 
 		//turn the ring on
 		GameVars.selection_ring.SetActive(true);
 
-		GameVars.currentSettlementGameObject = gameObject;
-		GameVars.currentSettlement = thisSettlement;
+		Session.currentSettlementGameObject = gameObject;
+		Session.currentSettlement = thisSettlement;
 
 	}
 	*/
@@ -47,7 +47,7 @@ public class script_settlement_functions : MonoBehaviour, IPointerEnterHandler, 
 	}
 
 	void TryShowTooltip() {
-		if (!Globals.UI.IsShown<CityView>() && !GameVars.IsCutsceneMode) {
+		if (!Globals.UI.IsShown<CityView>() && !Globals.Session.IsCutsceneMode) {
 			var ui = Globals.UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(thisSettlement, null));
 			ui.transform.position = Globals.UI.WorldToUI(GameVars.FPVCamera.GetComponent<Camera>(), transform.position);
 		}

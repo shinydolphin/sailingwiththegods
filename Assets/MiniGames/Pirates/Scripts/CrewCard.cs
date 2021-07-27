@@ -131,7 +131,7 @@ public class CrewCard : MonoBehaviour
 			Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
 				Icon = crewImage.sprite,
 				Title = crew.name,
-				Subtitle = Globals.GameVars.GetJobClassEquivalency(crew.typeOfCrew),
+				Subtitle = Globals.Database.GetJobClassEquivalency(crew.typeOfCrew),
 				Message = crew.backgroundInfo
 			})
 		}));

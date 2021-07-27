@@ -14,6 +14,9 @@ public class GameViewModel : Model
 	}
 
 	GameVars GameVars => Globals.GameVars;
+	GameSession Session => Globals.Session;
+	Notifications Notifications => Globals.Notifications;
+	MainState MainState => Globals.MainState;
 
 	// happens once crew is selected and we're putting the player in game
 	public void GUI_startMainGame() {
@@ -26,14 +29,14 @@ public class GameViewModel : Model
 		GameVars.FPVCamera.SetActive(true);
 
 		//Turn on the player distance fog wall
-		GameVars.playerShipVariables.fogWall.SetActive(true);
+		Session.playerShipVariables.fogWall.SetActive(true);
 
 		//Now change titleScreen to false
-		GameVars.isTitleScreen = false;
-		GameVars.isStartScreen = false;
+		MainState.isTitleScreen = false;
+		MainState.isStartScreen = false;
 
 		//Now enable the controls
-		GameVars.controlsLocked = false;
+		Session.controlsLocked = false;
 
 		//Initiate the main questline
 		Globals.Quests.InitiateMainQuestLineForPlayer();
@@ -51,9 +54,9 @@ public class GameViewModel : Model
 	// TODO: This flow skips StartMainGame, so does some of the same stuff. Should merge if we can.
 	public void GUI_loadGame(Difficulty difficulty) {
 		if (GameVars.LoadSavedGame()) {
-			GameVars.isLoadedGame = true;
-			GameVars.isTitleScreen = false;
-			GameVars.isStartScreen = false;
+			MainState.isLoadedGame = true;
+			MainState.isTitleScreen = false;
+			MainState.isStartScreen = false;
 
 			Globals.UI.Hide<TitleScreen>();
 
@@ -66,40 +69,40 @@ public class GameViewModel : Model
 			//Now turn on the main player controls camera
 			GameVars.FPVCamera.SetActive(true);
 			//Turn on the player distance fog wall
-			GameVars.playerShipVariables.fogWall.SetActive(true);
+			Session.playerShipVariables.fogWall.SetActive(true);
 			//Now enable the controls
-			GameVars.controlsLocked = false;
+			Session.controlsLocked = false;
 			//Set the player's initial position to the new position
-			GameVars.playerShipVariables.lastPlayerShipPosition = GameVars.playerShip.transform.position;
+			Session.playerShipVariables.lastPlayerShipPosition = Session.playerShip.transform.position;
 			//Update Ghost Route
 			GameVars.LoadSavedGhostRoute();
 
 
 			//Setup Difficulty Level
-			if (difficulty == Difficulty.Normal) GameVars.gameDifficulty_Beginner = false;
-			else GameVars.gameDifficulty_Beginner = true;
+			if (difficulty == Difficulty.Normal) Session.gameDifficulty_Beginner = false;
+			else Session.gameDifficulty_Beginner = true;
 			GameVars.SetupBeginnerGameDifficulty();
 
 			//Turn on the ship HUD
 			Globals.UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
-			
-			GameVars.controlsLocked = false;
+
+			Session.controlsLocked = false;
 			//Flag the main GUI scripts to turn on
-			GameVars.runningMainGameGUI = true;
+			MainState.runningMainGameGUI = true;
 		}
 	}
 
 	// happens upon clicking the new game button on the title screen
 	public void GUI_startNewGame(Difficulty difficulty) {
-		GameVars.isTitleScreen = false;
-		GameVars.isStartScreen = true;
+		MainState.isTitleScreen = false;
+		MainState.isStartScreen = true;
 
 		Globals.UI.Hide<TitleScreen>();
 
 		GameVars.FillNewGameCrewRosterAvailability();
 
-		if (difficulty == Difficulty.Normal) GameVars.gameDifficulty_Beginner = false;
-		else GameVars.gameDifficulty_Beginner = true;
+		if (difficulty == Difficulty.Normal) Session.gameDifficulty_Beginner = false;
+		else Session.gameDifficulty_Beginner = true;
 		GameVars.SetupBeginnerGameDifficulty();
 
 		// since we're skipping crew select, force pick the first StartingCrewSize members
@@ -120,7 +123,7 @@ public class GameViewModel : Model
 	//-----------------------------------------------------
 	//THIS IS THE SAVE DATA BUTTON
 	public void GUI_saveGame() {
-		GameVars.ShowANotificationMessage("Saved Data File 'player_save_game.txt' To: " + Application.persistentDataPath + "/");
+		Notifications.ShowANotificationMessage("Saved Data File 'player_save_game.txt' To: " + Application.persistentDataPath + "/");
 		GameVars.SaveUserGameData();
 	}
 

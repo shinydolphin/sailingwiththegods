@@ -65,7 +65,7 @@ public static class CSVLoader
 			settlement.foreignerFeePercent = float.Parse(records[afterCargo + 8]);
 			settlement.ellimenionPercent = float.Parse(records[afterCargo + 9]);
 			settlement.coinText = records[afterCargo + 10];
-			settlement.Region = Globals.GameVars.GetRegionByName(records[afterCargo + 11]);
+			settlement.Region = Globals.Database.GetRegionByName(records[afterCargo + 11]);
 
 			settlement_masterList.Add(id, settlement);
 		}

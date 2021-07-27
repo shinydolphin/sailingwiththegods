@@ -14,7 +14,7 @@ public enum TradeAction
 
 public class TradeViewModel : CityViewModel
 {
-	public Ship Ship => GameVars.playerShipVariables.ship;
+	public Ship Ship => Session.playerShipVariables.ship;
 
 	public readonly ICollectionModel<CargoItemTradeViewModel> Available;
 	public readonly ICollectionModel<CargoItemTradeViewModel> Mine;
@@ -25,7 +25,7 @@ public class TradeViewModel : CityViewModel
 	private CargoItemTradeViewModel _Selected;
 	public CargoItemTradeViewModel Selected { get => _Selected; set { _Selected = value; Notify(); } }
 
-	public string Capacity => Mathf.RoundToInt(GameVars.playerShipVariables.ship.CurrentCargoKg) + " / " + Mathf.RoundToInt(GameVars.playerShipVariables.ship.cargo_capicity_kg) + " kg";
+	public string Capacity => Mathf.RoundToInt(Session.playerShipVariables.ship.CurrentCargoKg) + " / " + Mathf.RoundToInt(Session.playerShipVariables.ship.cargo_capicity_kg) + " kg";
 
 	public BoundModel<int> Money;
 
@@ -36,20 +36,20 @@ public class TradeViewModel : CityViewModel
 	private int heraldUses;
 	private CargoItemTradeViewModel heraldTarget;
 
-	public TradeViewModel(Sprite herald = null, Sprite noHerald = null, bool justWater = false, bool portAccess = true, float heraldMod = 1.0f) : base(Globals.GameVars.currentSettlement, null) 
+	public TradeViewModel(Sprite herald = null, Sprite noHerald = null, bool justWater = false, bool portAccess = true, float heraldMod = 1.0f) : base(Globals.Session.currentSettlement, null) 
 	{
 		noHeraldIcon = noHerald;
 		heraldEffect = heraldMod;
 		portAccess = justWater ? false : portAccess;
 
-		Money = new BoundModel<int>(GameVars.playerShipVariables.ship, nameof(GameVars.playerShipVariables.ship.currency));
+		Money = new BoundModel<int>(Session.playerShipVariables.ship, nameof(Session.playerShipVariables.ship.currency));
 
 		// just wrap these non-observable lists as the resource list is static. only the contents change
-		Available = ValueModel.Wrap(new ObservableCollection<CargoItemTradeViewModel>(GameVars.currentSettlement.cargo
+		Available = ValueModel.Wrap(new ObservableCollection<CargoItemTradeViewModel>(Session.currentSettlement.cargo
 			.Where(r => r.amount_kg > 0)
 			.Select(r => new CargoItemTradeViewModel(TradeAction.Buy, r, this))
 		));
-		Mine = ValueModel.Wrap(new ObservableCollection<CargoItemTradeViewModel>(GameVars.playerShipVariables.ship.cargo
+		Mine = ValueModel.Wrap(new ObservableCollection<CargoItemTradeViewModel>(Session.playerShipVariables.ship.cargo
 			.Where(r => r.amount_kg > 0)
 			.Select(r => new CargoItemTradeViewModel(TradeAction.Sell, r, this))
 		));
@@ -128,14 +128,14 @@ public class TradeViewModel : CityViewModel
 	}
 
 	void ChangeSettlementCargo(string resourceName, float changeAmount) {
-		GameVars.currentSettlement.GetCargoByName(resourceName).amount_kg += changeAmount;
+		Session.currentSettlement.GetCargoByName(resourceName).amount_kg += changeAmount;
 	}
 
 	void ChangeShipCargo(string resourceName, int changeAmount, float priceMod) 
 	{
 		float price = 0.0f;
 
-		int unitPrice = GameVars.Trade.GetPriceOfResource(resourceName, GameVars.currentSettlement);
+		int unitPrice = Session.Trade.GetPriceOfResource(resourceName, Session.currentSettlement);
 
 		//if you're selling and there's a herald in play and this is what's being boosted, check the price
 		if (changeAmount < 0 && heraldTarget != null && heraldTarget.Name == resourceName) 
@@ -173,18 +173,18 @@ public class TradeViewModel : CityViewModel
 		}
 
 		
-		//Debug.Log(resourceName + "  :  " + GameVars.playerShipVariables.ship.GetCargoByName(resourceName).amount_kg + "  :  " + changeAmount);
-		GameVars.playerShipVariables.ship.GetCargoByName(resourceName).amount_kg += changeAmount;
+		//Debug.Log(resourceName + "  :  " + Session.playerShipVariables.ship.GetCargoByName(resourceName).amount_kg + "  :  " + changeAmount);
+		Session.playerShipVariables.ship.GetCargoByName(resourceName).amount_kg += changeAmount;
 		//we use a (-) change amount here because the changeAmount reflects the direction of the goods
 		//e.g. if the player is selling--they are negative in cargo---but their currency is positive and vice versa.
-		GameVars.playerShipVariables.ship.currency += Mathf.FloorToInt(-price);
+		Session.playerShipVariables.ship.currency += Mathf.FloorToInt(-price);
 	}
 
 	// REFERENCED IN BUTTON CLICK UNITYEVENT
 	public void GUI_Buy_Resources(CargoItemTradeViewModel item, int amount) {
 		Debug.Log(item.Name + " : " + amount);
 
-		int amountToBuy = GameVars.Trade.AdjustBuy(amount, item.Name);
+		int amountToBuy = Session.Trade.AdjustBuy(amount, item.Name);
 		if (amountToBuy > 0) {
 
 			// these change the values in our model too, just need to notify
@@ -195,7 +195,7 @@ public class TradeViewModel : CityViewModel
 			// probably need to write some sort of wrapper that watches for amount == 0 and does this automatically
 			var mine = Mine.FirstOrDefault(n => n.Name == item.Name);
 			if (mine == null) {
-				mine = new CargoItemTradeViewModel(TradeAction.Sell, GameVars.playerShipVariables.ship.GetCargoByName(item.Name), this);
+				mine = new CargoItemTradeViewModel(TradeAction.Sell, Session.playerShipVariables.ship.GetCargoByName(item.Name), this);
 				Mine.Add(mine);
 			}
 
@@ -214,7 +214,7 @@ public class TradeViewModel : CityViewModel
 	public void GUI_Sell_Resources(CargoItemTradeViewModel item, int amount) {
 		//Debug.Log(item.Name + " : " + amount);
 
-		int amountToSell = GameVars.Trade.AdjustSell(amount, item.Name);
+		int amountToSell = Session.Trade.AdjustSell(amount, item.Name);
 		if (amountToSell > 0) {
 
 			// these change the values in our model too, just need to notify
@@ -225,7 +225,7 @@ public class TradeViewModel : CityViewModel
 			// probably need to write some sort of wrapper that watches for amount == 0 and does this automatically
 			var available = Available.FirstOrDefault(n => n.Name == item.Name);
 			if (available == null) {
-				available = new CargoItemTradeViewModel(TradeAction.Buy, GameVars.currentSettlement.GetCargoByName(item.Name), this);
+				available = new CargoItemTradeViewModel(TradeAction.Buy, Session.currentSettlement.GetCargoByName(item.Name), this);
 				Available.Add(available);
 			}
 

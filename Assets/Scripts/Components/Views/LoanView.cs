@@ -10,46 +10,49 @@ using UnityEngine.UI;
 public class LoanViewModel : Model
 {
 	GameVars GameVars => Globals.GameVars;
+	GameSession Session => Globals.Session;
+	Database Database => Globals.Database;
+	Notifications Notifications => Globals.Notifications;
 
-	public Loan Loan => GameVars.playerShipVariables.ship.currentLoan;
+	public Loan Loan => Session.playerShipVariables.ship.currentLoan;
 	public Loan NewLoan {
 		get {
 			//Setup the initial term to repay the loan
 			float numOfDaysToPayOffLoan = 10;
 			//Determine the base loan amount off the city's population
-			float baseLoanAmount = 500 * (GameVars.currentSettlement.population / 1000);
+			float baseLoanAmount = 500 * (Session.currentSettlement.population / 1000);
 			//If base loan amount is less than 200 then make it 200 as the smallest amount available
 			if (baseLoanAmount < 200f) baseLoanAmount = 200f;
 			//Determine the actual loan amount off the player's clout
-			int loanAmount = (int)(baseLoanAmount + (baseLoanAmount * GameVars.GetOverallCloutModifier(GameVars.currentSettlement.settlementID)));
+			int loanAmount = (int)(baseLoanAmount + (baseLoanAmount * Session.GetOverallCloutModifier(Session.currentSettlement.settlementID)));
 			//Determmine the base interest rate of the loan off the city's population
-			float baseInterestRate = 10 + (GameVars.currentSettlement.population / 1000);
+			float baseInterestRate = 10 + (Session.currentSettlement.population / 1000);
 			//Determine finalized interest rate after determining player's clout
-			float finalInterestRate = (float)System.Math.Round(baseInterestRate - (baseInterestRate * GameVars.GetOverallCloutModifier(GameVars.currentSettlement.settlementID)), 3);
+			float finalInterestRate = (float)System.Math.Round(baseInterestRate - (baseInterestRate * Session.GetOverallCloutModifier(Session.currentSettlement.settlementID)), 3);
 
 			//Create the Loan object for our button to process		
-			return new Loan(loanAmount, finalInterestRate, numOfDaysToPayOffLoan, GameVars.currentSettlement.settlementID);
+			return new Loan(loanAmount, finalInterestRate, numOfDaysToPayOffLoan, Session.currentSettlement.settlementID);
 		}
 	}
 
-	public bool IsAtOriginPort => GameVars.CheckIfShipBackAtLoanOriginPort();
-	public Settlement OriginPort => Loan != null ? GameVars.GetSettlementFromID(Loan.settlementOfOrigin) : null;
+	public bool IsAtOriginPort => Session.CheckIfShipBackAtLoanOriginPort();
+	public Settlement OriginPort => Loan != null ? Database.GetSettlementFromID(Loan.settlementOfOrigin) : null;
 
 	public void GUI_PayBackLoan() {
 		var amountDue = Loan.GetTotalAmountDueWithInterest();
 
 		//Pay the loan back if the player has the currency to do it
-		if (GameVars.playerShipVariables.ship.currency > amountDue) {
-			GameVars.playerShipVariables.ship.currency -= amountDue;
-			GameVars.playerShipVariables.ship.currentLoan = null;
-			GameVars.ShowANotificationMessage("You paid back your loan and earned a little respect!");
+		if (Session.playerShipVariables.ship.currency > amountDue) {
+			Session.playerShipVariables.ship.currency -= amountDue;
+			Session.playerShipVariables.ship.currentLoan = null;
+			Notifications.ShowANotificationMessage("You paid back your loan and earned a little respect!");
 			//give a boost to the players clout for paying back loan
-			GameVars.AdjustPlayerClout(3);
+			Session.AdjustPlayerClout(3);
 
 			NotifyAny();
 		}
 		else {
-			GameVars.ShowANotificationMessage("You currently can't afford to pay your loan back! Better make some more money!");
+			Notifications.ShowANotificationMessage("You currently can't afford to pay your loan back! Better make some more money!");
 		}
 
 		NotifyAny();
@@ -59,9 +62,9 @@ public class LoanViewModel : Model
 		var loanAmount = NewLoan.amount;
 		var loan = NewLoan;
 
-		GameVars.playerShipVariables.ship.currentLoan = loan;
-		GameVars.playerShipVariables.ship.currency += loanAmount;
-		GameVars.ShowANotificationMessage("You took out a loan of " + loanAmount + " drachma! Remember to pay it back in due time!");
+		Session.playerShipVariables.ship.currentLoan = loan;
+		Session.playerShipVariables.ship.currency += loanAmount;
+		Notifications.ShowANotificationMessage("You took out a loan of " + loanAmount + " drachma! Remember to pay it back in due time!");
 
 		NotifyAny();
 	}

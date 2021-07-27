@@ -52,7 +52,7 @@ public class Dashboard : ViewBehaviour<DashboardViewModel>
 		// TODO: make 5000 max clout a const somewhere
 		CloutSlider.Bind(Model.Clout.Select(c => c / 5000f));
 		CloutTitle.Bind(ValueModel.Wrap(Model.Clout)
-			.Select(c => Globals.GameVars.GetCloutTitleEquivalency((int)c)));
+			.Select(c => Globals.Database.GetCloutTitleEquivalency((int)c)));
 
 		FoodInventory.Bind(Model.FoodInventory);
 		WaterInventory.Bind(Model.WaterInventory);

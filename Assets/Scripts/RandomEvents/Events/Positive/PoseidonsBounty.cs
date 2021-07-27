@@ -27,6 +27,6 @@ public class PoseidonsBounty : RandomEvents.PositiveEvent
 			"obviously it is a test by Poseidon on our avarice! We continue on our journey--despite the grumblings of the crew.";
 		}
 
-		gameVars.ShowANotificationMessage(finalMessage);
+		Globals.Notifications.ShowANotificationMessage(finalMessage);
 	}
 }

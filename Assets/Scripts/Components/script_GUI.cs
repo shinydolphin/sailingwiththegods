@@ -38,6 +38,8 @@ using UnityEngine.UI;
 
 public class script_GUI : MonoBehaviour
 {
+	Notifications Notifications => Globals.Notifications;
+	Database Database => Globals.Database;
 
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
@@ -128,7 +130,10 @@ public class script_GUI : MonoBehaviour
 
 	//===================================
 	// OTHER VARS
-	GameVars GameVars;
+	MainState MainState => Globals.MainState;
+	GameVars GameVars => Globals.GameVars;
+	GameSession Session => Globals.Session;
+
 	public GameObject player_currency;
 	public GameObject player_current_cargo;
 	public GameObject player_max_cargo;
@@ -162,14 +167,6 @@ public class script_GUI : MonoBehaviour
 		trade = null;
 	}
 
-	//======================================================================================================================================================================
-	//  INITIALIZE ANY NECESSARY VARIABLES
-	//======================================================================================================================================================================
-	void Start() {
-		GameVars = Globals.GameVars;
-
-	}
-
 
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
@@ -183,8 +180,8 @@ public class script_GUI : MonoBehaviour
 		//	--overhead to worry about.
 		updateLabelsForPlayerVariables();
 
-		if (GameVars.updatePlayerCloutMeter) {
-			GameVars.updatePlayerCloutMeter = false;
+		if (Session.updatePlayerCloutMeter) {
+			Session.updatePlayerCloutMeter = false;
 			GUI_UpdatePlayerCloutMeter();
 		}
 
@@ -192,40 +189,34 @@ public class script_GUI : MonoBehaviour
 		//  IF WE ARE AT THE TITLE SCREEN OR START SCREEN
 		//=====================================================================================================================================	
 
-		if (!GameVars.runningMainGameGUI) {
+		if (!MainState.runningMainGameGUI) {
 
 			//=====================================================================================================================================
 			// IF WE ARE AT THE TITLE SCREEN
-			if (GameVars.isTitleScreen) {
+			if (MainState.isTitleScreen) {
 
 				Globals.UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
-				GameVars.isTitleScreen = false;			// TODO: Make this based on an event rather than this hacky one-time execution style.
+				MainState.isTitleScreen = false;			// TODO: Make this based on an event rather than this hacky one-time execution style.
 			}
 
 			//=====================================================================================================================================	
 			// IF WE ARE AT THE START SCREEN	-- SHOW START SCREEN GUI
 
 
-			if (GameVars.isStartScreen) {
+			if (MainState.isStartScreen) {
 
 
 
 
 			}
 
-			//`````````````````````````````````````````````````````````````````
-			//Check to see if we need to show any generic notifications ?
-			if (GameVars.NotificationQueued) {
-				ShowNotification(GameVars.QueuedNotificationMessage);
-				GameVars.menuControlsLock = true;
-				GameVars.ConsumeNotification();
-			}
+			Notifications.Pump();
 
 			//=====================================================================================================================================	
 			//  IF WE AREN'T AT THE TITLE SCREEN OR START SCREEN
 			//=====================================================================================================================================	
 		}
-		else if (GameVars.runningMainGameGUI) {
+		else if (MainState.runningMainGameGUI) {
 
 			//----------------------------------------------------------------------------------------------------------
 			//      ALL static GUI elements go here for normail gameplay, e.g. ship stats, etc.
@@ -234,19 +225,19 @@ public class script_GUI : MonoBehaviour
 			//`````````````````````````````````````````````````````````````````
 			// 	SHIP STATS GUI
 			//Debug.Log ("Updating stats?");
-			hud_waterStores.GetComponent<Text>().text = ((int)GameVars.playerShipVariables.ship.cargo[0].amount_kg).ToString();
-			hud_provisions.GetComponent<Text>().text = ((int)GameVars.playerShipVariables.ship.cargo[1].amount_kg).ToString();
-			hud_shipHealth.GetComponent<Text>().text = ((int)GameVars.playerShipVariables.ship.health).ToString();
-			hud_daysTraveled.GetComponent<Text>().text = (Mathf.Round(GameVars.playerShipVariables.ship.totalNumOfDaysTraveled * 1000.0f) / 1000.0f).ToString();
-			hud_daysThirsty.GetComponent<Text>().text = (GameVars.playerShipVariables.dayCounterThirsty).ToString();
-			hud_daysStarving.GetComponent<Text>().text = (GameVars.playerShipVariables.dayCounterStarving).ToString();
-			hud_currentSpeed.GetComponent<Text>().text = (Mathf.Round(GameVars.playerShipVariables.current_shipSpeed_Magnitude * 1000.0f) / 1000.0f).ToString();
-			hud_crewmember_count.GetComponent<Text>().text = (GameVars.playerShipVariables.ship.crew).ToString();
-			hud_playerClout.GetComponent<Text>().text = GameVars.GetCloutTitleEquivalency((int)(Mathf.Round(GameVars.playerShipVariables.ship.playerClout * 1000.0f) / 1000.0f));
+			hud_waterStores.GetComponent<Text>().text = ((int)Session.playerShipVariables.ship.cargo[0].amount_kg).ToString();
+			hud_provisions.GetComponent<Text>().text = ((int)Session.playerShipVariables.ship.cargo[1].amount_kg).ToString();
+			hud_shipHealth.GetComponent<Text>().text = ((int)Session.playerShipVariables.ship.health).ToString();
+			hud_daysTraveled.GetComponent<Text>().text = (Mathf.Round(Session.playerShipVariables.ship.totalNumOfDaysTraveled * 1000.0f) / 1000.0f).ToString();
+			hud_daysThirsty.GetComponent<Text>().text = (Session.playerShipVariables.dayCounterThirsty).ToString();
+			hud_daysStarving.GetComponent<Text>().text = (Session.playerShipVariables.dayCounterStarving).ToString();
+			hud_currentSpeed.GetComponent<Text>().text = (Mathf.Round(Session.playerShipVariables.current_shipSpeed_Magnitude * 1000.0f) / 1000.0f).ToString();
+			hud_crewmember_count.GetComponent<Text>().text = (Session.playerShipVariables.ship.crew).ToString();
+			hud_playerClout.GetComponent<Text>().text = Database.GetCloutTitleEquivalency((int)(Mathf.Round(Session.playerShipVariables.ship.playerClout * 1000.0f) / 1000.0f));
 			//`````````````````````````````````````````````````````````````````
 			// DOCKING BUTTON -- other GUI button click handlers are done in the editor--These are done here because the button's behavior changes based on other variables. The others do not
-			if (GameVars.showSettlementTradeButton) { hud_button_dock.transform.GetChild(0).GetComponent<Text>().text = "CLICK TO \n  DOCK WITH \n" + GameVars.currentSettlement.name; hud_button_dock.GetComponent<Button>().onClick.RemoveAllListeners(); hud_button_dock.GetComponent<Button>().onClick.AddListener(() => GUI_checkOutOrDockWithPort(true)); }
-			else if (GameVars.showNonPortDockButton) { hud_button_dock.transform.GetChild(0).GetComponent<Text>().text = "CHECK OUT \n" + GameVars.currentSettlement.name; hud_button_dock.GetComponent<Button>().onClick.RemoveAllListeners(); hud_button_dock.GetComponent<Button>().onClick.AddListener(() => GUI_checkOutOrDockWithPort(true)); }
+			if (Session.showSettlementTradeButton) { hud_button_dock.transform.GetChild(0).GetComponent<Text>().text = "CLICK TO \n  DOCK WITH \n" + Session.currentSettlement.name; hud_button_dock.GetComponent<Button>().onClick.RemoveAllListeners(); hud_button_dock.GetComponent<Button>().onClick.AddListener(() => GUI_checkOutOrDockWithPort(true)); }
+			else if (Session.showNonPortDockButton) { hud_button_dock.transform.GetChild(0).GetComponent<Text>().text = "CHECK OUT \n" + Session.currentSettlement.name; hud_button_dock.GetComponent<Button>().onClick.RemoveAllListeners(); hud_button_dock.GetComponent<Button>().onClick.AddListener(() => GUI_checkOutOrDockWithPort(true)); }
 			else { hud_button_dock.transform.GetChild(0).GetComponent<Text>().text = "DOCKING \n CURRENTLY \n UNAVAILABLE"; hud_button_dock.GetComponent<Button>().onClick.RemoveAllListeners(); }
 
 
@@ -256,31 +247,25 @@ public class script_GUI : MonoBehaviour
 
 			//`````````````````````````````````````````````````````````````````
 			//WE ARE SHOWING A YES / NO  PORT TAX NOTIFICATION POP UP	?
-			if (GameVars.showPortDockingNotification) {
-				GameVars.showPortDockingNotification = false;
-				GameVars.menuControlsLock = true;
+			if (Session.showPortDockingNotification) {
+				Session.showPortDockingNotification = false;
+				MainState.menuControlsLock = true;
 				GUI_ShowPortDockingNotification();
 			}
-			else if (GameVars.showNonPortDockingNotification) {
-				GameVars.menuControlsLock = true;
-				GameVars.showNonPortDockingNotification = false;
+			else if (Session.showNonPortDockingNotification) {
+				MainState.menuControlsLock = true;
+				Session.showNonPortDockingNotification = false;
 				GUI_ShowNonPortDockingNotification();
 			}
 
-			//`````````````````````````````````````````````````````````````````
-			//Check to see if we need to show any generic notifications ?
-			if (GameVars.NotificationQueued) {
-				ShowNotification(GameVars.QueuedNotificationMessage);
-				GameVars.menuControlsLock = true;
-				GameVars.ConsumeNotification();
-			}
+			Notifications.Pump();
 
 			//`````````````````````````````````````````````````````````````````
 			// GAME OVER GUI (prevent blocking a more important UI if one is up using menuControlIsLock to check)
-			if (GameVars.isGameOver && !GameVars.menuControlsLock) {
-				GameVars.menuControlsLock = true;
+			if (MainState.isGameOver && !MainState.menuControlsLock) {
+				MainState.menuControlsLock = true;
 				GUI_ShowGameOverNotification();
-				GameVars.isGameOver = false;
+				MainState.isGameOver = false;
 			}
 
 
@@ -288,10 +273,10 @@ public class script_GUI : MonoBehaviour
 
 			//`````````````````````````````````````````````````````````````````
 			// WIN THE GAME GUI
-			if (GameVars.gameIsFinished) {
-				GameVars.menuControlsLock = true;
+			if (MainState.gameIsFinished) {
+				MainState.menuControlsLock = true;
 				GUI_ShowGameIsFinishedNotification();
-				GameVars.gameIsFinished = false;
+				MainState.gameIsFinished = false;
 			}
 
 		}
@@ -331,7 +316,7 @@ public class script_GUI : MonoBehaviour
 	//   GAME OVER NOTIFICATIONS AND COMPONENTS
 
 	public void GUI_ShowGameOverNotification() {
-		GameVars.controlsLocked = true;
+		Session.controlsLocked = true;
 		//Set the notification window as active
 		gameover_main.SetActive(true);
 		//Setup the GameOver Message
@@ -343,7 +328,7 @@ public class script_GUI : MonoBehaviour
 	}
 
 	public void GUI_ShowGameIsFinishedNotification() {
-		GameVars.controlsLocked = true;
+		Session.controlsLocked = true;
 		//Set the notification window as active
 		gameover_main.SetActive(true);
 		//Setup the GameOver Message
@@ -357,7 +342,7 @@ public class script_GUI : MonoBehaviour
 
 	public void GUI_RestartGame() {
 		gameover_main.SetActive(false);
-		GameVars.menuControlsLock = false;
+		MainState.menuControlsLock = false;
 		//Restart from Beginning
 		GameVars.RestartGame();
 	}
@@ -371,9 +356,9 @@ public class script_GUI : MonoBehaviour
 		//Show the non port notification window
 		nonport_info_main.SetActive(true);
 		//Set the title
-		nonport_info_name.GetComponent<Text>().text = GameVars.currentSettlement.name;
+		nonport_info_name.GetComponent<Text>().text = Session.currentSettlement.name;
 		//Set the description
-		nonport_info_notification.GetComponent<Text>().text = GameVars.currentSettlement.description;
+		nonport_info_notification.GetComponent<Text>().text = Session.currentSettlement.description;
 		//Setup the okay button
 		nonport_info_okay.GetComponent<Button>().onClick.RemoveAllListeners();
 		nonport_info_okay.GetComponent<Button>().onClick.AddListener(() => GUI_ExitPortNotification());
@@ -381,31 +366,31 @@ public class script_GUI : MonoBehaviour
 
 
 	public void GUI_ShowPortDockingNotification() {
-		GameVars.controlsLocked = true;
+		Session.controlsLocked = true;
 
-		if(GameVars.crewBeacon.Target == GameVars.currentSettlement) {
-			GameVars.DeactivateNavigatorBeacon(GameVars.crewBeacon);
+		if(GameVars.crewBeacon.Target == Session.currentSettlement) {
+			Session.DeactivateNavigatorBeacon(GameVars.crewBeacon);
 		}
-		if (GameVars.navigatorBeacon.Target == GameVars.currentSettlement) {
-			GameVars.DeactivateNavigatorBeacon(GameVars.navigatorBeacon);
+		if (GameVars.navigatorBeacon.Target == Session.currentSettlement) {
+			Session.DeactivateNavigatorBeacon(GameVars.navigatorBeacon);
 		}
 
 		//if (useDialog) {
 		port_dialog.SetActive(true);
-		Debug.Log("GameVars.CurrentSettlement: " + (GameVars.currentSettlement == null ? "null" : GameVars.currentSettlement.name));
-		port_dialog.GetComponent<DialogScreen>().StartDialog(GameVars.currentSettlement, useDebugDialog ? debugDialogNode : dialogNode, "port");
+		Debug.Log("Session.currentSettlement: " + (Session.currentSettlement == null ? "null" : Session.currentSettlement.name));
+		port_dialog.GetComponent<DialogScreen>().StartDialog(Session.currentSettlement, useDebugDialog ? debugDialogNode : dialogNode, "port");
 		//}
 		//else {
 		//	//Show the port notification pop up
 		//	port_info_main.SetActive(true);
 		//	//Set the title
-		//	port_info_name.GetComponent<Text>().text = GameVars.currentSettlement.name;
+		//	port_info_name.GetComponent<Text>().text = Session.currentSettlement.name;
 		//	//Setup the message for the scroll view
 		//	string portMessage = "";
-		//	portMessage += GameVars.currentSettlement.description;
+		//	portMessage += Session.currentSettlement.description;
 		//	portMessage += "\n\n";
 		//	if (GameVars.isInNetwork) {
-		//		var crewMemberWithNetwork = GameVars.Network.CrewMemberWithNetwork(GameVars.currentSettlement);
+		//		var crewMemberWithNetwork = GameVars.Network.CrewMemberWithNetwork(Session.currentSettlement);
 		//		portMessage += "This Port is part of your network!\n";
 		//		if (crewMemberWithNetwork != null)
 		//			portMessage += "Your crewman, " + crewMemberWithNetwork.name + " assures you their connections here are strong! They should welcome you openly and waive your port taxes on entering!";
@@ -419,8 +404,8 @@ public class script_GUI : MonoBehaviour
 		//	if (GameVars.currentPortTax != 0) {
 		//		portMessage += "If you want to dock here, your tax for entering will be " + GameVars.currentPortTax + " drachma. \n";
 		//		//If the port tax will make the player go negative--alert them as they enter
-		//		if (GameVars.playerShipVariables.ship.currency - GameVars.currentPortTax < 0)
-		//			portMessage += "Docking here will put you in debt for " + (GameVars.playerShipVariables.ship.currency - GameVars.currentPortTax) + "drachma, and you may lose your ship!\n";
+		//		if (Session.playerShipVariables.ship.currency - GameVars.currentPortTax < 0)
+		//			portMessage += "Docking here will put you in debt for " + (Session.playerShipVariables.ship.currency - GameVars.currentPortTax) + "drachma, and you may lose your ship!\n";
 		//	}
 		//	else {
 		//		portMessage += "You only have food and water stores on board, with no taxable goods. Thankfully you will dock for free!";
@@ -442,28 +427,28 @@ public class script_GUI : MonoBehaviour
 	public void GUI_ExitPortNotification() {
 		//Turn off both nonport AND port notification windows
 		//port_info_main.SetActive(false);
-		GameVars.showPortDockingNotification = false;
+		Session.showPortDockingNotification = false;
 		nonport_info_main.SetActive(false);
-		GameVars.showNonPortDockingNotification = false;
-		GameVars.controlsLocked = false;
-		GameVars.menuControlsLock = false;
+		Session.showNonPortDockingNotification = false;
+		Session.controlsLocked = false;
+		MainState.menuControlsLock = false;
 	}
 
 	public void GUI_EnterPort(Sprite heraldIcon = null, Sprite noHeraldIcon = null, Intention i = Intention.All, float heraldMod = 1.0f) 
 	{
 		//Turn off port welcome screen
-		GameVars.showPortDockingNotification = false;
+		Session.showPortDockingNotification = false;
 		//port_info_main.SetActive(false);
-		port_info_taxes.GetComponent<Text>().text = GameVars.currentPortTax.ToString();
+		port_info_taxes.GetComponent<Text>().text = Session.currentPortTax.ToString();
 		//Check if current Settlement is part of the main quest line
-		Globals.Quests.CheckCityTriggers(GameVars.currentSettlement.settlementID);
+		Globals.Quests.CheckCityTriggers(Session.currentSettlement.settlementID);
 		//Add this settlement to the player's knowledge base
-		//Debug.Log("Adding known city from script_GUI: " + GameVars.currentSettlement.name);
-		GameVars.playerShipVariables.ship.playerJournal.AddNewSettlementToLog(GameVars.currentSettlement.settlementID);
+		//Debug.Log("Adding known city from script_GUI: " + Session.currentSettlement.name);
+		Session.playerShipVariables.ship.playerJournal.AddNewSettlementToLog(Session.currentSettlement.settlementID);
 		//Determine what settlements are available to the player in the tavern
-		GameVars.showSettlementGUI = true;
-		GameVars.showSettlementTradeButton = false;
-		GameVars.controlsLocked = true;
+		Session.showSettlementGUI = true;
+		Session.showSettlementTradeButton = false;
+		Session.controlsLocked = true;
 
 		trade = new TradeViewModel(heraldIcon, noHeraldIcon, i.Equals(Intention.Water), i.Equals(Intention.All), heraldMod);
 		port = new PortViewModel(i.Equals(Intention.All));
@@ -481,9 +466,9 @@ public class script_GUI : MonoBehaviour
 		}
 
 		//Add a new route to the player journey log as a port entry
-		GameVars.playerShipVariables.journey.AddRoute(new PlayerRoute(GameVars.playerShip.transform.position, Vector3.zero, GameVars.currentSettlement.settlementID, GameVars.currentSettlement.name, false, GameVars.playerShipVariables.ship.totalNumOfDaysTraveled), GameVars.playerShipVariables, GameVars.CaptainsLog);
+		Session.playerShipVariables.journey.AddRoute(new PlayerRoute(Session.playerShip.transform.position, Vector3.zero, Session.currentSettlement.settlementID, Session.currentSettlement.name, false, Session.playerShipVariables.ship.totalNumOfDaysTraveled), Session.playerShipVariables, Session.CaptainsLog);
 		//We should also update the ghost trail with this route otherwise itp roduce an empty 0,0,0 position later
-		GameVars.playerShipVariables.UpdatePlayerGhostRouteLineRenderer(GameVars.IS_NOT_NEW_GAME);
+		Session.playerShipVariables.UpdatePlayerGhostRouteLineRenderer(MainState.IS_NOT_NEW_GAME);
 
 		//-------------------------------------------------
 		// UPDATE PLAYER CLOUT METER
@@ -494,8 +479,8 @@ public class script_GUI : MonoBehaviour
 		GetCrewHometowns();
 		GUI_GetListOfBuiltMonuments();
 		GUI_GetBuiltMonuments();
-		port_info_cityName.GetComponent<Text>().text = GameVars.currentSettlement.name;
-		port_info_description.GetComponent<Text>().text = GameVars.currentSettlement.description;
+		port_info_cityName.GetComponent<Text>().text = Session.currentSettlement.name;
+		port_info_description.GetComponent<Text>().text = Session.currentSettlement.description;
 	}
 
 	public void GUI_UpdatePlayerCloutMeter() {
@@ -503,7 +488,7 @@ public class script_GUI : MonoBehaviour
 		// UPDATE PLAYER CLOUT METER
 		// *This assumes the child gameobject elements of the clout meter are in order from lowest to highest. If not--then this will produce undesirable results
 		bool foundMatch = false;
-		hud_playerClout.GetComponent<Text>().text = GameVars.GetCloutTitleEquivalency((int)(Mathf.Round(GameVars.playerShipVariables.ship.playerClout * 1000.0f) / 1000.0f));
+		hud_playerClout.GetComponent<Text>().text = Database.GetCloutTitleEquivalency((int)(Mathf.Round(Session.playerShipVariables.ship.playerClout * 1000.0f) / 1000.0f));
 		for (int i = 0; i < port_info_cloutMeter.transform.childCount; i++) {
 			Transform currentCloutMeter = port_info_cloutMeter.transform.GetChild(i);
 			//Debug.Log(currentCloutMeter.name + "  =?  " + hud_playerClout.GetComponent<Text>().text);
@@ -521,8 +506,8 @@ public class script_GUI : MonoBehaviour
 	public IEnumerable<string> GUI_GetListOfPlayerNetworkCities() {
 		//Looks through the player's known settlements and adds it to a list
 		var result = new List<string>();
-		foreach (int knownSettlementID in GameVars.playerShipVariables.ship.playerJournal.knownSettlements) {
-			result.Add( GameVars.GetSettlementFromID(knownSettlementID).name );
+		foreach (int knownSettlementID in Session.playerShipVariables.ship.playerJournal.knownSettlements) {
+			result.Add( Database.GetSettlementFromID(knownSettlementID).name );
 		}
 		return result;
 	}
@@ -530,8 +515,8 @@ public class script_GUI : MonoBehaviour
 	public IEnumerable<string> GetCrewHometowns() {
 		//Looks through the hometowns of all crew and adds them to a list
 		var result = new List<string>();
-		foreach (CrewMember crewman in GameVars.playerShipVariables.ship.crewRoster) {
-			result.Add(GameVars.GetSettlementFromID(crewman.originCity).name);
+		foreach (CrewMember crewman in Session.playerShipVariables.ship.crewRoster) {
+			result.Add(Database.GetSettlementFromID(crewman.originCity).name);
 		}
 		return result;
 	}
@@ -548,7 +533,7 @@ public class script_GUI : MonoBehaviour
 		int seers = 0;
 		int other = 0;
 		string list = "";
-		foreach (CrewMember crewman in GameVars.playerShipVariables.ship.crewRoster) {
+		foreach (CrewMember crewman in Session.playerShipVariables.ship.crewRoster) {
 			switch (crewman.typeOfCrew) {
 				case CrewType.Sailor:
 					sailors++;
@@ -577,31 +562,10 @@ public class script_GUI : MonoBehaviour
 	}
 
 	public void GUI_GetBuiltMonuments() {
-		port_info_monumentsList.GetComponent<Text>().text = GameVars.playerShipVariables.ship.builtMonuments;
+		port_info_monumentsList.GetComponent<Text>().text = Session.playerShipVariables.ship.builtMonuments;
 	}
 
 
-
-	//=================================================================================================================
-	// NOTIFICATION POP-UP SYSTEM	//=================================================================================================================	
-
-	void ShowNotification(string message) {
-
-		// KD: I don't think the complexity of stacked notifications is needed. pretty sure it'd be okay to queue them up (stack them so you close one by one)
-		// also changed to the new popup which i think looks better
-		Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
-			Title = "Attention!",
-			Message = message,
-			OnClose = () => OnNotificationClose()
-	});
-		
-	}
-
-	public void OnNotificationClose() {
-		if (!Globals.UI.IsShown<PortScreen>() && !Globals.UI.IsShown<CityView>()) {
-			GameVars.menuControlsLock = false;
-		}
-	}
 
 	//=================================================================================================================
 	// HELPER FUNCTIONS FOR IN-PORT TRADE WINDOW
@@ -610,9 +574,9 @@ public class script_GUI : MonoBehaviour
 
 	//This function updates the player cargo labels after any exchange between money and resources has been made
 	public void updateLabelsForPlayerVariables() {
-		player_currency.GetComponent<Text>().text = GameVars.playerShipVariables.ship.currency.ToString();
-		player_current_cargo.GetComponent<Text>().text = Mathf.CeilToInt(GameVars.playerShipVariables.ship.GetTotalCargoAmount()).ToString();
-		player_max_cargo.GetComponent<Text>().text = Mathf.CeilToInt(GameVars.playerShipVariables.ship.cargo_capicity_kg).ToString();
+		player_currency.GetComponent<Text>().text = Session.playerShipVariables.ship.currency.ToString();
+		player_current_cargo.GetComponent<Text>().text = Mathf.CeilToInt(Session.playerShipVariables.ship.GetTotalCargoAmount()).ToString();
+		player_max_cargo.GetComponent<Text>().text = Mathf.CeilToInt(Session.playerShipVariables.ship.cargo_capicity_kg).ToString();
 
 	}
 
@@ -620,8 +584,8 @@ public class script_GUI : MonoBehaviour
 	public void GUI_checkOutOrDockWithPort(bool isAvailable) {
 		if (isAvailable) {
 			//Figure out the tax on the cargo hold
-			GameVars.currentPortTax = GameVars.Trade.GetTaxRateOnCurrentShipManifest();
-			GameVars.showPortDockingNotification = true;
+			Session.currentPortTax = Session.Trade.GetTaxRateOnCurrentShipManifest();
+			Session.showPortDockingNotification = true;
 		}
 		//Else do nothing
 	}
@@ -677,8 +641,8 @@ public class script_GUI : MonoBehaviour
 
 
 			memberName.text = currentMember.name;
-			memberJob.text = GameVars.GetJobClassEquivalency(currentMember.typeOfCrew);
-			memberHome.text = GameVars.GetSettlementFromID(currentMember.originCity).name;
+			memberJob.text = Database.GetJobClassEquivalency(currentMember.typeOfCrew);
+			memberHome.text = Database.GetSettlementFromID(currentMember.originCity).name;
 			memberClout.text = GameVars.GetCloutTitleEquivalency(currentMember.clout);
 
 
@@ -751,11 +715,11 @@ public class script_GUI : MonoBehaviour
 	// REFERENCED IN BUTTON CLICK UNITYEVENT
 	public void GUI_restOverNight() {
 		//If the controls are locked--we are traveling so force it to stop
-		if (GameVars.controlsLocked && !GameVars.showSettlementGUI)
-			GameVars.playerShipVariables.rayCheck_stopShip = true;
+		if (Session.controlsLocked && !Session.showSettlementGUI)
+			Session.playerShipVariables.rayCheck_stopShip = true;
 		//Run a script on the player controls that fast forwards time by a quarter day
-		GameVars.controlsLocked = true;
-		GameVars.playerShipVariables.PassTime(.25f, false);
+		Session.controlsLocked = true;
+		Session.playerShipVariables.PassTime(.25f, false);
 	}
 
 }

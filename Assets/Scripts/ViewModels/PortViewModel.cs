@@ -12,7 +12,7 @@ public class PortViewModel : CityViewModel
 
 	public bool allowTownAccess;
 
-	public PortViewModel(bool townAccess = true) : base(Globals.GameVars.currentSettlement, null){
+	public PortViewModel(bool townAccess = true) : base(Globals.Session.currentSettlement, null){
 		CrewManagement = new CrewManagementViewModel(City);
 		allowTownAccess = townAccess;
 	}

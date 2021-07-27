@@ -8,16 +8,17 @@ public class Network
 {
 	const int INDEPENDENT = 0;
 
-	GameVars GameVars;
-	Ship Ship => GameVars.playerShipVariables.ship;
+	Ship Ship => Session.playerShipVariables.ship;
 
-	public Network(GameVars gameVars) {
-		GameVars = gameVars;
+	GameSession Session => Globals.Session;
+	Database Database => Globals.Database;
+
+	public Network() {
 	}
 
 	public bool CheckForNetworkMatchBetweenTwoSettlements(int cityA, int cityB) {
-		Settlement cityAObj = GameVars.GetSettlementFromID(cityA);
-		Settlement cityBObj = GameVars.GetSettlementFromID(cityB);
+		Settlement cityAObj = Database.GetSettlementFromID(cityA);
+		Settlement cityBObj = Database.GetSettlementFromID(cityB);
 		foreach (int cityA_ID in cityAObj.networks) {
 			foreach (int cityB_ID in cityBObj.networks) {
 				if (cityA_ID == cityB_ID && cityA_ID != INDEPENDENT) {
@@ -28,18 +29,18 @@ public class Network
 		return false;
 	}
 
-	public IEnumerable<Settlement> GetCitiesFromNetwork(int netId) => Globals.GameVars.settlement_masterList.Where(s => s.networks.Contains(netId));
+	public IEnumerable<Settlement> GetCitiesFromNetwork(int netId) => Database.settlement_masterList.Where(s => s.networks.Contains(netId));
 
 	public IEnumerable<Settlement> MyImmediateNetwork => Ship.networks
 		.Where(netId => netId != INDEPENDENT)
 		.SelectMany(netId => GetCitiesFromNetwork(netId))
-		.Concat(new[] { GameVars.GetSettlementFromID(Ship.originSettlement) });
+		.Concat(new[] { Database.GetSettlementFromID(Ship.originSettlement) });
 
 	public IEnumerable<Settlement> GetCrewMemberNetwork(CrewMember crew) =>
-		Globals.GameVars.GetSettlementFromID(crew.originCity).networks
+		Database.GetSettlementFromID(crew.originCity).networks
 			.Where(netId => netId != INDEPENDENT)
 			.SelectMany(netId => GetCitiesFromNetwork(netId))
-			.Concat(new[] { GameVars.GetSettlementFromID(crew.originCity) });
+			.Concat(new[] { Database.GetSettlementFromID(crew.originCity) });
 
 	public IEnumerable<Settlement> MyCompleteNetwork => Ship.crewRoster
 		.SelectMany(crew => GetCrewMemberNetwork(crew))
@@ -47,8 +48,8 @@ public class Network
 
 	public IEnumerable<CrewMember> CrewMembersWithNetwork(Settlement settlement, bool includeJason = false) {
 		var list = Ship.crewRoster.Where(crew => GetCrewMemberNetwork(crew).Contains(settlement));
-		if (includeJason && GetCrewMemberNetwork(GameVars.Crew.Jason).Contains(settlement)) {
-			list = list.Concat(new[] { GameVars.Crew.Jason });
+		if (includeJason && GetCrewMemberNetwork(Session.Crew.Jason).Contains(settlement)) {
+			list = list.Concat(new[] { Session.Crew.Jason });
 		}
 		return list;
 	}
@@ -56,7 +57,7 @@ public class Network
 	public CrewMember CrewMemberWithNetwork(Settlement settlement) => CrewMembersWithNetwork(settlement).FirstOrDefault();
 
 	public bool CheckIfCityIDIsPartOfNetwork(int cityID) {
-		var settlement = GameVars.GetSettlementFromID(cityID);
+		var settlement = Database.GetSettlementFromID(cityID);
 		return settlement != null && MyCompleteNetwork.Contains(settlement);
 	}
 }

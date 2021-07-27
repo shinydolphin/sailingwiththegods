@@ -97,7 +97,7 @@ public class RandomizerForStorms : MonoBehaviour
 		//Debug.Log("Turning the storm lighting on");
 		stormLight.gameObject.SetActive(true);
 
-		cloutBracket = GetBracket(cloutRanges, Globals.GameVars.playerShipVariables.ship.playerClout);
+		cloutBracket = GetBracket(cloutRanges, Globals.Session.playerShipVariables.ship.playerClout);
 
 		InitializeView();
 		countingDown = false;
@@ -131,7 +131,7 @@ public class RandomizerForStorms : MonoBehaviour
 	{
 		//Debug.Log("Starting InitializeView");
 		//Debug.Log("Instantiating ship");
-		ship = Instantiate(shipModels[Globals.GameVars.playerShipVariables.ship.upgradeLevel]);
+		ship = Instantiate(shipModels[Globals.Session.playerShipVariables.ship.upgradeLevel]);
 		ship.tag = "StormShip";
 		ship.transform.SetParent(transform);
 		cam.transform.position = ship.transform.position + camOffset;

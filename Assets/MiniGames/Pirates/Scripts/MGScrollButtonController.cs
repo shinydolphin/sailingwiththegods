@@ -20,7 +20,7 @@ public class MGScrollButtonController : MonoBehaviour
 		rsp = GetComponent<RandomSlotPopulator>();
 
 		//-1 here so it goes from 0 to n-1 instead of 1 to n
-		totalRows = Mathf.CeilToInt((Globals.GameVars.playerShipVariables.ship.crew * 1.0f) / rsp.CrewPerRow) - 1;
+		totalRows = Mathf.CeilToInt((Globals.Session.playerShipVariables.ship.crew * 1.0f) / rsp.CrewPerRow) - 1;
 
 		//To center the next row, you need to scroll the height of the crew card plus the distance between rows
 		scrollDistance = rsp.crewCard.GetComponent<RectTransform>().rect.height + rsp.padding;

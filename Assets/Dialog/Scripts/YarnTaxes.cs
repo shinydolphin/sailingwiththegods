@@ -91,7 +91,7 @@ public class YarnTaxes : MonoBehaviour
 	[YarnCommand("networkconnections")]
 	public void NumberOfConnections() 
 	{
-		IEnumerable<CrewMember> connected = Globals.GameVars.Network.CrewMembersWithNetwork(city, true);
+		IEnumerable<CrewMember> connected = Globals.Session.Network.CrewMembersWithNetwork(city, true);
 		int connectedNum = Enumerable.Count(connected);
 		ds.Storage.SetValue("$connections_number", connectedNum);
 	}
@@ -123,22 +123,22 @@ public class YarnTaxes : MonoBehaviour
 	public void ConnectedCrewName() 
 	{
 		if (ds.Storage.GetValue("$connections_number").AsNumber > 0) {
-			if (Globals.GameVars.Network.GetCrewMemberNetwork(Globals.GameVars.Jason).Contains(city)) {
+			if (Globals.Session.Network.GetCrewMemberNetwork(Globals.Session.Jason).Contains(city)) {
 				ds.Storage.SetValue("$jason_connected", true);
 				ds.Storage.SetValue("$crew_name_1", "me");
 				ds.Storage.SetValue("$crew_name_2", "I");
 				ds.Storage.SetValue("$crew_name_3", "You");
-				ds.Storage.SetValue("$crew_description", Globals.GameVars.Jason.backgroundInfo);
-				ds.Storage.SetValue("$crew_home", Globals.GameVars.GetSettlementFromID(Globals.GameVars.Jason.originCity).name);
+				ds.Storage.SetValue("$crew_description", Globals.Session.Jason.backgroundInfo);
+				ds.Storage.SetValue("$crew_home", Globals.Database.GetSettlementFromID(Globals.Session.Jason.originCity).name);
 			}
 			else {
-				IEnumerable<CrewMember> connected = Globals.GameVars.Network.CrewMembersWithNetwork(city);
+				IEnumerable<CrewMember> connected = Globals.Session.Network.CrewMembersWithNetwork(city);
 				CrewMember crew = connected.RandomElement();
 				ds.Storage.SetValue("$crew_name_1", crew.name);
 				ds.Storage.SetValue("$crew_name_2", crew.name);
 				ds.Storage.SetValue("$crew_name_3", crew.name);
 				ds.Storage.SetValue("$crew_description", crew.backgroundInfo);
-				ds.Storage.SetValue("$crew_home", Globals.GameVars.GetSettlementFromID(crew.originCity).name);
+				ds.Storage.SetValue("$crew_home", Globals.Database.GetSettlementFromID(crew.originCity).name);
 			}
 		}
 		else {
@@ -215,10 +215,10 @@ public class YarnTaxes : MonoBehaviour
 			Debug.Log("ERROR: You don't owe any cargo!");
 			return;
 		}
-		Globals.GameVars.playerShipVariables.ship.currency = 0;
+		Globals.Session.playerShipVariables.ship.currency = 0;
 		ds.UpdateMoney();
 		for (int i = 0; i < owedResources.Count; i++) {
-			System.Array.Find(Globals.GameVars.playerShipVariables.ship.cargo, x => x.name == owedResources[i].name).amount_kg -= owedResources[i].amount_kg;
+			System.Array.Find(Globals.Session.playerShipVariables.ship.cargo, x => x.name == owedResources[i].name).amount_kg -= owedResources[i].amount_kg;
 			Debug.Log($"Paying {owedResources[i].amount_kg}kg of {owedResources[i].name}");
 		}
 		owedResources.Clear();
@@ -228,14 +228,14 @@ public class YarnTaxes : MonoBehaviour
 	public void CalculateNeededResources() 
 	{
 		owedResources.Clear();
-		float currentDr = Globals.GameVars.playerShipVariables.ship.currency;
+		float currentDr = Globals.Session.playerShipVariables.ship.currency;
 		ds.Storage.SetValue("$drachma", currentDr);
 		float cost = ds.Storage.GetValue("$final_cost").AsNumber;
 		float owedDr = cost - currentDr;
 		Debug.Log($"Taxes remaining: {owedDr}dr");
 
-		MetaResource[] sortedResources = Globals.GameVars.masterResourceList.OrderBy(x => x.trading_priority).ToArray();
-		Resource[] playerResources = Globals.GameVars.playerShipVariables.ship.cargo;
+		MetaResource[] sortedResources = Globals.Database.masterResourceList.OrderBy(x => x.trading_priority).ToArray();
+		Resource[] playerResources = Globals.Session.playerShipVariables.ship.cargo;
 
 		for (int i = 0; i < sortedResources.Length; i++) {
 			//If it's something that can be demanded (ie not water or food)...
@@ -286,11 +286,11 @@ public class YarnTaxes : MonoBehaviour
 
 	private float CargoValue() 
 	{
-		return Globals.GameVars.Trade.GetTotalPriceOfGoods() + Globals.GameVars.playerShipVariables.ship.currency;
+		return Globals.Session.Trade.GetTotalPriceOfGoods() + Globals.Session.playerShipVariables.ship.currency;
 	}
 
 	private float OneCargoValue(Resource r, float qty) 
 	{
-		return Globals.GameVars.Trade.GetPriceOfResource(r.name, city) * qty;
+		return Globals.Session.Trade.GetPriceOfResource(r.name, city) * qty;
 	}
 }

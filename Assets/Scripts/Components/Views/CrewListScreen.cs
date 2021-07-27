@@ -17,7 +17,7 @@ public class CrewListScreen : ViewBehaviour<ICollectionModel<CrewManagementMembe
 
 		// HACK: collectionwrappermodel has limited ordering features for now, so the *9999 simulates a orderby.thenby, and use a 1/(value) to simulate a desc sort
 		List?.Bind(model
-			.OrderBy(c => 1f / (c.CitiesInNetwork.Count(city => city.City.settlementID == Globals.Quests.CurrDestinationId) * 9999 + Globals.GameVars.Network.GetCrewMemberNetwork(c.Member).Count()))
+			.OrderBy(c => 1f / (c.CitiesInNetwork.Count(city => city.City.settlementID == Globals.Quests.CurrDestinationId) * 9999 + Globals.Session.Network.GetCrewMemberNetwork(c.Member).Count()))
 		);
 		Close?.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => Globals.UI.Hide(this) }));
 	}

@@ -14,13 +14,13 @@ public class CrewManagementMemberViewModel : Model
 	
 	public Sprite Portrait { get; private set; }
 	public string Name => Member.name;
-	public string City => Globals.GameVars.GetSettlementFromID(Member.originCity).name;
-	public string Job => Globals.GameVars.GetJobClassEquivalency(Member.typeOfCrew);
+	public string City => Globals.Database.GetSettlementFromID(Member.originCity).name;
+	public string Job => Globals.Database.GetJobClassEquivalency(Member.typeOfCrew);
 	public string BackgroundInfo => Member.backgroundInfo;
 
 	public string Role => "<#000000>" + Job + "</color>" + "\n" + Skills;
 
-	public bool IsInCrew => Globals.GameVars.playerShipVariables.ship.crewRoster.Contains(Member);
+	public bool IsInCrew => Globals.Session.playerShipVariables.ship.crewRoster.Contains(Member);
 	public string Skills => IsInCrew ? Member.changeOnFire.ToString() : Member.changeOnHire.ToString();
 	
 	public string NumConnectionsStr => CitiesInNetwork == null ? 
@@ -45,7 +45,7 @@ public class CrewManagementMemberViewModel : Model
 		// sort by port name so you can easily look up a port in the list
 		if(onClickCity != null) {
 			CitiesInNetwork = ValueModel.Wrap(new ObservableCollection<CityViewModel>(
-				Globals.GameVars.Network.GetCrewMemberNetwork(Member)
+				Globals.Session.Network.GetCrewMemberNetwork(Member)
 					.Select(s => new CityViewModel(s, onClickCity))
 					.OrderBy(c => c.PortName)
 			));

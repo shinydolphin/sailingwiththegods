@@ -60,7 +60,7 @@ namespace Quizzes
 			Debug.Log("Failed Quiz: " + Name);
 
 			HideAnyScreens();
-			Globals.GameVars.isGameOver = true;
+			Globals.MainState.isGameOver = true;
 		}
 
 		protected void Complete() {
