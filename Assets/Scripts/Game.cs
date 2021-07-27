@@ -33,6 +33,9 @@ public class Game
 	public bool menuControlsLock { get; set; } = false;
 	public bool gameIsFinished { get; set; } = false;
 
+	public void Update() {
+		Session?.Update();
+	}
 
 	#region UI Triggered functions
 
