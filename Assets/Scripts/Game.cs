@@ -2,14 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
 public class Game
 {
+	public enum Difficulty {
+		Normal,
+		Beginner
+	}
+
 	Notifications Notifications => Globals.Notifications;
 	Database Database => Globals.Database;
+	World World => Globals.World;
 
 	public GameSession Session { get; private set; }
 
@@ -27,13 +34,117 @@ public class Game
 	public bool gameIsFinished { get; set; } = false;
 
 
-	//====================================================================================================
-	//      DATA SAVING FUNCTIONS
-	//====================================================================================================
+	#region UI Triggered functions
+
+	public void StartNewGame(Difficulty difficulty) {
+
+		isTitleScreen = false;
+		isStartScreen = true;
+
+		Globals.UI.Hide<TitleScreen>();
+
+		FillNewGameCrewRosterAvailability();
+
+		if (difficulty == Difficulty.Normal) Session.gameDifficulty_Beginner = false;
+		else Session.gameDifficulty_Beginner = true;
+		SetupBeginnerGameDifficulty();
+
+		// since we're skipping crew select, force pick the first StartingCrewSize members
+		for (var i = 0; i < Ship.StartingCrewSize; i++) {
+			World.newGameCrewSelectList[i] = true;
+		}
+
+		// TODO: For now, skip straight to starting the game since i turned off crew selection
+		StartMainGame();
+		//play the intro for the game
+		//time_Line_controll.play();//start the intro seen
+		// TODO: Turned off crew selection because it's too overwhelming. Needs to be reworked.
+		//title_crew_select.SetActive(true);
+		//GUI_SetupStartScreenCrewSelection();
+
+	}
+
+	void StartMainGame() {
+		World.camera_titleScreen.SetActive(false);
+
+		//Turn on the environment fog
+		RenderSettings.fog = true;
+
+		//Now turn on the main player controls camera
+		World.FPVCamera.SetActive(true);
+
+		//Turn on the player distance fog wall
+		Session.playerShipVariables.fogWall.SetActive(true);
+
+		//Now change titleScreen to false
+		isTitleScreen = false;
+		isStartScreen = false;
+
+		//Now enable the controls
+		Session.controlsLocked = false;
+
+		//Initiate the main questline
+		Globals.Quests.InitiateMainQuestLineForPlayer();
+
+		//Reset Start Game Button
+		World.startGameButton_isPressed = false;
+
+		// TODO: Crew select disabled for now
+		//title_crew_select.SetActive(false);
+
+		//Turn on the ship HUD
+		Globals.UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
+	}
+
+	public void LoadGame(Difficulty difficulty) {
+		if (LoadSavedGame()) {
+			isLoadedGame = true;
+			isTitleScreen = false;
+			isStartScreen = false;
+
+			Globals.UI.Hide<TitleScreen>();
+
+			World.camera_titleScreen.SetActive(false);
+
+
+
+			//Turn on the environment fog
+			RenderSettings.fog = true;
+			//Now turn on the main player controls camera
+			World.FPVCamera.SetActive(true);
+			//Turn on the player distance fog wall
+			Session.playerShipVariables.fogWall.SetActive(true);
+			//Now enable the controls
+			Session.controlsLocked = false;
+			//Set the player's initial position to the new position
+			Session.playerShipVariables.lastPlayerShipPosition = Session.playerShip.transform.position;
+			//Update Ghost Route
+			LoadSavedGhostRoute();
+
+
+			//Setup Difficulty Level
+			if (difficulty == Game.Difficulty.Normal) Session.gameDifficulty_Beginner = false;
+			else Session.gameDifficulty_Beginner = true;
+			SetupBeginnerGameDifficulty();
+
+			//Turn on the ship HUD
+			Globals.UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
+
+			Session.controlsLocked = false;
+			//Flag the main GUI scripts to turn on
+			runningMainGameGUI = true;
+		}
+	}
+
+	#endregion
+
+	#region Main Functions
 
 	public bool LoadSavedGame() {
+		var session = Session;
+
 		PlayerJourneyLog loadedJourney = new PlayerJourneyLog();
-		Ship ship = playerShipVariables.ship;
+		Ship ship = session.playerShipVariables.ship;
 
 		string[] splitFile = new string[] { "\r\n", "\r", "\n" };
 		char[] lineDelimiter = new char[] { ',' };
@@ -87,7 +198,7 @@ public class Game
 			loadedJourney.routeLog[loadedJourney.routeLog.Count - 1].UnityXYZEndPoint = new Vector3(float.Parse(XYZ[0]), float.Parse(XYZ[1]), float.Parse(XYZ[2]));
 
 		}
-		playerShipVariables.journey = loadedJourney;
+		session.playerShipVariables.journey = loadedJourney;
 
 		//Now use the last line of data to update the current player status and load the game
 		string[] playerVars = fileByLine[fileByLine.Length - 1].Split(lineDelimiter, StringSplitOptions.None);
@@ -95,7 +206,7 @@ public class Game
 		//Update in game Time
 		ship.totalNumOfDaysTraveled = float.Parse(playerVars[1]);
 		//Update Sky to match time
-		playerShipVariables.UpdateDayNightCycle(Game.IS_NOT_NEW_GAME);
+		session.playerShipVariables.UpdateDayNightCycle(Game.IS_NOT_NEW_GAME);
 
 		//Update all Cargo Holds
 		int fileStartIndex = 8;
@@ -115,7 +226,7 @@ public class Game
 
 		//Update Ship Position
 		string[] parsedXYZ = playerVars[27].Split(recordDelimiter, StringSplitOptions.None);
-		playerShip.transform.position = new Vector3(float.Parse(parsedXYZ[0]), float.Parse(parsedXYZ[1]), float.Parse(parsedXYZ[2]));
+		session.playerShip.transform.position = new Vector3(float.Parse(parsedXYZ[0]), float.Parse(parsedXYZ[1]), float.Parse(parsedXYZ[2]));
 
 		//Update Current Quest Leg
 		ship.mainQuest.currentQuestSegment = int.Parse(playerVars[28]);
@@ -138,8 +249,8 @@ public class Game
 		ship.networks = loadedNetworks;
 
 		//Update player starving and thirsty day counters
-		playerShipVariables.dayCounterStarving = int.Parse(playerVars[32]);
-		playerShipVariables.dayCounterThirsty = int.Parse(playerVars[33]);
+		session.playerShipVariables.dayCounterStarving = int.Parse(playerVars[32]);
+		session.playerShipVariables.dayCounterThirsty = int.Parse(playerVars[33]);
 
 		//Update Currency
 		ship.currency = int.Parse(playerVars[34]);
@@ -160,10 +271,10 @@ public class Game
 			ship.currentNavigatorTarget = targetID;
 			//change location of beacon
 			Vector3 location = Vector3.zero;
-			for (int x = 0; x < settlement_masterList_parent.transform.childCount; x++)
-				if (settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == targetID)
-					location = settlement_masterList_parent.transform.GetChild(x).position;
-			ActivateNavigatorBeacon(navigatorBeacon, location);
+			for (int x = 0; x < World.settlement_masterList_parent.transform.childCount; x++)
+				if (World.settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == targetID)
+					location = World.settlement_masterList_parent.transform.GetChild(x).position;
+			session.ActivateNavigatorBeacon(World.navigatorBeacon, location);
 		}
 		else {
 			ship.currentNavigatorTarget = -1;
@@ -178,14 +289,14 @@ public class Game
 		}
 		//Add Captains Log
 		string restoreCommasAndNewLines = playerVars[39].Replace('^', ',');
-		currentCaptainsLog = restoreCommasAndNewLines.Replace('*', '\n');
+		session.ResetCaptainsLog(restoreCommasAndNewLines.Replace('*', '\n'));
 		//Debug.Log (currentCaptainsLog);
 
 		// KDTODO: This needs to be done every time we add a new field right now. Needs a rewrite.
 		ship.upgradeLevel = int.Parse(playerVars[40]);
 		ship.crewCapacity = int.Parse(playerVars[41]);
 		ship.cargo_capicity_kg = int.Parse(playerVars[42]);
-		SetShipModel(ship.upgradeLevel);
+		session.SetShipModel(ship.upgradeLevel);
 
 		// KDTODO: Once the save game routines are rewritten, need to save the crew available in each city instead of regenerating since this is exploitable
 		// it's just too much hassle to support saving this right now because the save format is limiting
@@ -200,12 +311,14 @@ public class Game
 	}
 
 	public void SaveUserGameData() {
-		string delimitedData = playerShipVariables.journey.ConvertJourneyLogToCSVText();
+		var session = Session;
+
+		string delimitedData = session.playerShipVariables.journey.ConvertJourneyLogToCSVText();
 		Debug.Log(delimitedData);
 		string filePath = Application.persistentDataPath + "/";
 
 		string fileNameServer = "";
-		if (DEBUG_MODE_ON)
+		if (World.DEBUG_MODE_ON)
 			fileNameServer += "DEBUG_DATA_" + SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv";
 		else
 			fileNameServer += SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv";
@@ -224,13 +337,13 @@ public class Game
 			Debug.Log(Application.persistentDataPath);
 
 			// secretly save a JSON version of the save data to prep for a move to make that the canonical save file - but it's not hooked up to be loaded yet
-			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(playerShipVariables.ship));
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(session.playerShipVariables.ship));
 		}
 		catch (Exception e) {
 			Notifications.ShowANotificationMessage("ERROR: a backup wasn't saved at: " + Application.persistentDataPath + "  - which means it may not have uploaded either: " + e.Message);
 		}
 		//Only upload to the server is the DebugMode is OFF
-		if (!DEBUG_MODE_ON) SaveUserGameDataToServer(filePath, fileNameServer);
+		if (!World.DEBUG_MODE_ON) SaveUserGameDataToServer(filePath, fileNameServer);
 
 	}
 
@@ -330,95 +443,100 @@ public class Game
 
 	public void RestartGame() {
 
+		// TOOD: make the session completely recreated on restart. didn't do it yet because i bet the code in this function assumes some leftovers.
+		var session = Session;
+
 		//Debug.Log ("Quest Seg: " + playerShipVariables.ship.mainQuest.currentQuestSegment);
 		//First we need to save the game that just ended
 		SaveUserGameData();
 		//Then we need to re-initialize all the player's variables
-		playerShipVariables.Reset();
+		session.playerShipVariables.Reset();
 
 		//Reset Other Player Ship Variables
-		playerShipVariables.numOfDaysTraveled = 0;
-		playerShipVariables.numOfDaysWithoutProvisions = 0;
-		playerShipVariables.numOfDaysWithoutWater = 0;
-		playerShipVariables.dayCounterStarving = 0;
-		playerShipVariables.dayCounterThirsty = 0;
+		session.playerShipVariables.numOfDaysTraveled = 0;
+		session.playerShipVariables.numOfDaysWithoutProvisions = 0;
+		session.playerShipVariables.numOfDaysWithoutWater = 0;
+		session.playerShipVariables.dayCounterStarving = 0;
+		session.playerShipVariables.dayCounterThirsty = 0;
 
 		//Take player back to title screen
 		//Debug.Log ("GOING TO TITLE SCREEN");
 		Globals.UI.HideAll();
 		Globals.UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
-		controlsLocked = true;
-		Game.isTitleScreen = true;
+		session.controlsLocked = true;
+		isTitleScreen = true;
 		RenderSettings.fog = false;
-		FPVCamera.SetActive(false);
-		camera_titleScreen.SetActive(true);
-		Game.isTitleScreen = true;
-		Game.runningMainGameGUI = false;
+		World.FPVCamera.SetActive(false);
+		World.camera_titleScreen.SetActive(true);
+		isTitleScreen = true;
+		runningMainGameGUI = false;
 
-		SetShipModel(playerShipVariables.ship.upgradeLevel);
+		session.SetShipModel(session.playerShipVariables.ship.upgradeLevel);
 
 		//clear captains log
-		currentCaptainsLog = "";
+		session.ResetCaptainsLog(string.Empty);
 
 	}
 
 	public void FillNewGameCrewRosterAvailability() {
+		var session = Session;
+
 		//We need to fill a list of 40 crewmembers for the player to choose from on a new game start
 		//--The first set will come from the Argonautica, and the top of the list will be populated with necessary characters for the plot
 		//--The remainder will be filled from the remaining available argonautica start crew and then randomly generated crew to choose from to create 40 members
 
 		//initialize a fresh List of crew and corresponding array of 40 bools
-		newGameAvailableCrew = new List<CrewMember>();
-		newGameCrewSelectList = new bool[40];
+		World.newGameAvailableCrew = new List<CrewMember>();
+		World.newGameCrewSelectList = new bool[40];
 
 		//TODO FIX THIS LATER Let's remove the randomly generated crew--this is just a safety precaution--might not be needed.
-		playerShipVariables.ship.crewRoster.Clear();
+		session.playerShipVariables.ship.crewRoster.Clear();
 
 		//Let's add all the optional crew from the Argonautica
-		foreach (int crewID in playerShipVariables.ship.mainQuest.questSegments[0].crewmembersToAdd) {
+		foreach (int crewID in session.playerShipVariables.ship.mainQuest.questSegments[0].crewmembersToAdd) {
 			CrewMember currentMember = Database.GetCrewMemberFromID(crewID);
 			if (currentMember.isKillable && !currentMember.isJason) {
-				newGameAvailableCrew.Add(currentMember);
+				World.newGameAvailableCrew.Add(currentMember);
 			}
 		}
 
 		//Now let's add all the possible non-quest historical people for hire
-		foreach (CrewMember thisMember in Crew.StandardCrew) {
+		foreach (CrewMember thisMember in session.Crew.StandardCrew) {
 			//make sure we don't go over 40 listings
-			if (newGameAvailableCrew.Count == 40)
+			if (World.newGameAvailableCrew.Count == 40)
 				break;
 
 			if (!thisMember.isPartOfMainQuest) {
-				newGameAvailableCrew.Add(thisMember);
+				World.newGameAvailableCrew.Add(thisMember);
 			}
 		}
 
 
 		//Now let's add randomly generated crew to the list until the quota of 40 is fulfilled
-		while (newGameAvailableCrew.Count < 40) {
-			newGameAvailableCrew.Add(GenerateRandomCrewMembers(1)[0]);
+		while (World.newGameAvailableCrew.Count < 40) {
+			World.newGameAvailableCrew.Add(GenerateRandomCrewMembers(1)[0]);
 		}
 
 		// filter out people who don't have connections at the ports in your starting bay or have overwhelmingly large networks
 		// prefer random people with small networks over argonautica crew who have very large networks. you should have to hire these people later
 		var nearestToStart = new string[] { "Pagasae", "Iolcus", "Pherai (Thessaly)", "Phylace", "Tisaia", "Histiaia/Oreos" };
-		var bestOptions = from c in newGameAvailableCrew
-						  let network = Network.GetCrewMemberNetwork(c)
+		var bestOptions = from c in World.newGameAvailableCrew
+						  let network = Session.Network.GetCrewMemberNetwork(c)
 						  where network.Any(s => nearestToStart.Contains(s.name)) && network.Count() < 10
 						  select c;
 
 		// use people with low # connections as backup options. this is just to keep the early game from being confusing
-		var backupOptions = from c in newGameAvailableCrew
-							let network = Network.GetCrewMemberNetwork(c)
+		var backupOptions = from c in World.newGameAvailableCrew
+							let network = Session.Network.GetCrewMemberNetwork(c)
 							where network.Count() < 10
 							select c;
 
 		var remainingNeeded = Ship.StartingCrewSize - bestOptions.Count();
 		if (remainingNeeded > 0) {
-			newGameAvailableCrew = bestOptions.Concat(backupOptions.Take(remainingNeeded)).ToList();
+			World.newGameAvailableCrew = bestOptions.Concat(backupOptions.Take(remainingNeeded)).ToList();
 		}
 		else {
-			newGameAvailableCrew = bestOptions.ToList();
+			World.newGameAvailableCrew = bestOptions.ToList();
 		}
 
 	}
@@ -429,12 +547,12 @@ public class Game
 		//	--the most it has available
 		List<CrewMember> availableCrew = new List<CrewMember>();
 		int numOfIterations = 0;
-		int numStandardCrew = Crew.StandardCrew.Count();
+		int numStandardCrew = Session.Crew.StandardCrew.Count();
 		while (numberOfCrewmanNeeded != availableCrew.Count) {
-			CrewMember thisMember = Crew.StandardCrew.RandomElement();
+			CrewMember thisMember = Session.Crew.StandardCrew.RandomElement();
 			if (!thisMember.isPartOfMainQuest) {
 				//Now make sure this crewmember isn't already in the current crew
-				if (!playerShipVariables.ship.crewRoster.Contains(thisMember)) {
+				if (!Session.playerShipVariables.ship.crewRoster.Contains(thisMember)) {
 					availableCrew.Add(thisMember);
 				}
 			}
@@ -451,24 +569,25 @@ public class Game
 
 	public void SetupBeginnerGameDifficulty() {
 		//Set difficulty level variables
-		if (gameDifficulty_Beginner)
-			camera_Mapview.GetComponent<Camera>().enabled = true;
+		if (Session.gameDifficulty_Beginner)
+			World.camera_Mapview.GetComponent<Camera>().enabled = true;
 		else
-			camera_Mapview.GetComponent<Camera>().enabled = false;
+			World.camera_Mapview.GetComponent<Camera>().enabled = false;
 	}
 
 	public void LoadSavedGhostRoute() {
 		//For the loadgame function--it just fills the ghost trail with the routes that exist
-		playerGhostRoute.positionCount = playerShipVariables.journey.routeLog.Count;
-		for (int routeIndex = 0; routeIndex < playerShipVariables.journey.routeLog.Count; routeIndex++) {
+		World.playerGhostRoute.positionCount = Session.playerShipVariables.journey.routeLog.Count;
+		for (int routeIndex = 0; routeIndex < Session.playerShipVariables.journey.routeLog.Count; routeIndex++) {
 			Debug.Log("GhostRoute Index: " + routeIndex);
-			playerGhostRoute.SetPosition(routeIndex, playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, playerShip.transform.position.y, 0));
+			World.playerGhostRoute.SetPosition(routeIndex, Session.playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, Session.playerShip.transform.position.y, 0));
 			//set player last origin point for next route add on
-			if (routeIndex == playerShipVariables.journey.routeLog.Count - 1) {
-				playerShipVariables.travel_lastOrigin = playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, playerShip.transform.position.y);
-				playerShipVariables.originOfTrip = playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, playerShip.transform.position.y);
+			if (routeIndex == Session.playerShipVariables.journey.routeLog.Count - 1) {
+				Session.playerShipVariables.travel_lastOrigin = Session.playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, Session.playerShip.transform.position.y);
+				Session.playerShipVariables.originOfTrip = Session.playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, Session.playerShip.transform.position.y);
 			}
 		}
 	}
 
+	#endregion
 }

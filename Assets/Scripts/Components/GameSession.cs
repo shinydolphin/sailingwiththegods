@@ -34,6 +34,11 @@ public class GameSession
 	private List<CaptainsLogEntry> currentLogPool = new List<CaptainsLogEntry>();
 	public string CaptainsLog => currentCaptainsLog;
 
+	// TODO: Delete once we are creating new sessions on restart and load
+	public void ResetCaptainsLog(string content) {
+		currentCaptainsLog = content;
+	}
+
 	public void AddToCaptainsLog(string message) {
 		currentCaptainsLog = message + "\n\n" + currentCaptainsLog;
 	}
@@ -185,7 +190,8 @@ public class GameSession
 		controlsLocked = true;
 	}
 
-	void SetShipModel(int shipLevel) {
+	// TODO: Only public because RestartGame uses it. If we make the game session completely deleted we could have the Destroy reset the ship model or something.
+	public void SetShipModel(int shipLevel) {
 		foreach (var upgradeLevel in World.shipLevels) {
 			upgradeLevel.SetActive(false);
 		}

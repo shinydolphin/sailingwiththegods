@@ -1,45 +1,12 @@
-//=======================================================================================================================================
-//
-//  script_GUI.cs   -- Main GUI code interface
-//
-//    --This script handles all of the GUI interactions with the player. There is a main update loop that
-//      acts as a listener for any changes in the player controls, or through click listeners on any GUI
-//      buttons that are enabled here.
-//
-//    --The first block handles setting variables for all of the required GUI attached GameObjects in the scene
-//
-//    --The second block handles the main loop that looks for the changes
-//
-//    --The last block contains all relevant functions called on by the main loop
-//
-//
-//      Note: Anything GUI related should pass through this script. This script can access both the player GameObject variabels
-//          and the global variables GameObject (MGV) that are being updated outside this script, e.g. a trade menu here may need
-//          access to a set of variables stored in the player ship's object in the player GameObject, as well as global functions
-//          stored in the global variables GameObject to process that information. Eventually I would like to keep most of the
-//          processing to the global variables script, and keep this script as ONLY a delivery system of pre-processed information 
-//
-//======================================================================================================================================
-
-
-
-
-
-
-
-
-
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.NetworkInformation;
 using UnityEngine.UI;
 
 public class script_GUI : MonoBehaviour
 {
 	Notifications Notifications => Globals.Notifications;
 	Database Database => Globals.Database;
+	Game Game => Globals.Game;
 
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
@@ -344,7 +311,7 @@ public class script_GUI : MonoBehaviour
 		gameover_main.SetActive(false);
 		MainState.menuControlsLock = false;
 		//Restart from Beginning
-		World.RestartGame();
+		Game.RestartGame();
 	}
 
 

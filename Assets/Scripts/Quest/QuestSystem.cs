@@ -12,7 +12,7 @@ public class QuestSystem : MonoBehaviour
 	GameSession Session => Globals.Game.Session;
 	World World => Globals.World;
 	Database Database => Globals.Database;
-	Game MainState => Globals.Game;
+	Game Game => Globals.Game;
 	Notifications Notifications => Globals.Notifications;
 
 	GameObject playerShip => Session.playerShip;
@@ -247,19 +247,19 @@ public class QuestSystem : MonoBehaviour
 		playerShipVariables.lastPlayerShipPosition = playerShip.transform.position;
 
 		//Setup Difficulty Level
-		World.SetupBeginnerGameDifficulty();
+		Game.SetupBeginnerGameDifficulty();
 
 		// setup each city with 5 crew available and for now, they never regenerate.
 		foreach (var settlement in Database.settlement_masterList) {
 			settlement.availableCrew.Clear();
-			World.GenerateRandomCrewMembers(5).ForEach(c => settlement.availableCrew.Add(c));
+			Game.GenerateRandomCrewMembers(5).ForEach(c => settlement.availableCrew.Add(c));
 		}
 
 		Globals.Quests.StartQuestSegment(0);
 		Debug.Log("Current quest segment " + quest.currentQuestSegment);
 
 		//Flag the main GUI scripts to turn on
-		MainState.runningMainGameGUI = true;
+		Game.runningMainGameGUI = true;
 	}
 
 }

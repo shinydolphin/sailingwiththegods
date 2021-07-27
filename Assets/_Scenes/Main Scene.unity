@@ -6663,7 +6663,7 @@ PrefabInstance:
     - target: {fileID: 1762844606371785343, guid: 521eea5dec15d52499d9371a30ec9acc,
         type: 3}
       propertyPath: m_Name
-      value: GameVars
+      value: World
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 521eea5dec15d52499d9371a30ec9acc, type: 3}

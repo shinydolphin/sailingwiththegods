@@ -62,8 +62,8 @@ public class TitleScreen : ViewBehaviour<GameViewModel>
 	Vector2Int[] supportedResolutions;
 
 	private void Start() {
-		Subscribe(title_newgame_button.onClick, () => Model.GUI_startNewGame(GameViewModel.Difficulty.Normal));
-		Subscribe(title_loadgame_button.onClick, () => Model.GUI_loadGame(GameViewModel.Difficulty.Normal));
+		Subscribe(title_newgame_button.onClick, () => Model.GUI_startNewGame(Game.Difficulty.Normal));
+		Subscribe(title_loadgame_button.onClick, () => Model.GUI_loadGame(Game.Difficulty.Normal));
 		Subscribe(title_quitgame_button.onClick, Application.Quit);
 
 		Subscribe(title_credits_button.onClick, () => GUI_showCredits());
