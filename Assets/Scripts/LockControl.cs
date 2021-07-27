@@ -9,13 +9,13 @@ public static class CutsceneMode
 	static IEnumerable<ViewBehaviour> _restoreViews;
 
 	public static void Enter() {
-		Globals.Session.IsCutsceneMode = true;
+		Globals.Game.Session.IsCutsceneMode = true;
 		_restoreViews = Globals.UI.GetActiveViews();
 		Globals.UI.HideAll();
 	}
 
 	public static void Exit() {
-		Globals.Session.IsCutsceneMode = false;
+		Globals.Game.Session.IsCutsceneMode = false;
 		foreach(var view in _restoreViews) {
 			Globals.UI.Show(view);
 		}

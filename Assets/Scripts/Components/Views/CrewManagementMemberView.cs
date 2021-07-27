@@ -20,7 +20,7 @@ public class CrewManagementMemberViewModel : Model
 
 	public string Role => "<#000000>" + Job + "</color>" + "\n" + Skills;
 
-	public bool IsInCrew => Globals.Session.playerShipVariables.ship.crewRoster.Contains(Member);
+	public bool IsInCrew => Globals.Game.Session.playerShipVariables.ship.crewRoster.Contains(Member);
 	public string Skills => IsInCrew ? Member.changeOnFire.ToString() : Member.changeOnHire.ToString();
 	
 	public string NumConnectionsStr => CitiesInNetwork == null ? 
@@ -45,7 +45,7 @@ public class CrewManagementMemberViewModel : Model
 		// sort by port name so you can easily look up a port in the list
 		if(onClickCity != null) {
 			CitiesInNetwork = ValueModel.Wrap(new ObservableCollection<CityViewModel>(
-				Globals.Session.Network.GetCrewMemberNetwork(Member)
+				Globals.Game.Session.Network.GetCrewMemberNetwork(Member)
 					.Select(s => new CityViewModel(s, onClickCity))
 					.OrderBy(c => c.PortName)
 			));

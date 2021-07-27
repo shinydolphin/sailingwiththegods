@@ -26,7 +26,7 @@ public class TavernaMiniGameDialog : MonoBehaviour
 	public void DisplayInsult() {
 		Time.timeScale = 0;
 		textBackground.SetActive(true);
-		if (Globals.GameVars != null) {
+		if (Globals.World != null) {
 			dialog.text = insultingTexts.RandomElement();
 		}
 		else {
@@ -40,7 +40,7 @@ public class TavernaMiniGameDialog : MonoBehaviour
 	public void DisplayBragging() {
 		Time.timeScale = 0;
 		textBackground.SetActive(true);
-		if (Globals.GameVars != null) {
+		if (Globals.World != null) {
 			dialog.text = braggingTexts.RandomElement();
 		}
 		else {

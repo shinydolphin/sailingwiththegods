@@ -8,8 +8,8 @@ using UnityEngine;
 
 public class DashboardViewModel : Model
 {
-	GameVars GameVars => Globals.GameVars;
-	GameSession Session => Globals.Session;
+	World World => Globals.World;
+	GameSession Session => Globals.Game.Session;
 
 	public string CaptainsLog => Session.CaptainsLog;
 	public readonly CargoInventoryViewModel WaterInventory;
@@ -51,10 +51,10 @@ public class DashboardViewModel : Model
 			Globals.UI.Hide<CityView>();
 		}
 
-		var beacon = GameVars.crewBeacon;
+		var beacon = World.crewBeacon;
 		if (city.City != beacon.Target) {
 			beacon.Target = city.City;
-			Session.ActivateNavigatorBeacon(GameVars.crewBeacon, city.City.theGameObject.transform.position);
+			Session.ActivateNavigatorBeacon(World.crewBeacon, city.City.theGameObject.transform.position);
 			Session.RotateCameraTowards(city.City.theGameObject.transform.position);
 			Globals.UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(city.City, null));
 		}
@@ -75,12 +75,12 @@ public class DashboardViewModel : Model
 	public void GUI_furlOrUnfurlSails() {
 		if (Session.playerShipVariables.ship.sailsAreUnfurled) {
 			Session.playerShipVariables.ship.sailsAreUnfurled = false;
-			foreach (GameObject sail in GameVars.sails)
+			foreach (GameObject sail in World.sails)
 				sail.SetActive(false);
 		}
 		else {
 			Session.playerShipVariables.ship.sailsAreUnfurled = true;
-			foreach (GameObject sail in GameVars.sails)
+			foreach (GameObject sail in World.sails)
 				sail.SetActive(true);
 
 		}

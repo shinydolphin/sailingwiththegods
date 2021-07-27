@@ -45,7 +45,7 @@ public class MiniGameManager : MonoBehaviour
 	private RandomSlotPopulator rsp;
 	private int cloutChange;
 	private int moneyDemand = 0;
-	private Resource[] playerInvo => Globals.Session.playerShipVariables.ship.cargo;
+	private Resource[] playerInvo => Globals.Game.Session.playerShipVariables.ship.cargo;
 	int[] demandedAmounts;
 
 	private void OnEnable() 
@@ -66,13 +66,13 @@ public class MiniGameManager : MonoBehaviour
 
 		//check true zones, out of those, have a pirate type spawn from one of the "true" areas
 		//no pirates should appear if there aren't any actve zones
-		if (Globals.Session.playerShipVariables.zonesList.Count > 0) {
+		if (Globals.Game.Session.playerShipVariables.zonesList.Count > 0) {
 			//below line is unneeded
-			//int randomPirateTypeFromActiveZones = UnityEngine.Random.Range(1, Globals.Session.playerShipVariables.zonesList.Count);
+			//int randomPirateTypeFromActiveZones = UnityEngine.Random.Range(1, Globals.Game.Session.playerShipVariables.zonesList.Count);
 
-			string randomPirateTypeName = Globals.Session.playerShipVariables.zonesList.RandomElement();
+			string randomPirateTypeName = Globals.Game.Session.playerShipVariables.zonesList.RandomElement();
 
-			PirateType theType = Globals.Session.PirateTypes.FirstOrDefault(t => t.name == randomPirateTypeName);
+			PirateType theType = Globals.Game.Session.PirateTypes.FirstOrDefault(t => t.name == randomPirateTypeName);
 			//Debug.Log("theType = " + theType);
 			rsp.SetPirateType(theType);
 			//Debug.Log("Pirate type in game is: " + rsp.GetType());
@@ -122,7 +122,7 @@ public class MiniGameManager : MonoBehaviour
 
 	public void GameOver() 
 	{
-		Globals.MainState.isGameOver = true;
+		Globals.Game.isGameOver = true;
 	}
 	
 	private string NetCloutText(int clout) 
@@ -144,11 +144,11 @@ public class MiniGameManager : MonoBehaviour
 	/// <returns></returns>
 	private CrewMember CrewFromPirateHometown(PirateType pirate) 
 	{
-		List<CrewMember> allPirates = Globals.Session.Pirates.Where(x => x.pirateType.Equals(pirate)).ToList();
+		List<CrewMember> allPirates = Globals.Game.Session.Pirates.Where(x => x.pirateType.Equals(pirate)).ToList();
 
-		foreach (CrewMember c in Globals.Session.playerShipVariables.ship.crewRoster) 
+		foreach (CrewMember c in Globals.Game.Session.playerShipVariables.ship.crewRoster) 
 		{
-			IEnumerable<Settlement> crewNetwork = Globals.Session.Network.GetCrewMemberNetwork(c);
+			IEnumerable<Settlement> crewNetwork = Globals.Game.Session.Network.GetCrewMemberNetwork(c);
 			foreach (CrewMember p in allPirates) 
 			{
 				if (crewNetwork.Contains(Globals.Database.GetSettlementFromID(p.originCity))) 
@@ -188,11 +188,11 @@ public class MiniGameManager : MonoBehaviour
 
 	public void OpenNegotiations() 
 	{
-		demandedAmounts = new int[Globals.Session.playerShipVariables.ship.cargo.Length];
+		demandedAmounts = new int[Globals.Game.Session.playerShipVariables.ship.cargo.Length];
 
 		if (!alreadyTriedNegotiating) 
 		{
-			int currentPlayerMoney = Globals.Session.playerShipVariables.ship.currency;
+			int currentPlayerMoney = Globals.Game.Session.playerShipVariables.ship.currency;
 
 			//Only consider stuff you have any actual quantity of
 			List<Resource> availableInvo = new List<Resource>();
@@ -282,17 +282,17 @@ public class MiniGameManager : MonoBehaviour
 	public void AcceptDeal() {
 		//Subtract out resources
 
-		Globals.Session.playerShipVariables.ship.currency -= moneyDemand;
+		Globals.Game.Session.playerShipVariables.ship.currency -= moneyDemand;
 
 		for (int i = 0; i < demandedAmounts.Length; i++) {
-			Globals.Session.playerShipVariables.ship.cargo[i].amount_kg -= demandedAmounts[i];
+			Globals.Game.Session.playerShipVariables.ship.cargo[i].amount_kg -= demandedAmounts[i];
 		}
 
 		closeButton.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = acceptedNegotiationClose;
 		closeButton.onClick.RemoveAllListeners();
 		closeButton.onClick.AddListener(UnloadMinigame);
 
-		Globals.Session.AdjustPlayerClout(tookNegotiationClout + cloutChange, false);
+		Globals.Game.Session.AdjustPlayerClout(tookNegotiationClout + cloutChange, false);
 
 		mgInfo.DisplayText(
 			Globals.Database.pirateTitles[1],
@@ -341,7 +341,7 @@ public class MiniGameManager : MonoBehaviour
 	public void RanAway() 
 	{
 		//You can adjust clout here because this is the end of the game, so you don't need to save that for later
-		Globals.Session.AdjustPlayerClout(succeedRunClout + cloutChange, false);
+		Globals.Game.Session.AdjustPlayerClout(succeedRunClout + cloutChange, false);
 		string cloutText = $"Your cowardice has tarnished your reputation and your clout has gone down by {succeedRunClout}.";
 		if (cloutChange != 0) {
 			cloutText += $" Combined with the earlier {cloutChange}, that is a net clout change of {succeedRunClout + cloutChange}.";
@@ -392,7 +392,7 @@ public class MiniGameManager : MonoBehaviour
 		int difficulty = rsp.CurrentPirates.difficulty;
 
 		float baseShipSpeed = 7.408f;
-		float crewMod = Globals.Session.playerShipVariables.shipSpeed_Actual / baseShipSpeed / 1.5f;
+		float crewMod = Globals.Game.Session.playerShipVariables.shipSpeed_Actual / baseShipSpeed / 1.5f;
 		float run = (1.0f / difficulty) * crewMod;
 		run = Mathf.Max(runningBounds.x, run);
 		run = Mathf.Min(runningBounds.y, run);
@@ -488,7 +488,7 @@ public class MiniGameManager : MonoBehaviour
 		closeButton.onClick.RemoveAllListeners();
 		closeButton.onClick.AddListener(UnloadMinigame);
 
-		Globals.Session.AdjustPlayerClout(clout + cloutChange, false);
+		Globals.Game.Session.AdjustPlayerClout(clout + cloutChange, false);
 
 		mgInfo.gameObject.SetActive(true);
 		mgInfo.DisplayText(

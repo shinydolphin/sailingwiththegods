@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public class ShrinesViewModel : Model
 {
-	GameSession Session => Globals.Session;
+	GameSession Session => Globals.Game.Session;
 
 	int BaseCost {
 		get {

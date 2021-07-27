@@ -288,7 +288,7 @@ public class CrewMember
 	}
 
 	void InitChangeOnHire() {
-		var session = Globals.Session;
+		var session = Globals.Game.Session;
 
 		_changeOnHire = new SkillModifiers {
 			CitiesInNetwork = session.Network.GetCrewMemberNetwork(this).Count(s => !session.Network.MyCompleteNetwork.Contains(s)),
@@ -299,7 +299,7 @@ public class CrewMember
 	}
 
 	void InitChangeOnFire() {
-		var session = Globals.Session;
+		var session = Globals.Game.Session;
 
 		// the cities in network calculation is too expensive right now. disabled temporarily
 		_changeOnFire = new SkillModifiers {
@@ -311,7 +311,7 @@ public class CrewMember
 	}
 
 	void InitCurrentContribution() {
-		var session = Globals.Session;
+		var session = Globals.Game.Session;
 
 		// very similar to changeOnFire, but shows it as positives. this is their contribution to your team, not what you'll lose if you fire them (but it's basically the same).
 		_currentContribution = new SkillModifiers {

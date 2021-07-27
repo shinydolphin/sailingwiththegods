@@ -8,8 +8,8 @@ using UnityEngine.UI;
 
 public class RepairsViewModel : Model
 {
-	GameVars GameVars => Globals.GameVars;
-	GameSession Session => Globals.Session;
+	World World => Globals.World;
+	GameSession Session => Globals.Game.Session;
 	Notifications Notifications => Globals.Notifications;
 
 	public int costToRepair { get; private set; }
@@ -85,7 +85,7 @@ public class RepairsView : ViewBehaviour<RepairsViewModel>
 		base.Bind(model);
 
 		ShipHealth.Bind(ValueModel.Wrap(model.shipHealth)
-			.Select(h => Mathf.CeilToInt(Globals.Session.playerShipVariables.ship.health))
+			.Select(h => Mathf.CeilToInt(Globals.Game.Session.playerShipVariables.ship.health))
 			.AsString()
 		);
 
@@ -125,7 +125,7 @@ public class RepairsView : ViewBehaviour<RepairsViewModel>
 				.AsString());
 
 			CostAllHp.Bind(ValueModel.New(Model.costToRepair)
-				.Select(cost => (Mathf.CeilToInt(100 - Mathf.CeilToInt(Globals.Session.playerShipVariables.ship.health)) * cost))
+				.Select(cost => (Mathf.CeilToInt(100 - Mathf.CeilToInt(Globals.Game.Session.playerShipVariables.ship.health)) * cost))
 				.AsString());
 
 			RepairOneButton.GetComponent<Button>().interactable = true;

@@ -68,11 +68,11 @@ public class CityDetailsViewModel : CityViewModel
 			Globals.UI.Hide<CityView>();
 		}
 
-		var beacon = Globals.GameVars.crewBeacon;
+		var beacon = Globals.World.crewBeacon;
 		if (city.City != beacon.Target) {
 			beacon.Target = city.City;
-			Globals.Session.ActivateNavigatorBeacon(Globals.GameVars.crewBeacon, city.City.theGameObject.transform.position);
-			Globals.Session.RotateCameraTowards(city.City.theGameObject.transform.position);
+			Globals.Game.Session.ActivateNavigatorBeacon(Globals.World.crewBeacon, city.City.theGameObject.transform.position);
+			Globals.Game.Session.RotateCameraTowards(city.City.theGameObject.transform.position);
 			Globals.UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(city.City, null));
 		}
 		else {
@@ -83,10 +83,10 @@ public class CityDetailsViewModel : CityViewModel
 
 public class CityViewModel : Model
 {
-	protected GameVars GameVars => Globals.GameVars;
-	protected GameSession Session => Globals.Session;
+	protected World World => Globals.World;
+	protected GameSession Session => Globals.Game.Session;
 	protected Notifications Notifications => Globals.Notifications;
-	protected MainState MainState => Globals.MainState;
+	protected Game MainState => Globals.Game;
 
 	public Settlement City { get; private set; }
 
@@ -122,18 +122,18 @@ public class CityViewModel : Model
 	// REFERENCED IN BUTTON CLICK UNITYEVENT
 	public void GUI_Button_TryToLeavePort() {
 		//If you aren't low on supplies or you've already been warned
-		if (!Globals.Session.playerShipVariables.CheckIfShipLeftPortStarvingOrThirsty()) {
+		if (!Globals.Game.Session.playerShipVariables.CheckIfShipLeftPortStarvingOrThirsty()) {
 			//if (Session.Trade.CheckIfPlayerCanAffordToPayPortTaxes()) {
 			//MGV.controlsLocked = false;
 			//Start Our time passage
 			Session.playerShipVariables.PassTime(.25f, true);
 			Session.justLeftPort = true;
-			//Session.playerShipVariables.ship.currency -= GameVars.currentPortTax;
+			//Session.playerShipVariables.ship.currency -= World.currentPortTax;
 
 			//Add a new route to the player journey log as a port exit
 			Session.playerShipVariables.journey.AddRoute(new PlayerRoute(new Vector3(Session.playerShip.transform.position.x, Session.playerShip.transform.position.y, Session.playerShip.transform.position.z), Vector3.zero, Session.currentSettlement.settlementID, Session.currentSettlement.name, true, Session.playerShipVariables.ship.totalNumOfDaysTraveled), Session.playerShipVariables, Session.CaptainsLog);
 			//We should also update the ghost trail with this route otherwise itp roduce an empty 0,0,0 position later
-			Session.playerShipVariables.UpdatePlayerGhostRouteLineRenderer(MainState.IS_NOT_NEW_GAME);
+			Session.playerShipVariables.UpdatePlayerGhostRouteLineRenderer(Game.IS_NOT_NEW_GAME);
 
 			//Turn off the coin image texture
 			MainState.menuControlsLock = false;
@@ -141,7 +141,7 @@ public class CityViewModel : Model
 			Session.showSettlementGUI = false;
 			MainState.runningMainGameGUI = true;
 
-			GameVars.MasterGUISystem.ClearViewModels();
+			World.MasterGUISystem.ClearViewModels();
 
 			Globals.UI.Hide<PortScreen>();
 			Globals.UI.Hide<TownScreen>();

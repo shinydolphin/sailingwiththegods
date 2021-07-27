@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class CrewManagementViewModel : Model
 {
-	GameSession Session => Globals.Session;
+	GameSession Session => Globals.Game.Session;
 	Notifications Notifications => Globals.Notifications;
 
 	public readonly ICollectionModel<CrewManagementMemberViewModel> AvailableCrew;

@@ -51,7 +51,7 @@ public class RandomSlotPopulator : MonoBehaviour
     {
 		loaded = false;
 		canvas = GetComponent<Canvas>();
-		crewNum = Globals.Session.playerShipVariables.ship.crew;
+		crewNum = Globals.Game.Session.playerShipVariables.ship.crew;
 		crewGrid = crewOriginParent.GetComponent<GridLayoutGroup>();
 		crewPerRow = crewGrid.constraintCount;
 		slotsPerRow = Mathf.CeilToInt(pirateRange.y / 2f);
@@ -91,7 +91,7 @@ public class RandomSlotPopulator : MonoBehaviour
 		//random number of enemy priates within range
 		//the number spawned will never exceed the number of crew you have
 		int count = Random.Range(pirateRange.x, Mathf.Min(pirateRange.y, crewNum) + 1);
-		List<CrewMember> possiblePirates = Globals.Session.Pirates.Where(x => x.pirateType.Equals(typeToSpawn)).ToList();
+		List<CrewMember> possiblePirates = Globals.Game.Session.Pirates.Where(x => x.pirateType.Equals(typeToSpawn)).ToList();
 
 		List<CardDropZone> crewSlots = new List<CardDropZone>();
 
@@ -173,7 +173,7 @@ public class RandomSlotPopulator : MonoBehaviour
 
 		//	}
 
-		//	//CrewMember randomPirate = Globals.GameVars.Pirates.RandomElement();
+		//	//CrewMember randomPirate = Globals.World.Pirates.RandomElement();
 		//	CrewMember randomPirate = possiblePirates.RandomElement();
 		//	g.SetCrew(randomPirate);
 		//	g.Bind();
@@ -257,7 +257,7 @@ public class RandomSlotPopulator : MonoBehaviour
 					CrewCard newCrewCard = Instantiate(crewCard);
 					newCrewCard.SetRSP(this);
 					newCrewCard.name = "Card " + r + ", " + c;
-					newCrewCard.SetCrew(Globals.Session.playerShipVariables.ship.crewRoster[spawnedSlots]);
+					newCrewCard.SetCrew(Globals.Game.Session.playerShipVariables.ship.crewRoster[spawnedSlots]);
 					newCrewCard.Bind();
 					newCrewCard.transform.SetParent(crewParentInOrigin);
 					CardDropZone cdz = spawnedCrewSlots[r, c];

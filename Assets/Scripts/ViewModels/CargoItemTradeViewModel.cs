@@ -4,7 +4,7 @@ public class CargoItemTradeViewModel : Model
 {
 	private Resource Resource;
 
-	GameSession Session => Globals.Session;
+	GameSession Session => Globals.Game.Session;
 
 	public TradeViewModel Parent { get; private set; }
 	TradeAction TradeAction;

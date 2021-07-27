@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class ShrineOptionModel : Model
 {
-	GameSession Session => Globals.Session;
+	GameSession Session => Globals.Game.Session;
 	Notifications Notifications => Globals.Notifications;
 
 	public string Name;

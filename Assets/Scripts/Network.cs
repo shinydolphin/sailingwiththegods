@@ -10,7 +10,7 @@ public class Network
 
 	Ship Ship => Session.playerShipVariables.ship;
 
-	GameSession Session => Globals.Session;
+	GameSession Session => Globals.Game.Session;
 	Database Database => Globals.Database;
 
 	public Network() {

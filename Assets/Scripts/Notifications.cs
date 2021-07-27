@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 public class Notifications
 {
-	MainState MainState => Globals.MainState;
+	Game MainState => Globals.Game;
 
 	// notifications
 	public bool NotificationQueued { get; private set; }

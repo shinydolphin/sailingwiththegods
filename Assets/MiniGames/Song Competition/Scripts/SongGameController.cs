@@ -161,7 +161,7 @@ public class SongGameController : MonoBehaviour
 		endGameState = true;		
 		win.interactable = true;
 		win.alpha += Time.deltaTime;
-		if (!endGameState && Globals.GameVars != null) { Globals.Session.AdjustPlayerClout(clout, false); }
+		if (!endGameState && Globals.World != null) { Globals.Game.Session.AdjustPlayerClout(clout, false); }
 		setmessage = true;
 	}
 	// Update is called once per frame

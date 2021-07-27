@@ -64,10 +64,10 @@ public class TavernCityViewModel : CityViewModel
 			Session.playerShipVariables.ship.currency -= (int)CostToHire;
 			//change location of beacon
 			Vector3 location = Vector3.zero;
-			for (int x = 0; x < GameVars.settlement_masterList_parent.transform.childCount; x++)
-				if (GameVars.settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == City.settlementID)
-					location = GameVars.settlement_masterList_parent.transform.GetChild(x).position;
-			Session.ActivateNavigatorBeacon(GameVars.navigatorBeacon, location);
+			for (int x = 0; x < World.settlement_masterList_parent.transform.childCount; x++)
+				if (World.settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == City.settlementID)
+					location = World.settlement_masterList_parent.transform.GetChild(x).position;
+			Session.ActivateNavigatorBeacon(World.navigatorBeacon, location);
 			Session.playerShipVariables.ship.currentNavigatorTarget = City.settlementID;
 			Notifications.ShowANotificationMessage("You hired a navigator to " + City.name + " for " + CostToHire + " drachma.");
 			//If not enough money, then let the player know
@@ -80,8 +80,8 @@ public class TavernCityViewModel : CityViewModel
 
 public class TavernViewModel : Model
 {
-	GameVars GameVars => Globals.GameVars;
-	GameSession Session => Globals.Session;
+	World World => Globals.World;
+	GameSession Session => Globals.Game.Session;
 	Database Database => Globals.Database;
 
 	public ICollectionModel<CityViewModel> Cities { get; private set; }

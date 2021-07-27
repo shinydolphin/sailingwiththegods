@@ -69,7 +69,7 @@ public class RandomizerForStorms : MonoBehaviour
 		damagePerSecond = h.MaxHealth / (timeLimit * 60);
 
 		//Debug.Log("Setting SunLight in Start");
-		sunLight = Globals.GameVars.skybox_sun;
+		sunLight = Globals.World.skybox_sun;
 	}
 
 	private void OnEnable() 
@@ -84,7 +84,7 @@ public class RandomizerForStorms : MonoBehaviour
 
 		if (sunLight == null) {
 			//Debug.Log("SunLight was null, assigning object");
-			sunLight = Globals.GameVars.skybox_sun;
+			sunLight = Globals.World.skybox_sun;
 		}
 		//else {
 		//	Debug.Log("SunLight was already assigned, good to go");
@@ -92,12 +92,12 @@ public class RandomizerForStorms : MonoBehaviour
 
 		//Debug.Log("Turning sunLight and camera off");
 		sunLight.gameObject.SetActive(false);
-		Globals.GameVars.FPVCamera.gameObject.SetActive(false);
+		Globals.World.FPVCamera.gameObject.SetActive(false);
 
 		//Debug.Log("Turning the storm lighting on");
 		stormLight.gameObject.SetActive(true);
 
-		cloutBracket = GetBracket(cloutRanges, Globals.Session.playerShipVariables.ship.playerClout);
+		cloutBracket = GetBracket(cloutRanges, Globals.Game.Session.playerShipVariables.ship.playerClout);
 
 		InitializeView();
 		countingDown = false;
@@ -106,14 +106,14 @@ public class RandomizerForStorms : MonoBehaviour
 	private void OnDisable() 
 	{
 		if (sunLight == null) {
-			sunLight = Globals.GameVars.skybox_sun;
+			sunLight = Globals.World.skybox_sun;
 		}
 		if (sunLight.gameObject != null) {
 			sunLight.gameObject.SetActive(true);
 		}
-		if (Globals.GameVars.FPVCamera.gameObject != null) 
+		if (Globals.World.FPVCamera.gameObject != null) 
 		{
-			Globals.GameVars.FPVCamera.gameObject.SetActive(true);
+			Globals.World.FPVCamera.gameObject.SetActive(true);
 		}
 
 		stormLight.gameObject.SetActive(false);
@@ -131,7 +131,7 @@ public class RandomizerForStorms : MonoBehaviour
 	{
 		//Debug.Log("Starting InitializeView");
 		//Debug.Log("Instantiating ship");
-		ship = Instantiate(shipModels[Globals.Session.playerShipVariables.ship.upgradeLevel]);
+		ship = Instantiate(shipModels[Globals.Game.Session.playerShipVariables.ship.upgradeLevel]);
 		ship.tag = "StormShip";
 		ship.transform.SetParent(transform);
 		cam.transform.position = ship.transform.position + camOffset;

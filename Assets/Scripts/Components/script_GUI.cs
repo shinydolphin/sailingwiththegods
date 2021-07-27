@@ -130,9 +130,9 @@ public class script_GUI : MonoBehaviour
 
 	//===================================
 	// OTHER VARS
-	MainState MainState => Globals.MainState;
-	GameVars GameVars => Globals.GameVars;
-	GameSession Session => Globals.Session;
+	Game MainState => Globals.Game;
+	World World => Globals.World;
+	GameSession Session => Globals.Game.Session;
 
 	public GameObject player_currency;
 	public GameObject player_current_cargo;
@@ -344,7 +344,7 @@ public class script_GUI : MonoBehaviour
 		gameover_main.SetActive(false);
 		MainState.menuControlsLock = false;
 		//Restart from Beginning
-		GameVars.RestartGame();
+		World.RestartGame();
 	}
 
 
@@ -368,11 +368,11 @@ public class script_GUI : MonoBehaviour
 	public void GUI_ShowPortDockingNotification() {
 		Session.controlsLocked = true;
 
-		if(GameVars.crewBeacon.Target == Session.currentSettlement) {
-			Session.DeactivateNavigatorBeacon(GameVars.crewBeacon);
+		if(World.crewBeacon.Target == Session.currentSettlement) {
+			Session.DeactivateNavigatorBeacon(World.crewBeacon);
 		}
-		if (GameVars.navigatorBeacon.Target == Session.currentSettlement) {
-			Session.DeactivateNavigatorBeacon(GameVars.navigatorBeacon);
+		if (World.navigatorBeacon.Target == Session.currentSettlement) {
+			Session.DeactivateNavigatorBeacon(World.navigatorBeacon);
 		}
 
 		//if (useDialog) {
@@ -389,8 +389,8 @@ public class script_GUI : MonoBehaviour
 		//	string portMessage = "";
 		//	portMessage += Session.currentSettlement.description;
 		//	portMessage += "\n\n";
-		//	if (GameVars.isInNetwork) {
-		//		var crewMemberWithNetwork = GameVars.Network.CrewMemberWithNetwork(Session.currentSettlement);
+		//	if (World.isInNetwork) {
+		//		var crewMemberWithNetwork = World.Network.CrewMemberWithNetwork(Session.currentSettlement);
 		//		portMessage += "This Port is part of your network!\n";
 		//		if (crewMemberWithNetwork != null)
 		//			portMessage += "Your crewman, " + crewMemberWithNetwork.name + " assures you their connections here are strong! They should welcome you openly and waive your port taxes on entering!";
@@ -401,11 +401,11 @@ public class script_GUI : MonoBehaviour
 		//		portMessage += "This port is outside your social network!\n";
 		//	}
 
-		//	if (GameVars.currentPortTax != 0) {
-		//		portMessage += "If you want to dock here, your tax for entering will be " + GameVars.currentPortTax + " drachma. \n";
+		//	if (World.currentPortTax != 0) {
+		//		portMessage += "If you want to dock here, your tax for entering will be " + World.currentPortTax + " drachma. \n";
 		//		//If the port tax will make the player go negative--alert them as they enter
-		//		if (Session.playerShipVariables.ship.currency - GameVars.currentPortTax < 0)
-		//			portMessage += "Docking here will put you in debt for " + (Session.playerShipVariables.ship.currency - GameVars.currentPortTax) + "drachma, and you may lose your ship!\n";
+		//		if (Session.playerShipVariables.ship.currency - World.currentPortTax < 0)
+		//			portMessage += "Docking here will put you in debt for " + (Session.playerShipVariables.ship.currency - World.currentPortTax) + "drachma, and you may lose your ship!\n";
 		//	}
 		//	else {
 		//		portMessage += "You only have food and water stores on board, with no taxable goods. Thankfully you will dock for free!";
@@ -468,7 +468,7 @@ public class script_GUI : MonoBehaviour
 		//Add a new route to the player journey log as a port entry
 		Session.playerShipVariables.journey.AddRoute(new PlayerRoute(Session.playerShip.transform.position, Vector3.zero, Session.currentSettlement.settlementID, Session.currentSettlement.name, false, Session.playerShipVariables.ship.totalNumOfDaysTraveled), Session.playerShipVariables, Session.CaptainsLog);
 		//We should also update the ghost trail with this route otherwise itp roduce an empty 0,0,0 position later
-		Session.playerShipVariables.UpdatePlayerGhostRouteLineRenderer(MainState.IS_NOT_NEW_GAME);
+		Session.playerShipVariables.UpdatePlayerGhostRouteLineRenderer(Game.IS_NOT_NEW_GAME);
 
 		//-------------------------------------------------
 		// UPDATE PLAYER CLOUT METER
@@ -608,12 +608,12 @@ public class script_GUI : MonoBehaviour
 		Button startGame = (Button)title_crew_select_start_game.GetComponent<Button>();
 		startGame.onClick.RemoveAllListeners();//We have to remove this listener before we add it in case of an in-game restart, otherwise we have to simulataneous duplicate listeners when the button is pressed
 		startGame.onClick.AddListener(() => GUI_startMainGame());
-		for (int i = 0; i < GameVars.newGameAvailableCrew.Count; i++) {
+		for (int i = 0; i < World.newGameAvailableCrew.Count; i++) {
 			//Debug.Log ("CREW COUNT   " +i);
 			//We have to re-declare the CrewMember argument here or else when we apply the variable to the onClick() handler
 			//	--all onClick()'s in this loop will reference the last CrewMember instance in the loop rather than their
 			//	--respective iterated instances
-			CrewMember currentMember = GameVars.newGameAvailableCrew[i];
+			CrewMember currentMember = World.newGameAvailableCrew[i];
 
 			//First let's get a clone of our hidden row in the tavern scroll view
 			GameObject currentMemberRow = Instantiate((GameObject)title_crew_select_entry_template.transform.gameObject) as GameObject;
@@ -643,7 +643,7 @@ public class script_GUI : MonoBehaviour
 			memberName.text = currentMember.name;
 			memberJob.text = Database.GetJobClassEquivalency(currentMember.typeOfCrew);
 			memberHome.text = Database.GetSettlementFromID(currentMember.originCity).name;
-			memberClout.text = GameVars.GetCloutTitleEquivalency(currentMember.clout);
+			memberClout.text = World.GetCloutTitleEquivalency(currentMember.clout);
 
 
 			moreMemberInfo.onClick.RemoveAllListeners();
@@ -653,8 +653,8 @@ public class script_GUI : MonoBehaviour
 			int numOfCrew = 0;
 			int currentIndex = i;
 			//If the crewmember is necessary for the quest--lock the selection in as true
-			if (!GameVars.newGameAvailableCrew[i].isKillable) {
-				GameVars.newGameCrewSelectList[i] = true;
+			if (!World.newGameAvailableCrew[i].isKillable) {
+				World.newGameCrewSelectList[i] = true;
 				hireMember.transform.GetChild(0).GetComponent<Text>().text = "X";
 				numOfCrew++;
 			}
@@ -668,17 +668,17 @@ public class script_GUI : MonoBehaviour
 	}
 	public void GUI_CrewSelectToggle(int crewIndex) {
 		Transform currentCrewman = title_crew_select_crew_list.transform.Find("Content").GetChild(crewIndex + 1).Find("Hire Button");
-		if (GameVars.newGameCrewSelectList[crewIndex] != true) {
+		if (World.newGameCrewSelectList[crewIndex] != true) {
 			currentCrewman.GetChild(0).GetComponent<Text>().text = "X";
-			GameVars.newGameCrewSelectList[crewIndex] = true;
+			World.newGameCrewSelectList[crewIndex] = true;
 		}
 		else {
 			currentCrewman.GetChild(0).GetComponent<Text>().text = "";
-			GameVars.newGameCrewSelectList[crewIndex] = false;
+			World.newGameCrewSelectList[crewIndex] = false;
 		}
 		//Update our crew total!
 		int crewTotal = 0;
-		foreach (bool crew in GameVars.newGameCrewSelectList) {
+		foreach (bool crew in World.newGameCrewSelectList) {
 			if (crew) crewTotal++;
 		}
 		title_crew_select_crew_count.GetComponent<Text>().text = crewTotal.ToString();
@@ -688,7 +688,7 @@ public class script_GUI : MonoBehaviour
 		if (crewTotal >= 30) {
 			for (int x = 1; x < title_crew_select_crew_list.transform.Find("Content").childCount; x++) {
 				Transform childButton = title_crew_select_crew_list.transform.Find("Content").GetChild(x).Find("Hire Button");
-				if (!GameVars.newGameCrewSelectList[x - 1]) childButton.gameObject.SetActive(false);
+				if (!World.newGameCrewSelectList[x - 1]) childButton.gameObject.SetActive(false);
 			}
 			//Enable our Start Game Button
 			title_crew_select_start_game.SetActive(true);

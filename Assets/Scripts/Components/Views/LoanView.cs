@@ -9,8 +9,8 @@ using UnityEngine.UI;
 
 public class LoanViewModel : Model
 {
-	GameVars GameVars => Globals.GameVars;
-	GameSession Session => Globals.Session;
+	World World => Globals.World;
+	GameSession Session => Globals.Game.Session;
 	Database Database => Globals.Database;
 	Notifications Notifications => Globals.Notifications;
 

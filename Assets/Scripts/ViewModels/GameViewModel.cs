@@ -13,20 +13,20 @@ public class GameViewModel : Model
 		Beginner
 	}
 
-	GameVars GameVars => Globals.GameVars;
-	GameSession Session => Globals.Session;
+	World World => Globals.World;
+	GameSession Session => Globals.Game.Session;
 	Notifications Notifications => Globals.Notifications;
-	MainState MainState => Globals.MainState;
+	Game MainState => Globals.Game;
 
 	// happens once crew is selected and we're putting the player in game
 	public void GUI_startMainGame() {
-		GameVars.camera_titleScreen.SetActive(false);
+		World.camera_titleScreen.SetActive(false);
 
 		//Turn on the environment fog
 		RenderSettings.fog = true;
 
 		//Now turn on the main player controls camera
-		GameVars.FPVCamera.SetActive(true);
+		World.FPVCamera.SetActive(true);
 
 		//Turn on the player distance fog wall
 		Session.playerShipVariables.fogWall.SetActive(true);
@@ -42,7 +42,7 @@ public class GameViewModel : Model
 		Globals.Quests.InitiateMainQuestLineForPlayer();
 
 		//Reset Start Game Button
-		GameVars.startGameButton_isPressed = false;
+		World.startGameButton_isPressed = false;
 
 		// TODO: Crew select disabled for now
 		//title_crew_select.SetActive(false);
@@ -53,21 +53,21 @@ public class GameViewModel : Model
 
 	// TODO: This flow skips StartMainGame, so does some of the same stuff. Should merge if we can.
 	public void GUI_loadGame(Difficulty difficulty) {
-		if (GameVars.LoadSavedGame()) {
+		if (World.LoadSavedGame()) {
 			MainState.isLoadedGame = true;
 			MainState.isTitleScreen = false;
 			MainState.isStartScreen = false;
 
 			Globals.UI.Hide<TitleScreen>();
 
-			GameVars.camera_titleScreen.SetActive(false);
+			World.camera_titleScreen.SetActive(false);
 
 
 
 			//Turn on the environment fog
 			RenderSettings.fog = true;
 			//Now turn on the main player controls camera
-			GameVars.FPVCamera.SetActive(true);
+			World.FPVCamera.SetActive(true);
 			//Turn on the player distance fog wall
 			Session.playerShipVariables.fogWall.SetActive(true);
 			//Now enable the controls
@@ -75,13 +75,13 @@ public class GameViewModel : Model
 			//Set the player's initial position to the new position
 			Session.playerShipVariables.lastPlayerShipPosition = Session.playerShip.transform.position;
 			//Update Ghost Route
-			GameVars.LoadSavedGhostRoute();
+			World.LoadSavedGhostRoute();
 
 
 			//Setup Difficulty Level
 			if (difficulty == Difficulty.Normal) Session.gameDifficulty_Beginner = false;
 			else Session.gameDifficulty_Beginner = true;
-			GameVars.SetupBeginnerGameDifficulty();
+			World.SetupBeginnerGameDifficulty();
 
 			//Turn on the ship HUD
 			Globals.UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
@@ -99,15 +99,15 @@ public class GameViewModel : Model
 
 		Globals.UI.Hide<TitleScreen>();
 
-		GameVars.FillNewGameCrewRosterAvailability();
+		World.FillNewGameCrewRosterAvailability();
 
 		if (difficulty == Difficulty.Normal) Session.gameDifficulty_Beginner = false;
 		else Session.gameDifficulty_Beginner = true;
-		GameVars.SetupBeginnerGameDifficulty();
+		World.SetupBeginnerGameDifficulty();
 
 		// since we're skipping crew select, force pick the first StartingCrewSize members
 		for (var i = 0; i < Ship.StartingCrewSize; i++) {
-			GameVars.newGameCrewSelectList[i] = true;
+			World.newGameCrewSelectList[i] = true;
 		}
 
 		// TODO: For now, skip straight to starting the game since i turned off crew selection
@@ -124,12 +124,12 @@ public class GameViewModel : Model
 	//THIS IS THE SAVE DATA BUTTON
 	public void GUI_saveGame() {
 		Notifications.ShowANotificationMessage("Saved Data File 'player_save_game.txt' To: " + Application.persistentDataPath + "/");
-		GameVars.SaveUserGameData();
+		World.SaveUserGameData();
 	}
 
 	//-----------------------------------------------------
 	//THIS IS THE RESTART GAME BUTTON	
 	public void GUI_restartGame() {
-		GameVars.RestartGame();
+		World.RestartGame();
 	}
 }

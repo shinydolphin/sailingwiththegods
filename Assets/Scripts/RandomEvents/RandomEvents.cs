@@ -4,8 +4,8 @@ using System.Linq;
 
 public static class RandomEvents
 {
-	static GameVars GameVars => Globals.GameVars;
-	static GameSession Session => Globals.Session;
+	static World World => Globals.World;
+	static GameSession Session => Globals.Game.Session;
 	static Notifications Notifications => Globals.Notifications;
 
 	//#########################################################################################################
@@ -52,7 +52,7 @@ public static class RandomEvents
 				//Get the 0-1 aggregate clout score. Here we use the current zone of influence's network id to check
 				int currentZoneID = 0;
 				//TODO Right now this just uses the relevant city's ID to check--but in the aggregate score function--it should start using the networks--not the city.
-				if (GameVars.activeSettlementInfluenceSphereList.Count > 0) currentZoneID = GameVars.activeSettlementInfluenceSphereList[0];
+				if (World.activeSettlementInfluenceSphereList.Count > 0) currentZoneID = World.activeSettlementInfluenceSphereList[0];
 				float aggregateCloutScore = Session.GetOverallCloutModifier(currentZoneID);
 				//Now determine the final weighted chance score that will be .5f and under
 				chanceOfEvent = .5f - ship.crewRoster.Sum(c => c.changeOnHire.PositiveEvent / 100f) - (.2f * aggregateCloutScore);
@@ -91,8 +91,8 @@ public static class RandomEvents
 	public abstract class NegativeEvent : Event { }
 	public abstract class Event
 	{
-		protected GameVars GameVars => Globals.GameVars;
-		protected GameSession Session => Globals.Session;
+		protected World World => Globals.World;
+		protected GameSession Session => Globals.Game.Session;
 		protected Database Database => Globals.Database;
 
 		protected Ship ship { get; private set; }

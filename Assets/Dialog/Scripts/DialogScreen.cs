@@ -61,7 +61,7 @@ public class DialogScreen : ViewBehaviour
 
 	public void UpdateMoney() 
 	{
-		moneyText.text = Globals.Session.playerShipVariables.ship.currency + " dr";
+		moneyText.text = Globals.Game.Session.playerShipVariables.ship.currency + " dr";
 	}
 
 	public void AddToDialogText(string speaker, string text, TextAlignmentOptions align) 

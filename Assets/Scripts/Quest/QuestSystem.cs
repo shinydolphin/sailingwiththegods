@@ -9,10 +9,10 @@ public class QuestSystem : MonoBehaviour
 {
 	public const string QuestMessageIntro = "The Argonautica Quest: ";
 
-	GameSession Session => Globals.Session;
-	GameVars GameVars => Globals.GameVars;
+	GameSession Session => Globals.Game.Session;
+	World World => Globals.World;
 	Database Database => Globals.Database;
-	MainState MainState => Globals.MainState;
+	Game MainState => Globals.Game;
 	Notifications Notifications => Globals.Notifications;
 
 	GameObject playerShip => Session.playerShip;
@@ -100,7 +100,7 @@ public class QuestSystem : MonoBehaviour
 
 			//Now add the city name of the next journey quest to the players known settlements
 			// this is only valid for city destinations, obviously
-			Debug.Log("Adding known city from next quest destination: " + Globals.Session.currentSettlement.name);
+			Debug.Log("Adding known city from next quest destination: " + Globals.Game.Session.currentSettlement.name);
 			playerShipVariables.ship.playerJournal.AddNewSettlementToLog(cityTrigger2.DestinationId);
 			Debug.Log("next seg: " + cityTrigger2.DestinationId);
 		}
@@ -115,7 +115,7 @@ public class QuestSystem : MonoBehaviour
 			Debug.Log("mentioning: " + i);
 			//Make sure we don't add any null values--a -1 represents no mentions of any settlements
 			if (i != -1) {
-				Debug.Log("Adding known city from quest: " + Globals.Session.currentSettlement.name);
+				Debug.Log("Adding known city from quest: " + Globals.Game.Session.currentSettlement.name);
 				playerShipVariables.ship.playerJournal.AddNewSettlementToLog(i);
 			}
 
@@ -186,9 +186,9 @@ public class QuestSystem : MonoBehaviour
 		playerShipVariables.ship.crewCapacity = Ship.StartingCrewCap;
 
 		//Now let's add all the initial crew from the start screen selection and start the first leg of the quest
-		for (int i = 0; i < GameVars.newGameAvailableCrew.Count; i++) {
-			if (GameVars.newGameCrewSelectList[i]) {
-				playerShipVariables.ship.crewRoster.Add(GameVars.newGameAvailableCrew[i]);
+		for (int i = 0; i < World.newGameAvailableCrew.Count; i++) {
+			if (World.newGameCrewSelectList[i]) {
+				playerShipVariables.ship.crewRoster.Add(World.newGameAvailableCrew[i]);
 			}
 		}
 
@@ -247,12 +247,12 @@ public class QuestSystem : MonoBehaviour
 		playerShipVariables.lastPlayerShipPosition = playerShip.transform.position;
 
 		//Setup Difficulty Level
-		GameVars.SetupBeginnerGameDifficulty();
+		World.SetupBeginnerGameDifficulty();
 
 		// setup each city with 5 crew available and for now, they never regenerate.
 		foreach (var settlement in Database.settlement_masterList) {
 			settlement.availableCrew.Clear();
-			GameVars.GenerateRandomCrewMembers(5).ForEach(c => settlement.availableCrew.Add(c));
+			World.GenerateRandomCrewMembers(5).ForEach(c => settlement.availableCrew.Add(c));
 		}
 
 		Globals.Quests.StartQuestSegment(0);

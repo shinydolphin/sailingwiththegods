@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 //ISSUE: PowerIndiacator when activated stops the Menu buttons from being pressed
 public class KottabosManager : MonoBehaviour {
-	GameSession Session => Globals.Session;
+	GameSession Session => Globals.Game.Session;
 
 	public MiniGameInfoScreen mgscreen;
 	public Sprite gameIcon = null;
@@ -85,13 +85,13 @@ public class KottabosManager : MonoBehaviour {
 					//Here's your reward end game
 					//KottabosReset();
 					Session.AdjustPlayerClout(15 * score, false);
-					Globals.Session.playerShipVariables.ship.currency += Random.Range(5, 7);
+					Globals.Game.Session.playerShipVariables.ship.currency += Random.Range(5, 7);
 					mgscreen.DisplayText("Perfect", "Perfection absolute – desired but dangerous!", "You have reached it, but now beware\n Lest Envy drive the god of War\n To take aim at you as you have at these cups!", null, MiniGameInfoScreen.MiniGame.TavernaEnd);
 				}
 				else if (score >= 10) {
 					//KottabosReset();
 					Session.AdjustPlayerClout(Random.Range(10, 14) * score, false);
-					Globals.Session.playerShipVariables.ship.currency += Random.Range(3,4);
+					Globals.Game.Session.playerShipVariables.ship.currency += Random.Range(3,4);
 					mgscreen.DisplayText("Great", "Zeus himself could not have thrown better!", "Your hand was neither too stiff , nor too crooked; a master of the javelin, a god of the sling, a hero of missiles must you be on  the battlefield!", null, MiniGameInfoScreen.MiniGame.TavernaEnd);
 				}
 				else if (score >= 5) {

@@ -4,7 +4,7 @@ using System.Linq;
 public class Trade
 {
 	Database Database => Globals.Database;
-	GameSession Session => Globals.Session;
+	GameSession Session => Globals.Game.Session;
 
 	public Trade() {
 	}

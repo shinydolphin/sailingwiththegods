@@ -103,7 +103,7 @@ public class YarnGeneral : MonoBehaviour
 		else {
 			itemCost = Mathf.CeilToInt(float.Parse(cost));
 		}
-		ds.Storage.SetValue("$can_afford", Globals.Session.playerShipVariables.ship.currency >= itemCost);
+		ds.Storage.SetValue("$can_afford", Globals.Game.Session.playerShipVariables.ship.currency >= itemCost);
 	}
 
 	[YarnCommand("roundup")]
@@ -128,7 +128,7 @@ public class YarnGeneral : MonoBehaviour
 			itemCost = Mathf.RoundToInt(float.Parse(cost));
 		}
 
-		Globals.Session.playerShipVariables.ship.currency -= itemCost;
+		Globals.Game.Session.playerShipVariables.ship.currency -= itemCost;
 		ds.UpdateMoney();
 	}
 	#endregion

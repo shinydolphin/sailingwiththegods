@@ -12,25 +12,25 @@ public class script_settlement_functions : MonoBehaviour, IPointerEnterHandler, 
 
 	public Transform anchor;
 	public Settlement thisSettlement;
-	GameVars GameVars;
+	World World;
 
 	// debug display of settlement id so you can easily find them
 	[ShowNativeProperty] int SettlementId => thisSettlement != null ? thisSettlement.settlementID : -1;
 
 	
 	void Start() {
-		GameVars = Globals.GameVars;
+		World = Globals.World;
 	}
 
 	// TODO: Remove this once we're sure we don't want any of this selection_ring code
 	/*
 	public void ActivateHighlightOnMouseOver() {
 		//child selection ring to current settlement
-		GameVars.selection_ring.transform.SetParent(transform);
+		World.selection_ring.transform.SetParent(transform);
 		//set the ring to the origin coordinates of the settlement
-		GameVars.selection_ring.transform.localPosition = new Vector3(0, 2, 0);
+		World.selection_ring.transform.localPosition = new Vector3(0, 2, 0);
 		//turn the ring on
-		GameVars.selection_ring.SetActive(true);
+		World.selection_ring.SetActive(true);
 
 		Session.currentSettlementGameObject = gameObject;
 		Session.currentSettlement = thisSettlement;
@@ -47,9 +47,9 @@ public class script_settlement_functions : MonoBehaviour, IPointerEnterHandler, 
 	}
 
 	void TryShowTooltip() {
-		if (!Globals.UI.IsShown<CityView>() && !Globals.Session.IsCutsceneMode) {
+		if (!Globals.UI.IsShown<CityView>() && !Globals.Game.Session.IsCutsceneMode) {
 			var ui = Globals.UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(thisSettlement, null));
-			ui.transform.position = Globals.UI.WorldToUI(GameVars.FPVCamera.GetComponent<Camera>(), transform.position);
+			ui.transform.position = Globals.UI.WorldToUI(World.FPVCamera.GetComponent<Camera>(), transform.position);
 		}
 	}
 

@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// Only exists if a game is in progress.
+/// </summary>
 public class GameSession
 {
-	GameVars GameVars => Globals.GameVars;
+	World World => Globals.World;
 	Database Database => Globals.Database;
 	Notifications Notifications => Globals.Notifications;
 
-	// TODO: These should be removed eventually in favor of using Globals.GameVars.Crew.Jason, so that GameVars isn't so overloaded with util functions
+	// TODO: These should be removed eventually in favor of using Globals.World.Crew.Jason, so that World isn't so overloaded with util functions
 	public CrewMember Jason => Crew.Jason;
 	public IEnumerable<CrewMember> StandardCrew => Crew.StandardCrew;
 	public IEnumerable<CrewMember> Pirates => Crew.Pirates;
@@ -77,16 +78,16 @@ public class GameSession
 		Icons = new Icons(Database.masterResourceList);
 		Crew = new Crew(Database.masterCrewList, Database.masterPirateTypeList, playerShipVariables.ship);
 
-		GameVars.CreateSettlementsFromList();
-		currentSettlementGameObject = GameVars.settlement_masterList_parent.transform.GetChild(0).gameObject;
+		World.CreateSettlementsFromList();
+		currentSettlementGameObject = World.settlement_masterList_parent.transform.GetChild(0).gameObject;
 		currentSettlement = currentSettlementGameObject.GetComponent<script_settlement_functions>().thisSettlement;
 		//The lights are on at the start, so turn them off or they'll be on during the first day and no other day
-		GameVars.cityLightsParent.SetActive(false);
+		World.cityLightsParent.SetActive(false);
 
 		//Load the basic log entries into the log pool
 		AddEntriesToCurrentLogPool(0);
 		StartPlayerShipAtOriginCity();
-		GameVars.GenerateCityLights();
+		World.GenerateCityLights();
 	}
 
 	public void ActivateNavigatorBeacon(Beacon beacon, Vector3 location) {
@@ -117,10 +118,10 @@ public class GameSession
 
 		if (CameraLookTarget.HasValue) {
 
-			var camToTarget = CameraLookTarget.Value - GameVars.FPVCamera.transform.parent.parent.transform.position;
-			var angle = Vector3.SignedAngle(GameVars.FPVCamera.transform.parent.parent.forward, camToTarget.normalized, Vector3.up);
+			var camToTarget = CameraLookTarget.Value - World.FPVCamera.transform.parent.parent.transform.position;
+			var angle = Vector3.SignedAngle(World.FPVCamera.transform.parent.parent.forward, camToTarget.normalized, Vector3.up);
 
-			GameVars.FPVCamera.transform.parent.parent.RotateAround(GameVars.FPVCamera.transform.parent.parent.position, GameVars.FPVCamera.transform.parent.parent.up, angle * Time.deltaTime);
+			World.FPVCamera.transform.parent.parent.RotateAround(World.FPVCamera.transform.parent.parent.position, World.FPVCamera.transform.parent.parent.up, angle * Time.deltaTime);
 
 			if (Mathf.Abs(angle) < 2f) {
 				CameraLookTarget = null;
@@ -151,8 +152,8 @@ public class GameSession
 
 	void StartPlayerShipAtOriginCity() {
 		//first set the origin city to the first available as a default
-		GameObject originCity = GameVars.settlement_masterList_parent.transform.GetChild(0).gameObject;
-		foreach (Transform child in GameVars.settlement_masterList_parent.transform) {
+		GameObject originCity = World.settlement_masterList_parent.transform.GetChild(0).gameObject;
+		foreach (Transform child in World.settlement_masterList_parent.transform) {
 			//if the settlement we want exists, then use it as the default instead
 			if (child.name == "Samothrace") {
 				originCity = child.gameObject;
@@ -185,10 +186,10 @@ public class GameSession
 	}
 
 	void SetShipModel(int shipLevel) {
-		foreach (var upgradeLevel in GameVars.shipLevels) {
+		foreach (var upgradeLevel in World.shipLevels) {
 			upgradeLevel.SetActive(false);
 		}
-		GameVars.shipLevels[shipLevel].SetActive(true);
+		World.shipLevels[shipLevel].SetActive(true);
 	}
 
 
@@ -223,7 +224,7 @@ public class GameSession
 				Debug.Log("Lost a level");
 				Notifications.ShowANotificationMessage("Unfortunately you sunk to a new low level of respect in the world! Before this day you were Jason, " + Database.GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + Database.GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
 			}
-			GameVars.MasterGUISystem.GUI_UpdatePlayerCloutMeter();
+			World.MasterGUISystem.GUI_UpdatePlayerCloutMeter();
 		}
 
 

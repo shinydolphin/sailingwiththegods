@@ -12,13 +12,13 @@ public class PortViewModel : CityViewModel
 
 	public bool allowTownAccess;
 
-	public PortViewModel(bool townAccess = true) : base(Globals.Session.currentSettlement, null){
+	public PortViewModel(bool townAccess = true) : base(Globals.Game.Session.currentSettlement, null){
 		CrewManagement = new CrewManagementViewModel(City);
 		allowTownAccess = townAccess;
 	}
 
 	public void GoToTown() {
 		Globals.UI.Hide<PortScreen>();
-		Globals.UI.Show<TownScreen, TradeViewModel>(Globals.GameVars.MasterGUISystem.Trade);
+		Globals.UI.Show<TownScreen, TradeViewModel>(Globals.World.MasterGUISystem.Trade);
 	}
 }

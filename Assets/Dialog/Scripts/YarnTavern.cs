@@ -28,20 +28,20 @@ public class YarnTavern : MonoBehaviour
 	
 	[YarnCommand("getcurrentsettlement")]
 	public void GetCurrentSettlement() {
-		ds.Storage.SetValue("$known_city", Globals.Session.currentSettlement.name);
-		ds.Storage.SetValue("$known_city_ID", Globals.Session.currentSettlement.settlementID);
-		ds.Storage.SetValue("$known_city_type", Globals.Session.currentSettlement.typeOfSettlement);
+		ds.Storage.SetValue("$known_city", Globals.Game.Session.currentSettlement.name);
+		ds.Storage.SetValue("$known_city_ID", Globals.Game.Session.currentSettlement.settlementID);
+		ds.Storage.SetValue("$known_city_type", Globals.Game.Session.currentSettlement.typeOfSettlement);
 	}
 
 	//We need this so we can make sure not to let the player order a guide to the city they're currently at
 	[YarnCommand("checkifcurrent")]
 	public void CheckIfAskingAboutCurrentSettlement() {
-		ds.Storage.SetValue("$asking_current", ds.Storage.GetValue("$known_city_ID").AsNumber == Globals.Session.currentSettlement.settlementID);
+		ds.Storage.SetValue("$asking_current", ds.Storage.GetValue("$known_city_ID").AsNumber == Globals.Game.Session.currentSettlement.settlementID);
 	}
 
 	[YarnCommand("getknownsettlementnumber")]
 	public void GetNumberOfKnownSettlements() {
-		ds.Storage.SetValue("$settlement_number", Globals.Session.playerShipVariables.ship.playerJournal.knownSettlements.Count);
+		ds.Storage.SetValue("$settlement_number", Globals.Game.Session.playerShipVariables.ship.playerJournal.knownSettlements.Count);
 	}
 	#endregion
 
@@ -154,7 +154,7 @@ public class YarnTavern : MonoBehaviour
 				{
 					// Clean this up for readability.
 					ds.Storage.SetValue("$response", matchingType[(int)ds.Storage.GetValue("$current_myth_count").AsNumber].TextQA[1]);
-					Globals.Session.AddToCaptainsLog("Myth of " + e + ":\n" + ds.Storage.GetValue("$response").AsString);
+					Globals.Game.Session.AddToCaptainsLog("Myth of " + e + ":\n" + ds.Storage.GetValue("$response").AsString);
 				}
 				else
 					ds.Storage.SetValue("$response", "There is nothing more for me to say!");
@@ -198,7 +198,7 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("hirenavigator")]
 	public void SetSettlementWaypoint()
 	{
-		_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.Session.AllNonCrew.RandomElement().ID);		
+		_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.Game.Session.AllNonCrew.RandomElement().ID);		
 	}
 	#endregion
 

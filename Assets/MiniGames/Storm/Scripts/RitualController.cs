@@ -43,7 +43,7 @@ public class RitualController : MonoBehaviour
 	{
 		rfs = GetComponent<RandomizerForStorms>();
 		DisplayStartingText();
-		Globals.Session.playerShip.GetComponent<script_player_controls>().cursorRing.SetActive(false);
+		Globals.Game.Session.playerShip.GetComponent<script_player_controls>().cursorRing.SetActive(false);
 	}
 
 	public void DisplayStartingText() 
@@ -68,7 +68,7 @@ public class RitualController : MonoBehaviour
 
 		//Select an appropriate ritual
 		currentRitual = possibleRituals[RandomIndex(possibleRituals)];
-		currentCrew = Globals.Session.playerShipVariables.ship.crewRoster[RandomIndex(Globals.Session.playerShipVariables.ship.crewRoster)];
+		currentCrew = Globals.Game.Session.playerShipVariables.ship.crewRoster[RandomIndex(Globals.Game.Session.playerShipVariables.ship.crewRoster)];
 
 		DisplayRitualText();
 	}
@@ -104,11 +104,11 @@ public class RitualController : MonoBehaviour
 					performText += $"\n{currentCrew.name} will die as a sacrifice";
 					break;
 				case (-2):
-					performText += $"\n-{currentRitual.ResourceAmounts[i]} Drachma (You have {Globals.Session.playerShipVariables.ship.currency} Drachma)";
+					performText += $"\n-{currentRitual.ResourceAmounts[i]} Drachma (You have {Globals.Game.Session.playerShipVariables.ship.currency} Drachma)";
 					break;
 				default:
 					performText += $"\n-{currentRitual.ResourceAmounts[i]}kg {Globals.Database.masterResourceList[currentRitual.ResourceTypes[i]].name} " +
-						$"(You have {Globals.Session.playerShipVariables.ship.cargo[currentRitual.ResourceTypes[i]].amount_kg}kg)";
+						$"(You have {Globals.Game.Session.playerShipVariables.ship.cargo[currentRitual.ResourceTypes[i]].amount_kg}kg)";
 					break;
 			}
 		}
@@ -178,13 +178,13 @@ public class RitualController : MonoBehaviour
 		for (int i = 0; i < currentRitual.ResourceTypes.Length; i++) 
 		{
 			if (currentRitual.ResourceTypes[i] == -2) {
-				hasResources = hasResources && (Globals.Session.playerShipVariables.ship.currency > currentRitual.ResourceAmounts[i]);
+				hasResources = hasResources && (Globals.Game.Session.playerShipVariables.ship.currency > currentRitual.ResourceAmounts[i]);
 			}
 			else if (currentRitual.ResourceTypes[i] == -1) {
 				//skip - you know they have at least one crewmember
 			}
 			else {
-				hasResources = hasResources && (Globals.Session.playerShipVariables.ship.cargo[currentRitual.ResourceTypes[i]].amount_kg > currentRitual.ResourceAmounts[i]);
+				hasResources = hasResources && (Globals.Game.Session.playerShipVariables.ship.cargo[currentRitual.ResourceTypes[i]].amount_kg > currentRitual.ResourceAmounts[i]);
 			}
 		}
 		return hasResources;
@@ -196,14 +196,14 @@ public class RitualController : MonoBehaviour
 			switch (currentRitual.ResourceTypes[i]) 
 			{
 				case (-2):
-					Globals.Session.playerShipVariables.ship.currency = Mathf.Max(0, Globals.Session.playerShipVariables.ship.currency - currentRitual.ResourceAmounts[i]);
+					Globals.Game.Session.playerShipVariables.ship.currency = Mathf.Max(0, Globals.Game.Session.playerShipVariables.ship.currency - currentRitual.ResourceAmounts[i]);
 					break;
 				case (-1):
-					Globals.Session.playerShipVariables.ship.crewRoster.Remove(currentCrew);
+					Globals.Game.Session.playerShipVariables.ship.crewRoster.Remove(currentCrew);
 					break;
 				default:
 					int j = currentRitual.ResourceTypes[i];
-					Globals.Session.playerShipVariables.ship.cargo[j].amount_kg = Mathf.Max(0f, Globals.Session.playerShipVariables.ship.cargo[j].amount_kg - currentRitual.ResourceAmounts[i]);
+					Globals.Game.Session.playerShipVariables.ship.cargo[j].amount_kg = Mathf.Max(0f, Globals.Game.Session.playerShipVariables.ship.cargo[j].amount_kg - currentRitual.ResourceAmounts[i]);
 					break;
 			}
 		}
@@ -218,9 +218,9 @@ public class RitualController : MonoBehaviour
 	{
 		bool hasSeer = false;
 
-		for (int i = 0; i < Globals.Session.playerShipVariables.ship.crew; i++) 
+		for (int i = 0; i < Globals.Game.Session.playerShipVariables.ship.crew; i++) 
 		{
-			hasSeer = hasSeer || (Globals.Session.playerShipVariables.ship.crewRoster[i].typeOfCrew == CrewType.Seer);
+			hasSeer = hasSeer || (Globals.Game.Session.playerShipVariables.ship.crewRoster[i].typeOfCrew == CrewType.Seer);
 		}
 
 		return hasSeer;
@@ -236,7 +236,7 @@ public class RitualController : MonoBehaviour
 		int cloutGained = Mathf.CeilToInt((survivalGain.y - survivalGain.x) * percentDamage + survivalGain.x);
 		string cloutText = damageLevelText[damageBracket] + "\n\n" + $"For making your way out of the storm with your ship intact, your clout has risen {Mathf.RoundToInt(cloutGained)}." + 
 			$" Combined with the {cloutChange} from the ritual, your clout has changed a total of {Mathf.RoundToInt(cloutGained + cloutChange)}.";
-		Globals.Session.AdjustPlayerClout(cloutGained + cloutChange, false);
+		Globals.Game.Session.AdjustPlayerClout(cloutGained + cloutChange, false);
 
 		mgInfo.gameObject.SetActive(true);
 		mgInfo.DisplayText(
@@ -271,7 +271,7 @@ public class RitualController : MonoBehaviour
 
 	public void EndGame() 
 	{
-		Globals.MainState.isGameOver = true;
+		Globals.Game.isGameOver = true;
 	}
 
 	public void UnloadMinigame() 
@@ -279,7 +279,7 @@ public class RitualController : MonoBehaviour
 		//UNLOAD MINIGAME CODE GOES HERE
 		mgInfo.CloseDialog();
 		gameObject.SetActive(false);
-		Globals.Session.playerShip.GetComponent<script_player_controls>().cursorRing.SetActive(true);
+		Globals.Game.Session.playerShip.GetComponent<script_player_controls>().cursorRing.SetActive(true);
 		Globals.MiniGames.Exit();
 	}
 }
