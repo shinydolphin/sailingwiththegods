@@ -69,8 +69,6 @@ public class GameSession
 	[HideInInspector] public bool showPortDockingNotification = false;
 	[HideInInspector] public bool gameDifficulty_Beginner = false;
 	[HideInInspector] public bool showNonPortDockButton = false;
-	[HideInInspector] public bool showNonPortDockingNotification = false;
-	[HideInInspector] public bool updatePlayerCloutMeter = false;
 
 
 	public GameSession() {
@@ -218,7 +216,6 @@ public class GameSession
 		//First check if a player reaches a new clout level
 		//If the titles don't match after adjustment then we have a change!
 		if (Database.GetCloutTitleEquivalency(clout) != Database.GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout)) {
-			updatePlayerCloutMeter = true;
 			//Next we need to determine whether or not it was a level down or level up
 			//If it was an increase then show a positive message
 			if (clout < (clout + cloutAdjustment)) {
@@ -230,7 +227,6 @@ public class GameSession
 				Debug.Log("Lost a level");
 				Notifications.ShowANotificationMessage("Unfortunately you sunk to a new low level of respect in the world! Before this day you were Jason, " + Database.GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + Database.GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
 			}
-			World.MasterGUISystem.GUI_UpdatePlayerCloutMeter();
 		}
 
 

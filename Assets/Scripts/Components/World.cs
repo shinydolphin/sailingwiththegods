@@ -127,6 +127,8 @@ public class World : MonoBehaviour
 		Globals.Register(new Game());
 		Globals.Register(new Database());
 
+		Globals.Database.Init();
+
 		// wind and current init
 		BuildWindZoneGameObjects();
 		BuildCurrentZoneGameObjects();

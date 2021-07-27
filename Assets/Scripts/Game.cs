@@ -37,6 +37,7 @@ public class Game
 	#region UI Triggered functions
 
 	public void StartNewGame(Difficulty difficulty) {
+		Session = new GameSession();
 
 		isTitleScreen = false;
 		isStartScreen = true;
@@ -55,7 +56,7 @@ public class Game
 		}
 
 		// TODO: For now, skip straight to starting the game since i turned off crew selection
-		StartMainGame();
+		StartMainGameInternal();
 		//play the intro for the game
 		//time_Line_controll.play();//start the intro seen
 		// TODO: Turned off crew selection because it's too overwhelming. Needs to be reworked.
@@ -64,40 +65,48 @@ public class Game
 
 	}
 
-	void StartMainGame() {
-		World.camera_titleScreen.SetActive(false);
+	public void RestartGame() {
 
-		//Turn on the environment fog
-		RenderSettings.fog = true;
+		// TOOD: make the session completely recreated on restart. didn't do it yet because i bet the code in this function assumes some leftovers.
+		var session = Session;
 
-		//Now turn on the main player controls camera
-		World.FPVCamera.SetActive(true);
+		//Debug.Log ("Quest Seg: " + playerShipVariables.ship.mainQuest.currentQuestSegment);
+		//First we need to save the game that just ended
+		SaveUserGameData();
+		//Then we need to re-initialize all the player's variables
+		session.playerShipVariables.Reset();
 
-		//Turn on the player distance fog wall
-		Session.playerShipVariables.fogWall.SetActive(true);
+		//Reset Other Player Ship Variables
+		session.playerShipVariables.numOfDaysTraveled = 0;
+		session.playerShipVariables.numOfDaysWithoutProvisions = 0;
+		session.playerShipVariables.numOfDaysWithoutWater = 0;
+		session.playerShipVariables.dayCounterStarving = 0;
+		session.playerShipVariables.dayCounterThirsty = 0;
 
-		//Now change titleScreen to false
-		isTitleScreen = false;
-		isStartScreen = false;
+		//Take player back to title screen
+		//Debug.Log ("GOING TO TITLE SCREEN");
+		Globals.UI.HideAll();
+		Globals.UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
+		session.controlsLocked = true;
+		isTitleScreen = true;
+		RenderSettings.fog = false;
+		World.FPVCamera.SetActive(false);
+		World.camera_titleScreen.SetActive(true);
+		isTitleScreen = true;
+		runningMainGameGUI = false;
 
-		//Now enable the controls
-		Session.controlsLocked = false;
+		session.SetShipModel(session.playerShipVariables.ship.upgradeLevel);
 
-		//Initiate the main questline
-		Globals.Quests.InitiateMainQuestLineForPlayer();
+		//clear captains log
+		session.ResetCaptainsLog(string.Empty);
 
-		//Reset Start Game Button
-		World.startGameButton_isPressed = false;
-
-		// TODO: Crew select disabled for now
-		//title_crew_select.SetActive(false);
-
-		//Turn on the ship HUD
-		Globals.UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
 	}
 
+
 	public void LoadGame(Difficulty difficulty) {
-		if (LoadSavedGame()) {
+		Session = new GameSession();
+
+		if (LoadSavedGameInternal()) {
 			isLoadedGame = true;
 			isTitleScreen = false;
 			isStartScreen = false;
@@ -136,11 +145,77 @@ public class Game
 		}
 	}
 
+	public void SaveUserGameData() {
+		var session = Session;
+
+		string delimitedData = session.playerShipVariables.journey.ConvertJourneyLogToCSVText();
+		Debug.Log(delimitedData);
+		string filePath = Application.persistentDataPath + "/";
+
+		string fileNameServer = "";
+		if (World.DEBUG_MODE_ON)
+			fileNameServer += "DEBUG_DATA_" + SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv";
+		else
+			fileNameServer += SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv";
+
+		string fileName = "player_save_game.txt";
+
+		//Adding a try/catch block around this write because if someone tries playing the game out of zip on mac--it throws an error that is unoticeable but also
+		//causes the code to fall short and quit before saving to the server
+		try {
+			//save a backup before Joanna's edits
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/BACKUP-" + SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv", delimitedData);
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileName, delimitedData);
+			//TODO Temporary addition for joanna to remove the captains log from the server upload
+			string fileToUpload = RemoveCaptainsLogForJoanna(delimitedData);
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileNameServer, fileToUpload);
+			Debug.Log(Application.persistentDataPath);
+
+			// secretly save a JSON version of the save data to prep for a move to make that the canonical save file - but it's not hooked up to be loaded yet
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(session.playerShipVariables.ship));
+		}
+		catch (Exception e) {
+			Notifications.ShowANotificationMessage("ERROR: a backup wasn't saved at: " + Application.persistentDataPath + "  - which means it may not have uploaded either: " + e.Message);
+		}
+		//Only upload to the server is the DebugMode is OFF
+		if (!World.DEBUG_MODE_ON) SaveUserGameDataToServer(filePath, fileNameServer);
+
+	}
+
 	#endregion
 
-	#region Main Functions
+	#region Internal Functions
 
-	public bool LoadSavedGame() {
+	void StartMainGameInternal() {
+		World.camera_titleScreen.SetActive(false);
+
+		//Turn on the environment fog
+		RenderSettings.fog = true;
+
+		//Now turn on the main player controls camera
+		World.FPVCamera.SetActive(true);
+
+		//Turn on the player distance fog wall
+		Session.playerShipVariables.fogWall.SetActive(true);
+
+		//Now change titleScreen to false
+		isTitleScreen = false;
+		isStartScreen = false;
+
+		//Now enable the controls
+		Session.controlsLocked = false;
+
+		//Initiate the main questline
+		Globals.Quests.InitiateMainQuestLineForPlayer();
+
+		// TODO: Crew select disabled for now
+		//title_crew_select.SetActive(false);
+
+		//Turn on the ship HUD
+		Globals.UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
+	}
+
+	bool LoadSavedGameInternal() {
 		var session = Session;
 
 		PlayerJourneyLog loadedJourney = new PlayerJourneyLog();
@@ -310,44 +385,7 @@ public class Game
 		return true;
 	}
 
-	public void SaveUserGameData() {
-		var session = Session;
-
-		string delimitedData = session.playerShipVariables.journey.ConvertJourneyLogToCSVText();
-		Debug.Log(delimitedData);
-		string filePath = Application.persistentDataPath + "/";
-
-		string fileNameServer = "";
-		if (World.DEBUG_MODE_ON)
-			fileNameServer += "DEBUG_DATA_" + SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv";
-		else
-			fileNameServer += SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv";
-
-		string fileName = "player_save_game.txt";
-
-		//Adding a try/catch block around this write because if someone tries playing the game out of zip on mac--it throws an error that is unoticeable but also
-		//causes the code to fall short and quit before saving to the server
-		try {
-			//save a backup before Joanna's edits
-			System.IO.File.WriteAllText(Application.persistentDataPath + "/BACKUP-" + SystemInfo.deviceUniqueIdentifier + "_player_data_" + System.DateTime.UtcNow.ToString("HH-mm-ss_dd_MMMM_yyyy") + ".csv", delimitedData);
-			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileName, delimitedData);
-			//TODO Temporary addition for joanna to remove the captains log from the server upload
-			string fileToUpload = RemoveCaptainsLogForJoanna(delimitedData);
-			System.IO.File.WriteAllText(Application.persistentDataPath + "/" + fileNameServer, fileToUpload);
-			Debug.Log(Application.persistentDataPath);
-
-			// secretly save a JSON version of the save data to prep for a move to make that the canonical save file - but it's not hooked up to be loaded yet
-			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(session.playerShipVariables.ship));
-		}
-		catch (Exception e) {
-			Notifications.ShowANotificationMessage("ERROR: a backup wasn't saved at: " + Application.persistentDataPath + "  - which means it may not have uploaded either: " + e.Message);
-		}
-		//Only upload to the server is the DebugMode is OFF
-		if (!World.DEBUG_MODE_ON) SaveUserGameDataToServer(filePath, fileNameServer);
-
-	}
-
-	public void SaveUserGameDataToServer(string localPath, string localFile) {
+	void SaveUserGameDataToServer(string localPath, string localFile) {
 		Debug.Log("Starting FTP");
 		string user = "SamoGameBot";
 		string pass = "%Mgn~WxH+CRzj>4Z";
@@ -423,7 +461,7 @@ public class Game
 	}
 
 	//TODO: This is an incredibly specific function that won't be needed later
-	public string RemoveCaptainsLogForJoanna(string file) {
+	string RemoveCaptainsLogForJoanna(string file) {
 		string[] splitFile = new string[] { "\r\n", "\r", "\n" };
 		string newFile = "";
 		string[] fileByLine = file.Split(splitFile, StringSplitOptions.None);
@@ -441,44 +479,7 @@ public class Game
 	}
 
 
-	public void RestartGame() {
-
-		// TOOD: make the session completely recreated on restart. didn't do it yet because i bet the code in this function assumes some leftovers.
-		var session = Session;
-
-		//Debug.Log ("Quest Seg: " + playerShipVariables.ship.mainQuest.currentQuestSegment);
-		//First we need to save the game that just ended
-		SaveUserGameData();
-		//Then we need to re-initialize all the player's variables
-		session.playerShipVariables.Reset();
-
-		//Reset Other Player Ship Variables
-		session.playerShipVariables.numOfDaysTraveled = 0;
-		session.playerShipVariables.numOfDaysWithoutProvisions = 0;
-		session.playerShipVariables.numOfDaysWithoutWater = 0;
-		session.playerShipVariables.dayCounterStarving = 0;
-		session.playerShipVariables.dayCounterThirsty = 0;
-
-		//Take player back to title screen
-		//Debug.Log ("GOING TO TITLE SCREEN");
-		Globals.UI.HideAll();
-		Globals.UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
-		session.controlsLocked = true;
-		isTitleScreen = true;
-		RenderSettings.fog = false;
-		World.FPVCamera.SetActive(false);
-		World.camera_titleScreen.SetActive(true);
-		isTitleScreen = true;
-		runningMainGameGUI = false;
-
-		session.SetShipModel(session.playerShipVariables.ship.upgradeLevel);
-
-		//clear captains log
-		session.ResetCaptainsLog(string.Empty);
-
-	}
-
-	public void FillNewGameCrewRosterAvailability() {
+	void FillNewGameCrewRosterAvailability() {
 		var session = Session;
 
 		//We need to fill a list of 40 crewmembers for the player to choose from on a new game start
@@ -541,6 +542,24 @@ public class Game
 
 	}
 
+	void LoadSavedGhostRoute() {
+		//For the loadgame function--it just fills the ghost trail with the routes that exist
+		World.playerGhostRoute.positionCount = Session.playerShipVariables.journey.routeLog.Count;
+		for (int routeIndex = 0; routeIndex < Session.playerShipVariables.journey.routeLog.Count; routeIndex++) {
+			Debug.Log("GhostRoute Index: " + routeIndex);
+			World.playerGhostRoute.SetPosition(routeIndex, Session.playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, Session.playerShip.transform.position.y, 0));
+			//set player last origin point for next route add on
+			if (routeIndex == Session.playerShipVariables.journey.routeLog.Count - 1) {
+				Session.playerShipVariables.travel_lastOrigin = Session.playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, Session.playerShip.transform.position.y);
+				Session.playerShipVariables.originOfTrip = Session.playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, Session.playerShip.transform.position.y);
+			}
+		}
+	}
+
+	#endregion
+
+	#region TODO: Weird functions coupled with QuestSystem.InitiateQuestLineForPlayer
+
 	public List<CrewMember> GenerateRandomCrewMembers(int numberOfCrewmanNeeded) {
 		//This function pulls from the list of available crewmembers in the world and selects random crewman from that list of a defined
 		//	--size that isn't already on board the ship and returns it. This may not return a full list if the requested number is too high--it will return
@@ -573,20 +592,6 @@ public class Game
 			World.camera_Mapview.GetComponent<Camera>().enabled = true;
 		else
 			World.camera_Mapview.GetComponent<Camera>().enabled = false;
-	}
-
-	public void LoadSavedGhostRoute() {
-		//For the loadgame function--it just fills the ghost trail with the routes that exist
-		World.playerGhostRoute.positionCount = Session.playerShipVariables.journey.routeLog.Count;
-		for (int routeIndex = 0; routeIndex < Session.playerShipVariables.journey.routeLog.Count; routeIndex++) {
-			Debug.Log("GhostRoute Index: " + routeIndex);
-			World.playerGhostRoute.SetPosition(routeIndex, Session.playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, Session.playerShip.transform.position.y, 0));
-			//set player last origin point for next route add on
-			if (routeIndex == Session.playerShipVariables.journey.routeLog.Count - 1) {
-				Session.playerShipVariables.travel_lastOrigin = Session.playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, Session.playerShip.transform.position.y);
-				Session.playerShipVariables.originOfTrip = Session.playerShipVariables.journey.routeLog[routeIndex].UnityXYZEndPoint - new Vector3(0, Session.playerShip.transform.position.y);
-			}
-		}
 	}
 
 	#endregion

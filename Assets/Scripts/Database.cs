@@ -56,8 +56,8 @@ public class Database
 	public CaptainsLogEntry[] captainsLogEntries { get; private set; }
 
 
-	public Database() {
-		
+	public void Init() {
+
 		//Load all txt database files
 		masterPirateTypeList = CSVLoader.LoadMasterPirateTypes();
 		masterCrewList = CSVLoader.LoadMasterCrewRoster(masterPirateTypeList);

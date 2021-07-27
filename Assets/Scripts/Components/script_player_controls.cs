@@ -201,9 +201,6 @@ public class script_player_controls : MonoBehaviour
 			}
 		}
 
-		// debug tool to see where you are in lat long
-		longXLatY = CoordinateUtil.ConvertWebMercatorToWGS1984(CoordinateUtil.Convert_UnityWorld_WebMercator(Session.playerShip.transform.position));
-
 		//Make sure the camera transform is always tied to the front of the ship model's transform if the FPV camera is enabled
 		if (World.FPVCamera.activeSelf)
 			World.FPVCamera.transform.parent.parent.position = shipTransform.TransformPoint(new Vector3(shipTransform.localPosition.x, .31f, shipTransform.localPosition.z + .182f));
@@ -226,8 +223,13 @@ public class script_player_controls : MonoBehaviour
 		if (rayCheck_playBirdSong) SFX_birdsong.enabled = true;
 		else SFX_birdsong.enabled = false;
 
+		// don't run the rest of the update if a game session has not been started
+		if (Session == null) return;
 
-		// TODO: Make a game state system instead of all these booleans
+		// debug tool to see where you are in lat long (depends on session)
+		longXLatY = CoordinateUtil.ConvertWebMercatorToWGS1984(CoordinateUtil.Convert_UnityWorld_WebMercator(Session.playerShip.transform.position));
+
+		// TODO: Pull all this logic into the game state system (Game.cs) instead of all these booleans
 
 		//TODO: need to update all references to controlsLocked to the MGV.controlsLocked
 		//controlsLocked = MGV.controlsLocked;
@@ -267,36 +269,6 @@ public class script_player_controls : MonoBehaviour
 			else if (!MainState.isGameOver) {
 				//Check if we are starting a new game and are at the title screen
 				if (MainState.isTitleScreen || MainState.isStartScreen) {
-					//If the player triggers the GUI button to start the game, stop the animation and switch the camera off
-					if (World.startGameButton_isPressed) {
-						//Debug.Log ("Quest Seg start new game: " + ship.mainQuest.currentQuestSegment);
-						//Turn off title screen camera
-						World.camera_titleScreen.SetActive(false);
-
-						//Turn on the environment fog
-						RenderSettings.fog = true;
-
-						//Now turn on the main player controls camera
-						World.FPVCamera.SetActive(true);
-
-						//Turn on the player distance fog wall
-						fogWall.SetActive(true);
-
-						//Now change titleScreen to false
-						MainState.isTitleScreen = false;
-						MainState.isStartScreen = false;
-
-						//Now enable the controls
-						Session.controlsLocked = false;
-
-						//Initiate the main questline
-						Globals.Quests.InitiateMainQuestLineForPlayer();
-
-						//Reset Start Game Button
-						World.startGameButton_isPressed = false;
-
-					}
-
 					//Else if we are passing time at rest
 				}
 				else if (Session.isPassingTime) {
