@@ -8,6 +8,6 @@ public class UrAIController : MonoBehaviour
 
 	public void EnemyTurn() {
 		gc.RollDice();
-		StartCoroutine(gc.WaitToSwitchTurn(true, 1.75f));
+		StartCoroutine(gc.WaitToSwitchTurn(true, 3.75f));
 	}
 }
