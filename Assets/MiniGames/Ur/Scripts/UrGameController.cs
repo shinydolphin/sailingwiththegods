@@ -105,6 +105,15 @@ public class UrGameController : MonoBehaviour
 		
 	}
 
+	public int GetDiceRoll() {
+		rollDiceButton.interactable = false;
+		currentRoll = dice.RollDice();
+		if (isPlayerTurn) {
+			StartCoroutine(WaitToSwitchTurn(false, 1.75f));
+		}
+		return currentRoll;
+	}
+
 	public void RollDice() {
 		rollDiceButton.interactable = false;
 		currentRoll = dice.RollDice();
