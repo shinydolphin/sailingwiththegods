@@ -6,11 +6,12 @@ using UnityEngine.Audio;
 
 public class SoundsForMenus : MonoBehaviour
 {
+#pragma warning disable 0649
 	[SerializeField] private AudioMixerGroup mixer;
 
 	[SerializeField] private Sound[] menuSounds;
 	public static SoundsForMenus instance;
-
+#pragma warning restore 0649
 	// Start is called before the first frame update
 	void Awake() {
 		///////////////////////////////////////////////////////////////////////////

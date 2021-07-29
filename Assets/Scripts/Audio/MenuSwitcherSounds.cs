@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class MenuSwitcherSounds : MonoBehaviour
 {
+#pragma warning disable 0649
 	[SerializeField] private SoundsForMenus sounds;
-
-    // Update is called once per frame
-    void Update()
+#pragma warning restore 0649
+	// Update is called once per frame
+	void Update()
     {
 
     }

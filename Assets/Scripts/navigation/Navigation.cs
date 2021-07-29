@@ -9,7 +9,7 @@ using TMPro;
 namespace Nav {
 	public class Navigation : MonoBehaviour
 	{
-
+#pragma warning disable 0649
 		[SerializeField] private GameObject titleScreen = null;
 		Transform player;
 		private NavCity cities;
@@ -26,9 +26,9 @@ namespace Nav {
 		private bool startNavigation = false;
 		private bool coroutineOn = false;
 		private Vector3 nextPoint;
-		private String position;
+		private string position;
 		private int? _crewID;
-
+#pragma warning restore 0649
 
 		private void Start() {
 			cities = new NavCity();
