@@ -10,10 +10,10 @@ public class UrGameController : MonoBehaviour
 	public GameObject enemyPathImage;
 	public UrAIController enemyAI;
 
-	public List<UrGameTile> boardPositions;
-	public List<UrGameTile> eBoardPositions;
-	public List<UrCounter> counters;
-	public List<UrCounter> eCounters;
+	public List<UrGameTile> playerBoardPositions;
+	public List<UrGameTile> enemyBoardPositions;
+	public List<UrCounter> playerPieces;
+	public List<UrCounter> enemyPieces;
 	public UrDiceRoller dice;
 	public Text dvText;
 	private int diceValue = 0;
@@ -35,14 +35,16 @@ public class UrGameController : MonoBehaviour
 
 	private int currentRoll;
 	private bool isPlayerTurn = true;
-
-
+	private bool allowPlayerMove = false;
+	
 	public void Awake() {
 		//playerArms = dice.playerAnimator;
 	}
 
 	public void Update() 
 	{
+
+		#region Old Code
 		//if(Input.GetKeyDown("p")) {
 		//	EnemyTurn();
 		//}
@@ -102,12 +104,47 @@ public class UrGameController : MonoBehaviour
 		//		//	CounterSelected(selectedCounter);
 		//		}
 		//	}
-		
+		#endregion
+	}
+
+	public void UnhighlightBoard(UrGameTile ugt) 
+	{
+		foreach (UrGameTile tile in playerBoardPositions) {
+			if (!tile.Equals(ugt)) {
+				tile.ShowHighlight(false);
+			}
+		}
+		foreach (UrGameTile tile in enemyBoardPositions) {
+			if (!tile.Equals(ugt)) {
+				tile.ShowHighlight(false);
+			}
+		}
+	}
+
+	public void UnhighlightBoard() 
+	{
+		foreach (UrGameTile tile in playerBoardPositions) 
+		{
+			tile.ShowHighlight(false);
+		}
+
+		foreach (UrGameTile tile in enemyBoardPositions) 
+		{
+			tile.ShowHighlight(false);
+		}
+	}
+
+	public void UnhighlightPlayerPieces() 
+	{
+		foreach (UrCounter piece in playerPieces) 
+		{
+			piece.ShowHighlight(false);
+		}
 	}
 
 	public int GetDiceRoll() {
 		rollDiceButton.interactable = false;
-		currentRoll = dice.RollDice();
+		currentRoll = dice.RollDice(isPlayerTurn);
 		if (isPlayerTurn) {
 			StartCoroutine(WaitToSwitchTurn(false, 1.75f));
 		}
@@ -116,19 +153,21 @@ public class UrGameController : MonoBehaviour
 
 	public void RollDice() {
 		rollDiceButton.interactable = false;
-		currentRoll = dice.RollDice();
+		currentRoll = dice.RollDice(isPlayerTurn);
 		if (isPlayerTurn) {
-			StartCoroutine(WaitToSwitchTurn(false, 1.75f));
+			allowPlayerMove = true;
 		}
-		//rollDiceButton.interactable = false;
+		rollDiceButton.interactable = false;
 	}
 
 	public void SwitchTurn(bool playerTurn) {
 		Debug.Log("Switching turn");
 		isPlayerTurn = playerTurn;
+		allowPlayerMove = false;
 		rollDiceButton.interactable = isPlayerTurn;
 		playerPathImage.SetActive(isPlayerTurn);
 		enemyPathImage.SetActive(!isPlayerTurn);
+		UnhighlightBoard();
 		if (!isPlayerTurn) {
 			enemyAI.EnemyTurn();
 		}
@@ -139,122 +178,130 @@ public class UrGameController : MonoBehaviour
 		SwitchTurn(playerTurn);
 	}
 
-	public void CounterSelected(UrCounter c) {
-		if (c.onBoard) {
-			selectedCounter = c;
-			int bIndex = boardPositions.IndexOf(c.currentTile);
-			//for (int i = 0; i < diceValue; i++) {
-			//need to figure this out - what if bIndex + diceValue is out of range?
-			if (bIndex + diceValue < boardPositions.Count) {
-				if (!IsSpaceOccupied(boardPositions[bIndex + diceValue])) 
-				{
-					boardPositions[bIndex + diceValue].ShowAvailable();
-					selectingBoardPosition = !selectingBoardPosition;
-				}
-				else 
-				{
-					Debug.Log("This tile cannot move.");
-				}
-			}
-			else 
-			{
-				Debug.Log("This tile cannot move.");
-			}
+	//public void CounterSelected(UrCounter c) {
+	//	if (c.onBoard) {
+	//		selectedCounter = c;
+	//		int bIndex = playerBoardPositions.IndexOf(c.currentTile);
+	//		//for (int i = 0; i < diceValue; i++) {
+	//		//need to figure this out - what if bIndex + diceValue is out of range?
+	//		if (bIndex + diceValue < playerBoardPositions.Count) {
+	//			if (!IsSpaceOccupied(playerBoardPositions[bIndex + diceValue])) 
+	//			{
+	//				playerBoardPositions[bIndex + diceValue].ShowAvailable(true);
+	//				selectingBoardPosition = !selectingBoardPosition;
+	//			}
+	//			else 
+	//			{
+	//				Debug.Log("This tile cannot move.");
+	//			}
+	//		}
+	//		else 
+	//		{
+	//			Debug.Log("This tile cannot move.");
+	//		}
 
-			//bIndex++;
-			//}
+	//		//bIndex++;
+	//		//}
 
-			//selectingObject = !selectingObject;
-		}
-		else {
-			selectedCounter = c;
-			if (diceValue == 1 && !IsSpaceOccupied(boardPositions[0])) {
-				boardPositions[0].ShowAvailable();
-				selectingBoardPosition = !selectingBoardPosition;
-			}
-			else if(diceValue == 5 && !IsSpaceOccupied(boardPositions[4]) && !IsSpaceOccupied(boardPositions[16])) { boardPositions[4].ShowAvailable(); selectingBoardPosition = !selectingBoardPosition; }
-		}
+	//		//selectingObject = !selectingObject;
+	//	}
+	//	else {
+	//		selectedCounter = c;
+	//		if (diceValue == 1 && !IsSpaceOccupied(playerBoardPositions[0])) {
+	//			playerBoardPositions[0].ShowAvailable(true);
+	//			selectingBoardPosition = !selectingBoardPosition;
+	//		}
+	//		else if(diceValue == 5 && !IsSpaceOccupied(playerBoardPositions[4]) && !IsSpaceOccupied(playerBoardPositions[16])) { playerBoardPositions[4].ShowAvailable(true); selectingBoardPosition = !selectingBoardPosition; }
+	//	}
 	 
-	}
+	//}
 
 	public bool IsSpaceOccupied(UrGameTile gt) {
-		foreach(UrCounter c in counters) {
-			if(boardPositions.IndexOf(c.currentTile) == boardPositions.IndexOf(gt)) { Debug.Log("space is occupied");  return true; }
+		foreach(UrCounter c in playerPieces) {
+			if(playerBoardPositions.IndexOf(c.currentTile) == playerBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied");  return true; }
 		}
 		Debug.Log("space is free");
 		return false;
 	}
 
 	public UrCounter IsSpaceOccupiedCounter(UrGameTile gt) {
-		foreach (UrCounter c in counters) {
-			if (boardPositions.IndexOf(c.currentTile) == boardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return c; }
+		foreach (UrCounter c in playerPieces) {
+			if (playerBoardPositions.IndexOf(c.currentTile) == playerBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return c; }
 		}
 		Debug.Log("space is free");
 		return null;
 	}
 
 	public bool IsEnemySpaceOccupied(UrGameTile gt) {
-		foreach (UrCounter c in eCounters) {
-			if (eBoardPositions.IndexOf(c.currentTile) == eBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return true; }
+		foreach (UrCounter c in enemyPieces) {
+			if (enemyBoardPositions.IndexOf(c.currentTile) == enemyBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return true; }
 		}
 		Debug.Log("space is free");
 		return false;
 	}
 
 	public UrCounter IsEnemySpaceOccupiedCounter(UrGameTile gt) {
-		foreach (UrCounter c in eCounters) {
-			if (eBoardPositions.IndexOf(c.currentTile) == eBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return c; }
+		foreach (UrCounter c in enemyPieces) {
+			if (enemyBoardPositions.IndexOf(c.currentTile) == enemyBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return c; }
 		}
 		Debug.Log("space is free");
 		return null;
 	}
 
-	public bool CanPlayerMove(int val) {
-		foreach(UrCounter c in counters) {
-			if(c.currentTile != null && (boardPositions.IndexOf(c.currentTile)+ val) < 19) { return true; }
+	public bool CanPlayerMove() 
+	{
+		int movable = 0;
+		foreach(UrCounter c in playerPieces) 
+		{
+			if (c.PopulateValidMovesList().Count > 0) 
+			{
+				c.ShowHighlight(true);
+				movable++;
+			}
+			//if(c.currentTile != null && (playerBoardPositions.IndexOf(c.currentTile)+ val) < 19) { return true; }
 		}
-		return false;
+		return movable > 0;
 	}
 
 	public bool CanEnemyMove(int val, UrCounter c) {
 
-		if (c.currentTile != null && (eBoardPositions.IndexOf(c.currentTile) + val) < 19) { return true; }
+		if (c.currentTile != null && (enemyBoardPositions.IndexOf(c.currentTile) + val) < 19) { return true; }
 		else {
 			return false;
 		}
 	}
 
 	public void SetDiceValue(int val) {
-		//diceValue = dice.DiceResult(val);
-		//rollDiceButton.SetActive(false);
-		Debug.Log(diceValue);
-		dvText.text = "" + diceValue;
-		if(diceValue == 0) { EnemyTurn(); }
-		if (diceValue == 4 && !CanPlayerMove(diceValue)) { EnemyTurn(); }
-		if (countersOnBoard > 0) {
-			selectingObject = true;
-		}
-		else {
+		////diceValue = dice.DiceResult(val);
+		////rollDiceButton.SetActive(false);
+		//Debug.Log(diceValue);
+		//dvText.text = "" + diceValue;
+		//if(diceValue == 0) { EnemyTurn(); }
+		//if (diceValue == 4 && !CanPlayerMove()) { EnemyTurn(); }
+		//if (countersOnBoard > 0) {
+		//	selectingObject = true;
+		//}
+		//else {
 
 
-			if (diceValue == 1 && countersOffBoard > 0 && countersOnBoard == 0) {
-				counters[countersOffBoard - 1].PlaceOnBoard(boardPositions[0], false, false, false);
-				countersOffBoard--;
-				countersOnBoard++;
-				//aiAnim.SetTrigger("Angry");
-				//EnemyTurn();
-			}
-			else if (diceValue == 5 && countersOffBoard > 0 && countersOnBoard == 0) {
-				counters[countersOffBoard - 1].PlaceOnBoard(boardPositions[4], false, false, false);
-				countersOffBoard--;
-				countersOnBoard++;
-				//aiAnim.SetTrigger("Angry");
-				//EnemyTurn();
-			}
-			else {
-				EnemyTurn();
-			}
-		}
+		//	if (diceValue == 1 && countersOffBoard > 0 && countersOnBoard == 0) {
+		//		playerPieces[countersOffBoard - 1].PlaceOnBoard(playerBoardPositions[0], false, false, false);
+		//		countersOffBoard--;
+		//		countersOnBoard++;
+		//		//aiAnim.SetTrigger("Angry");
+		//		//EnemyTurn();
+		//	}
+		//	else if (diceValue == 5 && countersOffBoard > 0 && countersOnBoard == 0) {
+		//		playerPieces[countersOffBoard - 1].PlaceOnBoard(playerBoardPositions[4], false, false, false);
+		//		countersOffBoard--;
+		//		countersOnBoard++;
+		//		//aiAnim.SetTrigger("Angry");
+		//		//EnemyTurn();
+		//	}
+		//	else {
+		//		EnemyTurn();
+		//	}
+		//}
 		
 	}
 
@@ -283,94 +330,112 @@ public class UrGameController : MonoBehaviour
 	}
 
 	public void EnemyTurn() {
-		int[] i = { 0, 1, 4, 5 };
-		int sel = Random.Range(0, 4);
-		int ediceValue = i[sel];
-		dvText.text = "" + ediceValue;
-		if(ediceValue == 1 && enemyCountersOnBoard == 0) {
-			eCounters[0].PlaceOnBoard(eBoardPositions[0], false, true, false); enemyCountersOnBoard++;
-		}
-		else if(ediceValue == 5 && enemyCountersOnBoard == 0) {
-				eCounters[0].PlaceOnBoard(eBoardPositions[4], false, true, false); enemyCountersOnBoard++;
-			}
-		else if (ediceValue == 1 && enemyCountersOnBoard > 0 && !IsEnemySpaceOccupied(eBoardPositions[0])) {
-			eCounters[enemyCountersOnBoard].PlaceOnBoard(eBoardPositions[0], false, true, false); enemyCountersOnBoard++;
-		}
-		else if (ediceValue == 5 && enemyCountersOnBoard > 0 && !IsEnemySpaceOccupied(eBoardPositions[4])) {
-			eCounters[enemyCountersOnBoard].PlaceOnBoard(eBoardPositions[4], false, true, false); enemyCountersOnBoard++;
-		}
-		else if(enemyCountersOnBoard > 0) {
-			if(ediceValue == 1) {
-				foreach(UrCounter c in eCounters) {
-					if (c.onBoard && CanEnemyMove(ediceValue, c)) {
-						Debug.Log("i get here");
-						int index = eBoardPositions.IndexOf(c.currentTile);
-						if (!IsEnemySpaceOccupied(eBoardPositions[index + 1]) && ((index + 1) < 13)) {
-							c.PlaceOnBoard(eBoardPositions[index + 1], false, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 1])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 1]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 1]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 1]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 1]).currentTile = null; break;
-							}
-						}
-						else if (!IsEnemySpaceOccupied(eBoardPositions[index + 1]) && ((index + 1) >= 13)) {
-							if(index + 1 == 19) { PointScored(false); }
-							c.PlaceOnBoard(eBoardPositions[index + 1], true, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 1])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 1]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 1]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 1]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 1]).currentTile = null; break;
-							}
+	//	int[] i = { 0, 1, 4, 5 };
+	//	int sel = Random.Range(0, 4);
+	//	int ediceValue = i[sel];
+	//	dvText.text = "" + ediceValue;
+	//	if(ediceValue == 1 && enemyCountersOnBoard == 0) {
+	//		eCounters[0].PlaceOnBoard(enemyBoardPositions[0], false, true, false); enemyCountersOnBoard++;
+	//	}
+	//	else if(ediceValue == 5 && enemyCountersOnBoard == 0) {
+	//			eCounters[0].PlaceOnBoard(enemyBoardPositions[4], false, true, false); enemyCountersOnBoard++;
+	//		}
+	//	else if (ediceValue == 1 && enemyCountersOnBoard > 0 && !IsEnemySpaceOccupied(enemyBoardPositions[0])) {
+	//		eCounters[enemyCountersOnBoard].PlaceOnBoard(enemyBoardPositions[0], false, true, false); enemyCountersOnBoard++;
+	//	}
+	//	else if (ediceValue == 5 && enemyCountersOnBoard > 0 && !IsEnemySpaceOccupied(enemyBoardPositions[4])) {
+	//		eCounters[enemyCountersOnBoard].PlaceOnBoard(enemyBoardPositions[4], false, true, false); enemyCountersOnBoard++;
+	//	}
+	//	else if(enemyCountersOnBoard > 0) {
+	//		if(ediceValue == 1) {
+	//			foreach(UrCounter c in eCounters) {
+	//				if (c.onBoard && CanEnemyMove(ediceValue, c)) {
+	//					Debug.Log("i get here");
+	//					int index = enemyBoardPositions.IndexOf(c.currentTile);
+	//					if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 1]) && ((index + 1) < 13)) {
+	//						c.PlaceOnBoard(enemyBoardPositions[index + 1], false, true, false);
+	//						if (IsSpaceOccupied(playerBoardPositions[index + 1])) {
+	//							Debug.Log("haha rekt"); IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).onBoard = false; IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).initPosit; IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).currentTile = null; break;
+	//						}
+	//					}
+	//					else if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 1]) && ((index + 1) >= 13)) {
+	//						if(index + 1 == 19) { PointScored(false); }
+	//						c.PlaceOnBoard(enemyBoardPositions[index + 1], true, true, false);
+	//						if (IsSpaceOccupied(playerBoardPositions[index + 1])) {
+	//							Debug.Log("haha rekt"); IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).onBoard = false; IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).initPosit; IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).currentTile = null; break;
+	//						}
 
-						}
+	//					}
 						
-					}
+	//				}
 					
-				}
-			}
-			else if (ediceValue == 4) {
-				foreach (UrCounter c in eCounters) {
-					if (c.onBoard && CanEnemyMove(ediceValue, c)) {
-						Debug.Log("i get here");
-						int index = eBoardPositions.IndexOf(c.currentTile);
-						if (!IsEnemySpaceOccupied(eBoardPositions[index + 4]) && ((index + 4) < 13)) {
-							c.PlaceOnBoard(eBoardPositions[index + 4], false, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 4])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 4]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 4]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 4]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 4]).currentTile = null; break;
-							}
-						}
-						else if (!IsEnemySpaceOccupied(eBoardPositions[index + 4]) && ((index + 4) >= 13)) {
-							if (index + 4 == 19) { PointScored(false); }
-							c.PlaceOnBoard(eBoardPositions[index + 4], true, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 4])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 4]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 4]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 4]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 4]).currentTile = null; break;
-							}
+	//			}
+	//		}
+	//		else if (ediceValue == 4) {
+	//			foreach (UrCounter c in eCounters) {
+	//				if (c.onBoard && CanEnemyMove(ediceValue, c)) {
+	//					Debug.Log("i get here");
+	//					int index = enemyBoardPositions.IndexOf(c.currentTile);
+	//					if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 4]) && ((index + 4) < 13)) {
+	//						c.PlaceOnBoard(enemyBoardPositions[index + 4], false, true, false);
+	//						if (IsSpaceOccupied(playerBoardPositions[index + 4])) {
+	//							Debug.Log("haha rekt"); IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).onBoard = false; IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).initPosit; IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).currentTile = null; break;
+	//						}
+	//					}
+	//					else if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 4]) && ((index + 4) >= 13)) {
+	//						if (index + 4 == 19) { PointScored(false); }
+	//						c.PlaceOnBoard(enemyBoardPositions[index + 4], true, true, false);
+	//						if (IsSpaceOccupied(playerBoardPositions[index + 4])) {
+	//							Debug.Log("haha rekt"); IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).onBoard = false; IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).initPosit; IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).currentTile = null; break;
+	//						}
 
-						}
+	//					}
 
-					}
-				}
-			}
-			else if (ediceValue == 5) {
-				foreach (UrCounter c in eCounters) {
-					if (c.onBoard && CanEnemyMove(ediceValue, c)) {
-						Debug.Log("i get here");
-						int index = eBoardPositions.IndexOf(c.currentTile);
-						if (!IsEnemySpaceOccupied(eBoardPositions[index + 5]) && ((index + 5) < 13)) {
-							c.PlaceOnBoard(eBoardPositions[index + 5], false, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 5])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 5]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 5]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 5]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 5]).currentTile = null; break;
-							}
-						}
-						else if (!IsEnemySpaceOccupied(eBoardPositions[index + 5]) && ((index + 5) >= 13)) {
-							if (index + 5 == 19) { PointScored(false); }
-							c.PlaceOnBoard(eBoardPositions[index + 5], true, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 5])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 5]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 5]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 5]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 5]).currentTile = null; break;
-							}
+	//				}
+	//			}
+	//		}
+	//		else if (ediceValue == 5) {
+	//			foreach (UrCounter c in eCounters) {
+	//				if (c.onBoard && CanEnemyMove(ediceValue, c)) {
+	//					Debug.Log("i get here");
+	//					int index = enemyBoardPositions.IndexOf(c.currentTile);
+	//					if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 5]) && ((index + 5) < 13)) {
+	//						c.PlaceOnBoard(enemyBoardPositions[index + 5], false, true, false);
+	//						if (IsSpaceOccupied(playerBoardPositions[index + 5])) {
+	//							Debug.Log("haha rekt"); IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).onBoard = false; IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).initPosit; IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).currentTile = null; break;
+	//						}
+	//					}
+	//					else if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 5]) && ((index + 5) >= 13)) {
+	//						if (index + 5 == 19) { PointScored(false); }
+	//						c.PlaceOnBoard(enemyBoardPositions[index + 5], true, true, false);
+	//						if (IsSpaceOccupied(playerBoardPositions[index + 5])) {
+	//							Debug.Log("haha rekt"); IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).onBoard = false; IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).initPosit; IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).currentTile = null; break;
+	//						}
 
-						}
+	//					}
 
-					}
-				}
-			}
+	//				}
+	//			}
+	//		}
+	//	}
+	//	//rollDiceButton.SetActive(true);
+	}
+
+	public int CurrentRoll {
+		get {
+			return currentRoll;
 		}
-		//rollDiceButton.SetActive(true);
+	}
+
+	public bool IsPlayerTurn {
+		get {
+			return isPlayerTurn;
+		}
+	}
+
+	public bool AllowPlayerMove {
+		get {
+			return allowPlayerMove;
+		}
 	}
 }

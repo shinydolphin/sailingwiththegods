@@ -14,7 +14,13 @@ public class UrDiceRoller : MonoBehaviour
 	public Vector2 diceSpinTime;
 	public float diceSpeed;
 
-	public int RollDice()
+	private UrGameController ugc;
+
+	private void Start() {
+		ugc = GetComponent<UrGameController>();
+	}
+
+	public int RollDice(bool playerTurn)
 	{
 		//1 is a blank, 2 is a mark
 		int[] diceRolls = new int[diceModels.Length];
@@ -27,12 +33,12 @@ public class UrDiceRoller : MonoBehaviour
 		int marks = (diceRolls[0] % 2 == 0 ? 1 : 0) + (diceRolls[1] % 2 == 0 ? 1 : 0) + (diceRolls[2] % 2 == 0 ? 1 : 0);
 		int roll = marks == 3 ? 5 : marks;
 		
-		StartCoroutine(VisualDiceRoll(diceRolls, roll));
+		StartCoroutine(VisualDiceRoll(diceRolls, roll, playerTurn));
 		
 		return roll;
 	}
 
-	private IEnumerator VisualDiceRoll(int[] diceRolls, int resultRoll) 
+	private IEnumerator VisualDiceRoll(int[] diceRolls, int resultRoll, bool playerTurn) 
 	{
 		//Visually rotate the dice so they look like they're rolling
 		//I tried using Euler angles, but ran into issues because they're not unique - 0 == 180, for example
@@ -70,6 +76,16 @@ public class UrDiceRoller : MonoBehaviour
 		}
 
 		diceResultText.text = resultRoll.ToString();
+
+		if (playerTurn) 
+		{
+			if (!ugc.CanPlayerMove()) 
+			{
+				Debug.Log("No valid moves, skipping player turn!");
+				StartCoroutine(ugc.WaitToSwitchTurn(false, 1.5f));
+			}
+		}
+
 	}
 
 

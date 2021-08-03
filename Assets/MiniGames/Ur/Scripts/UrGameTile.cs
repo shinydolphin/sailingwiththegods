@@ -11,24 +11,40 @@ public class UrGameTile : MonoBehaviour
 	public Transform nextTileAL;
 	public Transform prevTileAL;
 
-	public bool rosette = false;
-	public int timesLandedOn = 0;
+	public bool isRosette = false;
+	//public int timesLandedOn = 0;
 
-	public GameObject isAvailable;
+	public GameObject highlight;
+	private bool occupied = false;
 
 	private void Awake() {
-		isAvailable = transform.GetChild(0).gameObject;
+		//isAvailable = transform.GetChild(0).gameObject;
 	}
+
 	//public void ShowAvailablePositions(int drv) {
 	//	List<GameTile> aTiles = new List<GameTile>();
 	//	aTiles.Add(nextTile.GetComponent<GameTile>());
 	//	for (int i = 0; i< drv; i++) {
 	//		aTiles[i].available.SetActive(true);
 	//	}
-		
+
 	//}
 
-	public void ShowAvailable() {
-		isAvailable.SetActive(!isAvailable.activeSelf);
+	public void ShowHighlight(bool toggle) 
+	{
+		if (highlight != null) {
+			highlight.SetActive(toggle);
+		}
+
+	}
+
+	public bool Occupied 
+	{
+		get {
+			return occupied;
+		}
+		set {
+			occupied = value;
+		}
 	}
 }

@@ -1,6 +1,19 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &4464392935327191443
+--- !u!65 &5978820704149838647
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4515166687430434373}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.31109315, y: 0.021777894, z: 0.31109312}
+  m_Center: {x: 0.000000022351742, y: 0.0000000088475645, z: 0.000000059604645}
+--- !u!1001 &3632278443497546516
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -81,11 +94,17 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 2da2fa42cfcad2d49b0dfb972991fe82, type: 2}
+      objectReference: {fileID: 2100000, guid: 872bb5aede1fd0f4eb2af48d17d164ce, type: 2}
     - target: {fileID: 919132149155446097, guid: c1f13e92d76b8514ea366b8d4fde7760,
         type: 3}
       propertyPath: m_Name
-      value: UrPlayerPiece
+      value: Ur Enemy Piece
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c1f13e92d76b8514ea366b8d4fde7760, type: 3}
+--- !u!1 &4515166687430434373 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c1f13e92d76b8514ea366b8d4fde7760,
+    type: 3}
+  m_PrefabInstance: {fileID: 3632278443497546516}
+  m_PrefabAsset: {fileID: 0}
