@@ -74,15 +74,15 @@ public class UrArmIKHandler : MonoBehaviour
 		}
 	}
 
-	void PickUpPiece() {
-		counterOnTheMove.TileMT();
-		useIk = true;
+	//void PickUpPiece() {
+	//	counterOnTheMove.TileMT();
+	//	useIk = true;
 
-	}
-	void PutDownPiece() {
-		counterOnTheMove.TileMT();
-		useIk = false;
-	}
+	//}
+	//void PutDownPiece() {
+	//	counterOnTheMove.TileMT();
+	//	useIk = false;
+	//}
 
 
 }

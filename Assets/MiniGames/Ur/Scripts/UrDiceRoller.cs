@@ -32,8 +32,12 @@ public class UrDiceRoller : MonoBehaviour
 		//Calculate - we're hard-coding it to 3 because there's not really a nice formula for the roll
 		int marks = (diceRolls[0] % 2 == 0 ? 1 : 0) + (diceRolls[1] % 2 == 0 ? 1 : 0) + (diceRolls[2] % 2 == 0 ? 1 : 0);
 		int roll = marks == 3 ? 5 : marks;
-		
-		StartCoroutine(VisualDiceRoll(diceRolls, roll, playerTurn));
+
+		if (!ugc.IsGameOver) 
+		{
+			StartCoroutine(VisualDiceRoll(diceRolls, roll, playerTurn));
+		}
+
 		
 		return roll;
 	}
@@ -81,7 +85,7 @@ public class UrDiceRoller : MonoBehaviour
 		{
 			if (!ugc.CanPlayerMove()) 
 			{
-				Debug.Log("No valid moves, skipping player turn!");
+				ugc.ShowAlertText("No Available Moves");
 				StartCoroutine(ugc.WaitToSwitchTurn(false, 1.5f));
 			}
 		}

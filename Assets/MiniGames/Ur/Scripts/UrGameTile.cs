@@ -5,19 +5,21 @@ using UnityEngine;
 
 public class UrGameTile : MonoBehaviour
 {
-	public Transform nextTile;
-	public Transform prevTile;
+	//public Transform nextTile;
+	//public Transform prevTile;
 
-	public Transform nextTileAL;
-	public Transform prevTileAL;
+	//public Transform nextTileAL;
+	//public Transform prevTileAL;
 
 	public bool isRosette = false;
 	//public int timesLandedOn = 0;
 
 	public GameObject highlight;
 	private bool occupied = false;
+	private UrCounter occupyingCounter = null;
 
-	private void Awake() {
+	private void Awake() 
+	{
 		//isAvailable = transform.GetChild(0).gameObject;
 	}
 
@@ -29,6 +31,19 @@ public class UrGameTile : MonoBehaviour
 	//	}
 
 	//}
+
+	private void OnTriggerEnter(Collider other) 
+	{
+		UrCounter c = other.GetComponent<UrCounter>();
+		if (c != null) {
+			occupyingCounter = c;
+		}
+	}
+
+	private void OnTriggerExit(Collider other) 
+	{
+		occupyingCounter = null;
+	}
 
 	public void ShowHighlight(bool toggle) 
 	{

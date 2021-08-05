@@ -8,14 +8,13 @@ public class UrAIController : MonoBehaviour
 
 	private int currentRoll;
 
-	public void EnemyTurn() {
-		gc.RollDice();
-		StartCoroutine(gc.WaitToSwitchTurn(true, 2.5f));
+	public void EnemyTurn() 
+	{
+		if (!gc.IsGameOver) {
+			currentRoll = gc.GetDiceRoll();
+			StartCoroutine(gc.WaitToSwitchTurn(true, 3.5f));
+		}
+
 	}
 
-	private IEnumerator DoEnemyTurn() {
-		yield return new WaitForSeconds(1.25f);
-		currentRoll = gc.GetDiceRoll();
-		StartCoroutine(gc.WaitToSwitchTurn(true, 3f));
-	}
 }

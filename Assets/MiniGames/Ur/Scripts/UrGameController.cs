@@ -15,16 +15,18 @@ public class UrGameController : MonoBehaviour
 	public List<UrCounter> playerPieces;
 	public List<UrCounter> enemyPieces;
 	public UrDiceRoller dice;
-	public Text dvText;
-	private int diceValue = 0;
-	public int countersOffBoard = 7;
-	public int countersOnBoard = 0;
-	public int enemyCountersOnBoard;
+	//public Text dvText;
+	public Text alertText;
+	public float alertShowTime;
+	//private int diceValue = 0;
+	//public int countersOffBoard = 7;
+	//public int countersOnBoard = 0;
+	//public int enemyCountersOnBoard;
 	public Camera cam;
-	public bool selectingObject = false;
+	//public bool selectingObject = false;
 
-	public bool selectingBoardPosition = false;
-	public UrCounter selectedCounter;
+	//public bool selectingBoardPosition = false;
+	//public UrCounter selectedCounter;
 	public Button rollDiceButton;
 	//public Animator aiAnim;
 	//private Animator playerArms;
@@ -33,12 +35,20 @@ public class UrGameController : MonoBehaviour
 	//public Text playerScoreText;
 	//public Text enemyScoreText;
 
+	private bool isGameOver = false;
 	private int currentRoll;
 	private bool isPlayerTurn = true;
 	private bool allowPlayerMove = false;
+
+	private Color baseAlertColor;
+	private Outline alertOutline;
+	private Color baseOutlineColor;
 	
 	public void Awake() {
 		//playerArms = dice.playerAnimator;
+		baseAlertColor = alertText.color;
+		alertOutline = alertText.GetComponent<Outline>();
+		baseOutlineColor = alertOutline.effectColor;
 	}
 
 	public void Update() 
@@ -160,8 +170,8 @@ public class UrGameController : MonoBehaviour
 		rollDiceButton.interactable = false;
 	}
 
-	public void SwitchTurn(bool playerTurn) {
-		Debug.Log("Switching turn");
+	public void SwitchTurn(bool playerTurn) 
+	{
 		isPlayerTurn = playerTurn;
 		allowPlayerMove = false;
 		rollDiceButton.interactable = isPlayerTurn;
@@ -173,7 +183,8 @@ public class UrGameController : MonoBehaviour
 		}
 	}
 
-	public IEnumerator WaitToSwitchTurn(bool playerTurn, float waitTime) {
+	public IEnumerator WaitToSwitchTurn(bool playerTurn, float waitTime) 
+	{
 		yield return new WaitForSeconds(waitTime);
 		SwitchTurn(playerTurn);
 	}
@@ -216,37 +227,49 @@ public class UrGameController : MonoBehaviour
 	 
 	//}
 
-	public bool IsSpaceOccupied(UrGameTile gt) {
-		foreach(UrCounter c in playerPieces) {
-			if(playerBoardPositions.IndexOf(c.currentTile) == playerBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied");  return true; }
-		}
-		Debug.Log("space is free");
-		return false;
-	}
+	//public bool IsSpaceOccupied(UrGameTile gt) 
+	//{
+	//	foreach(UrCounter c in playerPieces) 
+	//	{
+	//		if(playerBoardPositions.IndexOf(c.currentTile) == playerBoardPositions.IndexOf(gt)) 
+	//		{
+	//			Debug.Log("space is occupied");
+	//			return true;
+	//		}
+	//	}
+	//	Debug.Log("space is free");
+	//	return false;
+	//}
 
-	public UrCounter IsSpaceOccupiedCounter(UrGameTile gt) {
-		foreach (UrCounter c in playerPieces) {
-			if (playerBoardPositions.IndexOf(c.currentTile) == playerBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return c; }
-		}
-		Debug.Log("space is free");
-		return null;
-	}
+	//public UrCounter IsSpaceOccupiedCounter(UrGameTile gt) 
+	//{
+	//	foreach (UrCounter c in playerPieces) 
+	//	{
+	//		if (playerBoardPositions.IndexOf(c.currentTile) == playerBoardPositions.IndexOf(gt)) 
+	//		{
+	//			Debug.Log("space is occupied");
+	//			return c;
+	//		}
+	//	}
+	//	Debug.Log("space is free");
+	//	return null;
+	//}
 
-	public bool IsEnemySpaceOccupied(UrGameTile gt) {
-		foreach (UrCounter c in enemyPieces) {
-			if (enemyBoardPositions.IndexOf(c.currentTile) == enemyBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return true; }
-		}
-		Debug.Log("space is free");
-		return false;
-	}
+	//public bool IsEnemySpaceOccupied(UrGameTile gt) {
+	//	foreach (UrCounter c in enemyPieces) {
+	//		if (enemyBoardPositions.IndexOf(c.currentTile) == enemyBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return true; }
+	//	}
+	//	Debug.Log("space is free");
+	//	return false;
+	//}
 
-	public UrCounter IsEnemySpaceOccupiedCounter(UrGameTile gt) {
-		foreach (UrCounter c in enemyPieces) {
-			if (enemyBoardPositions.IndexOf(c.currentTile) == enemyBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return c; }
-		}
-		Debug.Log("space is free");
-		return null;
-	}
+	//public UrCounter IsEnemySpaceOccupiedCounter(UrGameTile gt) {
+	//	foreach (UrCounter c in enemyPieces) {
+	//		if (enemyBoardPositions.IndexOf(c.currentTile) == enemyBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return c; }
+	//	}
+	//	Debug.Log("space is free");
+	//	return null;
+	//}
 
 	public bool CanPlayerMove() 
 	{
@@ -263,13 +286,13 @@ public class UrGameController : MonoBehaviour
 		return movable > 0;
 	}
 
-	public bool CanEnemyMove(int val, UrCounter c) {
+	//public bool CanEnemyMove(int val, UrCounter c) {
 
-		if (c.currentTile != null && (enemyBoardPositions.IndexOf(c.currentTile) + val) < 19) { return true; }
-		else {
-			return false;
-		}
-	}
+	//	if (c.currentTile != null && (enemyBoardPositions.IndexOf(c.currentTile) + val) < 19) { return true; }
+	//	else {
+	//		return false;
+	//	}
+	//}
 
 	public void SetDiceValue(int val) {
 		////diceValue = dice.DiceResult(val);
@@ -305,6 +328,31 @@ public class UrGameController : MonoBehaviour
 		
 	}
 
+	public void ShowAlertText(string alert) 
+	{
+		StopCoroutine(FadeText(alertText, alertOutline));
+		alertText.color = baseAlertColor;
+		alertOutline.effectColor = baseOutlineColor;
+		alertText.text = alert;
+		StartCoroutine(FadeText(alertText, alertOutline));
+	}
+
+	private IEnumerator FadeText(Text t, Outline o) 
+	{
+		Color clearColor = new Color(baseAlertColor.r, baseAlertColor.g, baseAlertColor.b, 0f);
+		Color clearOutline = new Color(baseOutlineColor.r, baseOutlineColor.g, baseOutlineColor.b, 0f);
+
+		for (float i = 0; i <= 1; i += Time.deltaTime * alertShowTime) 
+		{
+			t.color = Color.Lerp(baseAlertColor, clearColor, i);
+			o.effectColor = Color.Lerp(baseOutlineColor, clearOutline, i);
+			yield return null;
+		}
+
+		alertText.text = "";
+		alertText.color = baseAlertColor;
+	}
+
 	bool isPlaying(Animator anim, string stateName) {
 		if (anim.GetCurrentAnimatorStateInfo(0).IsName(stateName))
 			return true;
@@ -312,14 +360,28 @@ public class UrGameController : MonoBehaviour
 			return false;
 	}
 
-	public void PointScored(bool player) {
-		if (player) {
-			//playerScore++;
-			//playerScoreText.text = "" + playerScore;
+	public void PointScored(bool player, UrCounter c) 
+	{
+		if (player) 
+		{
+			playerPieces.Remove(c);
+			c.GetComponent<MeshRenderer>().enabled = false;
+			Destroy(c.gameObject, 1f);
+			Debug.Log("Player scored with a piece!");
+			if (playerPieces.Count == 0) 
+			{
+				WinGame();
+			}
 		}
-		else {
-			//enemyScore++;
-			//enemyScoreText.text = "" + enemyScore;
+		else 
+		{
+			enemyPieces.Remove(c);
+			Destroy(c.gameObject);
+			Debug.Log("Enemy scored with a piece!");
+			if (enemyPieces.Count == 0) 
+			{
+				LoseGame();
+			}
 		}
 		//if(playerScore == 7) {
 		//	Debug.Log("You win.");
@@ -327,6 +389,22 @@ public class UrGameController : MonoBehaviour
 		//if (enemyScore == 7) {
 		//	Debug.Log("You lose.");
 		//}
+	}
+
+	public void WinGame() 
+	{
+		isGameOver = true;
+		rollDiceButton.interactable = false;
+		allowPlayerMove = false;
+		Debug.Log("Player wins!");
+	}
+
+	public void LoseGame() 
+	{
+		isGameOver = false;
+		rollDiceButton.interactable = false;
+		allowPlayerMove = false;
+		Debug.Log("Player loses :(");
 	}
 
 	public void EnemyTurn() {
@@ -436,6 +514,12 @@ public class UrGameController : MonoBehaviour
 	public bool AllowPlayerMove {
 		get {
 			return allowPlayerMove;
+		}
+	}
+
+	public bool IsGameOver {
+		get {
+			return isGameOver;
 		}
 	}
 }

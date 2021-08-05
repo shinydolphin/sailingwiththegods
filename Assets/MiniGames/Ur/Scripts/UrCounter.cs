@@ -4,20 +4,21 @@ using UnityEngine;
 
 public class UrCounter : MonoBehaviour
 {
-	public bool goingHome = false;
-	public bool enemyTile = false;
-	public UrGameTile currentTile;
-	public GameObject ikTarget;
-	public float increment;
-	public bool onTheMove = false;
-	public UrArmIKHandler armIK;
-	public UrGameController UR;
-	public bool pointScored = false;
+	//public bool goingHome = false;
+	//public bool enemyTile = false;
+	//public UrGameTile currentTile;
+	//public GameObject ikTarget;
+	//public float increment;
+	//public bool onTheMove = false;
+	//public UrArmIKHandler armIK;
+	//public UrGameController UR;
+	//public bool pointScored = false;
 	public GameObject highlight;
 	public GameObject ghostPiece;
+	public LineRenderer possiblePathLine;
 
 	private Vector3 startPos;
-	private bool onBoard = false;
+	//private bool onBoard = false;
 
 	private bool selected = false;
 	private int mask;
@@ -27,8 +28,10 @@ public class UrCounter : MonoBehaviour
 	private List<UrGameTile> validMoves;
 	public int boardIndex = -1;
 	private int potentialIndex;
+	private Animator anim;
 
 	private void Start() {
+		anim = GetComponent<Animator>();
 		ugc = GameObject.FindWithTag("GameController").GetComponent<UrGameController>();
 		startPos = transform.position;
 		mask = LayerMask.GetMask("GameSquare");
@@ -48,7 +51,32 @@ public class UrCounter : MonoBehaviour
 				if (ugt != null && validMoves.Contains(ugt)) 
 				{
 					transform.position = ugt.transform.position;
-					potentialIndex = ugc.playerBoardPositions.IndexOf(ugt);
+
+					//We have to do all this so we don't accidentally try to send the piece to an earlier index, which would break a lot of stuff
+					List<int> allPossibleIndices = new List<int>();
+					for (int i = 0; i < ugc.playerBoardPositions.Count; i++) 
+					{
+						if (ugc.playerBoardPositions[i].Equals(ugt)) {
+							allPossibleIndices.Add(i);
+						}
+					}
+
+					//We're going to hard-code this as always only having 2 potential tiles, since that's the way the game is set up
+					//Honestly, I probably should come up with a better way, but I can't think of it right now
+					if (allPossibleIndices.Count > 1) {
+						if (boardIndex > allPossibleIndices[0]) {
+							potentialIndex = allPossibleIndices[1];
+						}
+						else {
+							potentialIndex = allPossibleIndices[0];
+						}
+					}
+					else {
+						potentialIndex = allPossibleIndices[0];
+					}
+					
+					ClearPossiblePath();
+					ShowPossiblePath(boardIndex, potentialIndex);
 				}
 				else 
 				{
@@ -64,6 +92,9 @@ public class UrCounter : MonoBehaviour
 			}
 		}
 
+		if (Input.GetKeyDown(KeyCode.Space)) {
+			anim.SetTrigger("Flip");
+		}
 
 		//if (onTheMove && GetComponent<MeshRenderer>().enabled == false) {
 		//	if ((Vector3.Distance(ikTarget.transform.position, currentTile.transform.position) > 0.001f))
@@ -82,36 +113,36 @@ public class UrCounter : MonoBehaviour
 		//}
 	}
 
-	public void PlaceOnBoard(UrGameTile tile, bool flip, bool enemyT, bool ps) {
-		//GetComponent<MeshRenderer>().enabled = false;
-		//transform.GetChild(0).GetComponent<MeshRenderer>().enabled = false;
-		pointScored = ps;
-		goingHome = flip;
-		enemyTile = enemyT;
-		armIK.counterOnTheMove = this;
-		currentTile = tile;
-		onTheMove = true;
-		armIK.gameObject.GetComponent<Animator>().SetTrigger("BeginMovement");
+	//public void PlaceOnBoard(UrGameTile tile, bool flip, bool enemyT, bool ps) {
+	//	//GetComponent<MeshRenderer>().enabled = false;
+	//	//transform.GetChild(0).GetComponent<MeshRenderer>().enabled = false;
+	//	pointScored = ps;
+	//	goingHome = flip;
+	//	enemyTile = enemyT;
+	//	armIK.counterOnTheMove = this;
+	//	currentTile = tile;
+	//	onTheMove = true;
+	//	armIK.gameObject.GetComponent<Animator>().SetTrigger("BeginMovement");
 		
-		ikTarget.transform.position = transform.position;
+	//	ikTarget.transform.position = transform.position;
 		
-	}
+	//}
 
-	public void TileMT() {
-		GetComponent<MeshRenderer>().enabled = !GetComponent<MeshRenderer>().enabled;
-		transform.GetChild(0).GetComponent<MeshRenderer>().enabled = !transform.GetChild(0).GetComponent<MeshRenderer>().enabled;
-		if(goingHome) {
-			transform.rotation = Quaternion.Euler(0, 0, 0);
-		}
-	}
+	//public void TileMT() {
+	//	GetComponent<MeshRenderer>().enabled = !GetComponent<MeshRenderer>().enabled;
+	//	transform.GetChild(0).GetComponent<MeshRenderer>().enabled = !transform.GetChild(0).GetComponent<MeshRenderer>().enabled;
+	//	if(goingHome) {
+	//		transform.rotation = Quaternion.Euler(0, 0, 0);
+	//	}
+	//}
 
-	IEnumerator EnemyTurnDelay() {
-		yield return new WaitForSeconds(2.0f);
-		if(pointScored) {
-			gameObject.SetActive(false);
-		}
-		UR.EnemyTurn();
-	}
+	//IEnumerator EnemyTurnDelay() {
+	//	yield return new WaitForSeconds(2.0f);
+	//	if(pointScored) {
+	//		gameObject.SetActive(false);
+	//	}
+	//	UR.EnemyTurn();
+	//}
 
 	private void OnMouseDown() 
 	{
@@ -137,22 +168,41 @@ public class UrCounter : MonoBehaviour
 			selected = false;
 			Destroy(spawnedGhost);
 			ugc.UnhighlightBoard();
+			ClearPossiblePath();
 
-			//If you moved, pass the turn
+			//If you moved, check for flip or piece off, then pass the turn
 			if (spawnedGhost != null && boardIndex != potentialIndex) 
 			{
 				if (boardIndex != -1) {
 					ugc.playerBoardPositions[boardIndex].Occupied = false;
 				}
+
+				//We check this now because we won't need to do any more processing if you're moving off the board
+				//We especially don't want to set the end space to occupied!
+				if (potentialIndex == ugc.playerBoardPositions.Count - 1) 
+				{
+					Debug.Log("Scoring!");
+					ugc.PointScored(true, this);
+				}
+
+				//The "bridge" you go back along starts at index 16 for both player and enemy, so I'm hard-coding it in
+				//Again, this is a bad practice, but it shouldn't change so it's probably fine
+				if (boardIndex < 16 && potentialIndex >= 16) {
+					FlipPiece();
+				}
 				boardIndex = potentialIndex;
 				ugc.playerBoardPositions[boardIndex].Occupied = true;
-
+				
+				
 				//If it's a rosette, "switch" to player turn
-				if (ugc.playerBoardPositions[boardIndex].isRosette) {
+				if (ugc.playerBoardPositions[boardIndex].isRosette) 
+				{
+					ugc.ShowAlertText("Roll Again");
 					ugc.SwitchTurn(true);
 				}
-				else {
-					StartCoroutine(ugc.WaitToSwitchTurn(false, 1.5f));
+				else 
+				{
+					StartCoroutine(ugc.WaitToSwitchTurn(false, .75f));
 				}
 				validMoves.Clear();
 			}
@@ -195,7 +245,6 @@ public class UrCounter : MonoBehaviour
 			{
 				possibleMoves.Add(ugc.playerBoardPositions[boardIndex]);
 				possibleMoves.Add(ugc.playerBoardPositions[boardIndex + roll]);
-				Debug.Log("Piece off the end!");
 			}
 			//Otherwise if it's off the end you can't move it
 		}
@@ -203,8 +252,44 @@ public class UrCounter : MonoBehaviour
 		return possibleMoves;
 	}
 
-	public void FlipPiece() {
-		transform.Rotate(Vector3.left * -180f);
+	private void ShowPossiblePath(int start, int end) 
+	{
+		if (start != -1) 
+		{
+			//We need to add 1 so we include both ending squares
+			int length = end - start + 1;
+			Vector3[] positions = new Vector3[length];
+
+			for (int i = 0; i < positions.Length; i++) 
+			{
+				positions[i] = ugc.playerBoardPositions[i + start].transform.position;
+			}
+
+			possiblePathLine.positionCount = length;
+			possiblePathLine.SetPositions(positions);
+
+			UrScrollTex scroll = possiblePathLine.GetComponent<UrScrollTex>();
+
+			if (ugc.IsPlayerTurn) {
+				scroll.xSpeed = Mathf.Abs(scroll.xSpeed) * -1;
+			}
+			else {
+				scroll.xSpeed = Mathf.Abs(scroll.xSpeed);
+			}
+
+		}
+
+	}
+
+	private void ClearPossiblePath() 
+	{
+		possiblePathLine.positionCount = 0;
+	}
+
+	public void FlipPiece() 
+	{
+		anim.SetTrigger("Flip");
+		//transform.Rotate(Vector3.left * -180f);
 	}
 
 	public void RemovePieceFromBoard() 
