@@ -383,7 +383,8 @@ MonoBehaviour:
   enemyPieces: []
   dice: {fileID: 206646158}
   alertText: {fileID: 224972504}
-  alertShowTime: 0.5
+  alertShowTime: 1.5
+  alertFadeSpeed: 2
   cam: {fileID: 959669368}
   rollDiceButton: {fileID: 1492511150}
 --- !u!4 &206646157
@@ -483,11 +484,11 @@ RectTransform:
   m_Father: {fileID: 1329962180}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1485.5798, y: 353.8238}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_SizeDelta: {x: 1099.8347, y: 185.14972}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &224972503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -500,7 +501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectColor: {r: 0.17254902, g: 0.17254902, b: 0.6784314, a: 0.5019608}
   m_EffectDistance: {x: 4, y: -4}
   m_UseGraphicAlpha: 1
 --- !u!114 &224972504
@@ -516,26 +517,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.990566, g: 0.85919183, b: 0.7429245, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 048c8b2c83a7bcc4baa7b86f3b15107f, type: 3}
     m_FontSize: 14
-    m_FontStyle: 0
+    m_FontStyle: 2
     m_BestFit: 1
     m_MinSize: 10
-    m_MaxSize: 300
+    m_MaxSize: 115
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text: No Available Moves
 --- !u!222 &224972505
 CanvasRenderer:
   m_ObjectHideFlags: 0

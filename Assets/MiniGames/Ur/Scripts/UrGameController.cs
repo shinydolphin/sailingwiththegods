@@ -18,6 +18,7 @@ public class UrGameController : MonoBehaviour
 	//public Text dvText;
 	public Text alertText;
 	public float alertShowTime;
+	public float alertFadeSpeed;
 	//private int diceValue = 0;
 	//public int countersOffBoard = 7;
 	//public int countersOnBoard = 0;
@@ -43,17 +44,18 @@ public class UrGameController : MonoBehaviour
 	private Color baseAlertColor;
 	private Outline alertOutline;
 	private Color baseOutlineColor;
+	private Coroutine fadeCoroutine;
 	
 	public void Awake() {
 		//playerArms = dice.playerAnimator;
 		baseAlertColor = alertText.color;
 		alertOutline = alertText.GetComponent<Outline>();
 		baseOutlineColor = alertOutline.effectColor;
+		alertText.text = "";
 	}
 
 	public void Update() 
 	{
-
 		#region Old Code
 		//if(Input.GetKeyDown("p")) {
 		//	EnemyTurn();
@@ -330,19 +332,32 @@ public class UrGameController : MonoBehaviour
 
 	public void ShowAlertText(string alert) 
 	{
-		StopCoroutine(FadeText(alertText, alertOutline));
-		alertText.color = baseAlertColor;
-		alertOutline.effectColor = baseOutlineColor;
+		StartCoroutine(DoShowAlertText(alertText, alertOutline, alert));
+	}
+
+	private IEnumerator DoShowAlertText(Text t, Outline o, string alert) 
+	{
+		//For some reason, just calling StopCoroutine(FadeText(t, o)) doesn't work, so we have to do it this way
+		if (fadeCoroutine != null) 
+		{
+			StopCoroutine(fadeCoroutine);
+			fadeCoroutine = null;
+		}
+		yield return null;
+		t.color = baseAlertColor;
+		o.effectColor = baseOutlineColor;
 		alertText.text = alert;
-		StartCoroutine(FadeText(alertText, alertOutline));
+		yield return null;
+		fadeCoroutine = StartCoroutine(FadeText(t, o));
 	}
 
 	private IEnumerator FadeText(Text t, Outline o) 
 	{
+		yield return new WaitForSeconds(alertShowTime);
 		Color clearColor = new Color(baseAlertColor.r, baseAlertColor.g, baseAlertColor.b, 0f);
 		Color clearOutline = new Color(baseOutlineColor.r, baseOutlineColor.g, baseOutlineColor.b, 0f);
 
-		for (float i = 0; i <= 1; i += Time.deltaTime * alertShowTime) 
+		for (float i = 0; i <= 1; i += Time.deltaTime * alertFadeSpeed) 
 		{
 			t.color = Color.Lerp(baseAlertColor, clearColor, i);
 			o.effectColor = Color.Lerp(baseOutlineColor, clearOutline, i);
@@ -351,6 +366,7 @@ public class UrGameController : MonoBehaviour
 
 		alertText.text = "";
 		alertText.color = baseAlertColor;
+		o.effectColor = baseOutlineColor;
 	}
 
 	bool isPlaying(Animator anim, string stateName) {

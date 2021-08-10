@@ -92,10 +92,6 @@ public class UrCounter : MonoBehaviour
 			}
 		}
 
-		if (Input.GetKeyDown(KeyCode.Space)) {
-			anim.SetTrigger("Flip");
-		}
-
 		//if (onTheMove && GetComponent<MeshRenderer>().enabled == false) {
 		//	if ((Vector3.Distance(ikTarget.transform.position, currentTile.transform.position) > 0.001f))
 		//		ikTarget.transform.position = Vector3.MoveTowards(ikTarget.transform.position, currentTile.transform.position, (increment * Time.deltaTime));

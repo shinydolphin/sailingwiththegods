@@ -57,29 +57,23 @@ public class UrDiceRoller : MonoBehaviour
 			}
 			yield return null;
 		}
-
-		Quaternion[] newPositions = new Quaternion[diceRolls.Length];
+		
 		//Rotate the dice to show the appropriate mark/blank
 		for (int i = 0; i < diceRolls.Length; i++) 
 		{
 			if (diceRolls[i] % 2 == 0) 
 			{
-				newPositions[i] = markUpPositions.RandomElement().rotation;
+				diceModels[i].rotation = markUpPositions.RandomElement().rotation;
 			}
 			else 
 			{
-				newPositions[i] = blankUpPositions.RandomElement().rotation;
+				diceModels[i].rotation = blankUpPositions.RandomElement().rotation;
 			}
 
 			//Rotate randomly on the Y axis so dice that roll the same don't *look* the same
-			newPositions[i].eulerAngles += Vector3.up * Random.Range(0f, 360f);
+			diceModels[i].eulerAngles += Vector3.up * Random.Range(0f, 360f);
 		}
 
-
-		for (int i = 0; i < diceModels.Length; i++) 
-		{
-			diceModels[i].rotation = newPositions[i];
-		}
 
 		diceResultText.text = resultRoll.ToString();
 
