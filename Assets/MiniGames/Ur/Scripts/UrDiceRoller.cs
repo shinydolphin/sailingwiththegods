@@ -9,9 +9,9 @@ public class UrDiceRoller : MonoBehaviour
 {
 	public Text diceResultText;
 	public Transform[] diceModels;
-	public Vector3[] markUpPositions;
-	public Vector3[] blankUpPositions;
-	public Vector2 diceSpinTime;
+	public Transform[] markUpPositions;
+	public Transform[] blankUpPositions;
+	public float diceSpinTime;
 	public float diceSpeed;
 
 	private UrGameController ugc;
@@ -48,35 +48,37 @@ public class UrDiceRoller : MonoBehaviour
 		//I tried using Euler angles, but ran into issues because they're not unique - 0 == 180, for example
 		//Was also running into problems with gimble locking at 90 degrees X
 		//It all added up to some weird behaior with 110 degrees switching to 70 and the whole die rotating weirdly
-		//So instead, we take how far it's going to rotate in total, then how much it should rotate per frame, then just rotate that amount per frame
-		float spinTime = Random.Range(diceSpinTime.x, diceSpinTime.y);
-
-		float totalRot = diceSpeed * spinTime;
-		float rotPerFrame = totalRot * Time.deltaTime;
-
-		for (float t = 0; t <= spinTime; t += Time.deltaTime)
+		
+		for (float t = 0; t <= diceSpinTime; t += Time.deltaTime)
 		{
 			for (int i = 0; i < diceModels.Length; i++) 
 			{
-				diceModels[i].Rotate(Vector3.one * rotPerFrame);
+				diceModels[i].Rotate(Vector3.one * diceSpeed);
 			}
 			yield return null;
 		}
 
+		Quaternion[] newPositions = new Quaternion[diceRolls.Length];
 		//Rotate the dice to show the appropriate mark/blank
 		for (int i = 0; i < diceRolls.Length; i++) 
 		{
 			if (diceRolls[i] % 2 == 0) 
 			{
-				diceModels[i].eulerAngles = markUpPositions.RandomElement();
+				newPositions[i] = markUpPositions.RandomElement().rotation;
 			}
 			else 
 			{
-				diceModels[i].eulerAngles = blankUpPositions.RandomElement();
+				newPositions[i] = blankUpPositions.RandomElement().rotation;
 			}
 
 			//Rotate randomly on the Y axis so dice that roll the same don't *look* the same
-			diceModels[i].eulerAngles += Vector3.up * Random.Range(0f, 360f);
+			newPositions[i].eulerAngles += Vector3.up * Random.Range(0f, 360f);
+		}
+
+
+		for (int i = 0; i < diceModels.Length; i++) 
+		{
+			diceModels[i].rotation = newPositions[i];
 		}
 
 		diceResultText.text = resultRoll.ToString();
