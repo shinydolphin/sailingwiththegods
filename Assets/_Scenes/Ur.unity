@@ -424,7 +424,7 @@ MonoBehaviour:
   blankUpPositions:
   - {fileID: 736168352}
   - {fileID: 1917502704}
-  diceSpinTime: 1.75
+  diceSpinTime: 1
   diceSpeed: 3
 --- !u!114 &206646159
 MonoBehaviour:

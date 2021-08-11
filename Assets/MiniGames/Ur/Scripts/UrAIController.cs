@@ -12,7 +12,7 @@ public class UrAIController : MonoBehaviour
 	{
 		if (!gc.IsGameOver) {
 			currentRoll = gc.GetDiceRoll();
-			StartCoroutine(gc.WaitToSwitchTurn(true, 3.5f));
+			StartCoroutine(gc.WaitToSwitchTurn(true, 1.5f));
 		}
 
 	}

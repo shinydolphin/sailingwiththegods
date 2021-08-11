@@ -16,6 +16,10 @@ public class UrDiceRoller : MonoBehaviour
 
 	private UrGameController ugc;
 
+	//Testing
+	private int spins = 0;
+	private int spinsSinceLast = 0;
+
 	private void Start() {
 		ugc = GetComponent<UrGameController>();
 	}
@@ -48,14 +52,32 @@ public class UrDiceRoller : MonoBehaviour
 		//I tried using Euler angles, but ran into issues because they're not unique - 0 == 180, for example
 		//Was also running into problems with gimble locking at 90 degrees X
 		//It all added up to some weird behaior with 110 degrees switching to 70 and the whole die rotating weirdly
-		
+
+		float ticks = 0f;
+		float avgDelta = 0f;
+		float timer = 0f;
+
 		for (float t = 0; t <= diceSpinTime; t += Time.deltaTime)
 		{
 			for (int i = 0; i < diceModels.Length; i++) 
 			{
 				diceModels[i].Rotate(Vector3.one * diceSpeed);
 			}
+			ticks++;
+			timer += Time.deltaTime;
+			avgDelta += Time.deltaTime;
 			yield return null;
+		}
+		avgDelta /= ticks;
+		spins++;
+		spinsSinceLast++;
+		
+		//Debug.Log($"Total ticks to rotate (expected {diceSpinTime} actual {timer} | {avgDelta} deltaTime): {ticks}");
+
+		if (avgDelta > 0.006f) 
+		{
+			Debug.Log($"Slowdown to average deltaTime {avgDelta} | Spins since last slowdown: {spinsSinceLast} | Spins since start of game: {spins}");
+			spinsSinceLast = 0;
 		}
 		
 		//Rotate the dice to show the appropriate mark/blank
@@ -82,7 +104,7 @@ public class UrDiceRoller : MonoBehaviour
 			if (!ugc.CanPlayerMove()) 
 			{
 				ugc.ShowAlertText("No Available Moves");
-				StartCoroutine(ugc.WaitToSwitchTurn(false, 1.5f));
+				//StartCoroutine(ugc.WaitToSwitchTurn(false, 1.5f));
 			}
 		}
 

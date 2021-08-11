@@ -169,7 +169,7 @@ public class UrGameController : MonoBehaviour
 		if (isPlayerTurn) {
 			allowPlayerMove = true;
 		}
-		rollDiceButton.interactable = false;
+		rollDiceButton.interactable = true;
 	}
 
 	public void SwitchTurn(bool playerTurn) 
