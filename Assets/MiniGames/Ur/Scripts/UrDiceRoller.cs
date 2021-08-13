@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class UrDiceRoller : MonoBehaviour
 {
 	public Text diceResultText;
-	public Transform[] diceModels;
+	public Animator[] diceModels;
 	public Transform[] markUpPositions;
 	public Transform[] blankUpPositions;
 	public float diceSpinTime;
@@ -16,12 +16,20 @@ public class UrDiceRoller : MonoBehaviour
 
 	private UrGameController ugc;
 
-	//Testing
-	private int spins = 0;
-	private int spinsSinceLast = 0;
-
 	private void Start() {
 		ugc = GetComponent<UrGameController>();
+	}
+
+	private IEnumerator RollAndRotate(Animator anim, string trigger) 
+	{
+		yield return null;
+		anim.SetTrigger("Reset");
+		anim.transform.rotation = Quaternion.identity;
+		anim.SetTrigger(trigger);
+		yield return null;
+		anim.ResetTrigger("Reset");
+		yield return null;
+		anim.transform.eulerAngles += Vector3.up * Random.Range(1f, 361f);
 	}
 
 	public int RollDice(bool playerTurn)
@@ -41,7 +49,6 @@ public class UrDiceRoller : MonoBehaviour
 		{
 			StartCoroutine(VisualDiceRoll(diceRolls, roll, playerTurn));
 		}
-
 		
 		return roll;
 	}
@@ -49,53 +56,21 @@ public class UrDiceRoller : MonoBehaviour
 	private IEnumerator VisualDiceRoll(int[] diceRolls, int resultRoll, bool playerTurn) 
 	{
 		//Visually rotate the dice so they look like they're rolling
-		//I tried using Euler angles, but ran into issues because they're not unique - 0 == 180, for example
-		//Was also running into problems with gimble locking at 90 degrees X
-		//It all added up to some weird behaior with 110 degrees switching to 70 and the whole die rotating weirdly
+		//I TRIED to do it procedurally by adding to the transform.rotation, but it wouldn't work
+		//First I tried Euler angles and kept having issues with them not being unique and with gimble lock
+		//Then I tried Transform.Rotate, but sometimes it would cause massive framerate dips
+		//So I had to give up and do animations instead
 
-		float ticks = 0f;
-		float avgDelta = 0f;
-		float timer = 0f;
-
-		for (float t = 0; t <= diceSpinTime; t += Time.deltaTime)
+		for (int i = 0; i < diceModels.Length; i++) 
 		{
-			for (int i = 0; i < diceModels.Length; i++) 
-			{
-				diceModels[i].Rotate(Vector3.one * diceSpeed);
-			}
-			ticks++;
-			timer += Time.deltaTime;
-			avgDelta += Time.deltaTime;
-			yield return null;
-		}
-		avgDelta /= ticks;
-		spins++;
-		spinsSinceLast++;
-		
-		//Debug.Log($"Total ticks to rotate (expected {diceSpinTime} actual {timer} | {avgDelta} deltaTime): {ticks}");
-
-		if (avgDelta > 0.006f) 
-		{
-			Debug.Log($"Slowdown to average deltaTime {avgDelta} | Spins since last slowdown: {spinsSinceLast} | Spins since start of game: {spins}");
-			spinsSinceLast = 0;
-		}
-		
-		//Rotate the dice to show the appropriate mark/blank
-		for (int i = 0; i < diceRolls.Length; i++) 
-		{
-			if (diceRolls[i] % 2 == 0) 
-			{
-				diceModels[i].rotation = markUpPositions.RandomElement().rotation;
-			}
-			else 
-			{
-				diceModels[i].rotation = blankUpPositions.RandomElement().rotation;
-			}
-
-			//Rotate randomly on the Y axis so dice that roll the same don't *look* the same
-			diceModels[i].eulerAngles += Vector3.up * Random.Range(0f, 360f);
+			int suffix = Random.Range(1, 3);
+			//1 is blank, 2 is mark
+			string trigger = diceRolls[i] == 1 ? "RollBlank" : "RollMark";
+			trigger += suffix.ToString();
+			StartCoroutine(RollAndRotate(diceModels[i], trigger));
 		}
 
+		yield return new WaitForSeconds(diceSpinTime);
 
 		diceResultText.text = resultRoll.ToString();
 
