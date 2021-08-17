@@ -5,44 +5,28 @@ using UnityEngine;
 
 public class UrGameTile : MonoBehaviour
 {
-	//public Transform nextTile;
-	//public Transform prevTile;
-
-	//public Transform nextTileAL;
-	//public Transform prevTileAL;
-
 	public bool isRosette = false;
-	//public int timesLandedOn = 0;
 
 	public GameObject highlight;
 	private bool occupied = false;
-	private UrCounter occupyingCounter = null;
+	private UrPiece currentPiece = null;
+	private UrGameController urGC;
 
-	private void Awake() 
-	{
-		//isAvailable = transform.GetChild(0).gameObject;
+	private void Start() {
+		urGC = GameObject.FindWithTag("GameController").GetComponent<UrGameController>();
 	}
-
-	//public void ShowAvailablePositions(int drv) {
-	//	List<GameTile> aTiles = new List<GameTile>();
-	//	aTiles.Add(nextTile.GetComponent<GameTile>());
-	//	for (int i = 0; i< drv; i++) {
-	//		aTiles[i].available.SetActive(true);
-	//	}
-
-	//}
 
 	private void OnTriggerEnter(Collider other) 
 	{
-		UrCounter c = other.GetComponent<UrCounter>();
+		UrPiece c = other.GetComponent<UrPiece>();
 		if (c != null) {
-			occupyingCounter = c;
+			currentPiece = c;
 		}
 	}
 
 	private void OnTriggerExit(Collider other) 
 	{
-		occupyingCounter = null;
+		currentPiece = null;
 	}
 
 	public void ShowHighlight(bool toggle) 
@@ -50,7 +34,6 @@ public class UrGameTile : MonoBehaviour
 		if (highlight != null) {
 			highlight.SetActive(toggle);
 		}
-
 	}
 
 	public bool Occupied 
@@ -61,5 +44,28 @@ public class UrGameTile : MonoBehaviour
 		set {
 			occupied = value;
 		}
+	}
+
+	public void RemoveCurrentFromBoard() 
+	{
+		if (currentPiece != null) 
+		{
+			currentPiece.RemovePieceFromBoard();
+			currentPiece = null;
+		}
+	}
+
+	/// <summary>
+	/// Returns true if the piece on the occupying square is not controlled by the player indicated by isPlayer
+	/// </summary>
+	/// <param name="isPlayer"></param>
+	/// <returns></returns>
+	public bool OppositeOccupyingPiece(bool isPlayer) 
+	{
+		if (currentPiece == null) 
+		{
+			return true;
+		}
+		return isPlayer ? currentPiece.CompareTag(urGC.enemyTag) : currentPiece.CompareTag(urGC.enemyTag);
 	}
 }

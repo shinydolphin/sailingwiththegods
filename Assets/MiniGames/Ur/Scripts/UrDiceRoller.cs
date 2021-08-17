@@ -14,10 +14,10 @@ public class UrDiceRoller : MonoBehaviour
 	public float diceSpinTime;
 	public float diceSpeed;
 
-	private UrGameController ugc;
+	private UrGameController urGC;
 
 	private void Start() {
-		ugc = GetComponent<UrGameController>();
+		urGC = GetComponent<UrGameController>();
 	}
 
 	private IEnumerator RollAndRotate(Animator anim, string trigger) 
@@ -45,7 +45,7 @@ public class UrDiceRoller : MonoBehaviour
 		int marks = (diceRolls[0] % 2 == 0 ? 1 : 0) + (diceRolls[1] % 2 == 0 ? 1 : 0) + (diceRolls[2] % 2 == 0 ? 1 : 0);
 		int roll = marks == 3 ? 5 : marks;
 
-		if (!ugc.IsGameOver) 
+		if (!urGC.IsGameOver) 
 		{
 			StartCoroutine(VisualDiceRoll(diceRolls, roll, playerTurn));
 		}
@@ -76,10 +76,23 @@ public class UrDiceRoller : MonoBehaviour
 
 		if (playerTurn) 
 		{
-			if (!ugc.CanPlayerMove()) 
+			if (!urGC.CanPlayerMove(true)) 
 			{
-				ugc.ShowAlertText("No Available Moves");
-				//StartCoroutine(ugc.WaitToSwitchTurn(false, 1.5f));
+				urGC.ShowAlertText("No Available Moves");
+				StartCoroutine(urGC.WaitToSwitchTurn(false, 1.5f));
+			}
+			
+		}
+		else 
+		{
+			if (!urGC.CanPlayerMove(false)) 
+			{
+				urGC.ShowAlertText("Opponent Has No Moves");
+				StartCoroutine(urGC.WaitToSwitchTurn(true, 2.5f));
+			}
+			else 
+			{
+				urGC.enemyAI.DoEnemyTurn();
 			}
 		}
 

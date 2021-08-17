@@ -10,6 +10,9 @@ public class PetteiaGameController : MonoBehaviour
 {
 	public Vector2Int rewardAmts;
 
+	public string playerTag;
+	public string enemyTag;
+
 	[Header("Game Pieces")]
 	public List<PetteiaPlayerPiece> playerPieces;
 	public PetteiaEnemyAI enemyAI;
@@ -426,7 +429,7 @@ public class PetteiaGameController : MonoBehaviour
 	public void MovePiece(Vector2Int oldPos, Vector2Int newPos, string tag) 
 	{
 		positions[oldPos.x, oldPos.y] = 0;
-		positions[newPos.x, newPos.y] = tag == "PetteiaW" ? 2 : 1;
+		positions[newPos.x, newPos.y] = tag == playerTag ? 2 : 1;
 	}
 
 	
