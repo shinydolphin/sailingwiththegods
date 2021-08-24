@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class UrDiceRoller : MonoBehaviour
 {
+	public float skipTurnWaitTime = 1.5f;
 	public Text diceResultText;
 	public Animator[] diceModels;
 	public Transform[] markUpPositions;
@@ -79,7 +80,7 @@ public class UrDiceRoller : MonoBehaviour
 			if (!urGC.CanPlayerMove(true)) 
 			{
 				urGC.ShowAlertText("No Available Moves");
-				StartCoroutine(urGC.WaitToSwitchTurn(false, 1.5f));
+				StartCoroutine(urGC.WaitToSwitchTurn(false, skipTurnWaitTime));
 			}
 			
 		}
@@ -88,11 +89,11 @@ public class UrDiceRoller : MonoBehaviour
 			if (!urGC.CanPlayerMove(false)) 
 			{
 				urGC.ShowAlertText("Opponent Has No Moves");
-				StartCoroutine(urGC.WaitToSwitchTurn(true, 2.5f));
+				StartCoroutine(urGC.WaitToSwitchTurn(true, skipTurnWaitTime));
 			}
 			else 
 			{
-				urGC.enemyAI.DoEnemyTurn();
+				StartCoroutine(urGC.enemyAI.DoEnemyTurn());
 			}
 		}
 

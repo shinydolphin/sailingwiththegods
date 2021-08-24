@@ -6,6 +6,9 @@ public class UrAIController : MonoBehaviour
 {
 	public List<UrPiece> enemyPieces;
 
+	public float midTurnPause = 0.5f;
+	public float endTurnPause = 1f;
+
 	private UrGameController urGC;
 	private int currentRoll;
 
@@ -22,7 +25,7 @@ public class UrAIController : MonoBehaviour
 		}
 	}
 
-	public void DoEnemyTurn() 
+	public IEnumerator DoEnemyTurn() 
 	{
 		//Chooses what value the dice roll
 
@@ -35,6 +38,7 @@ public class UrAIController : MonoBehaviour
 
 		if (currentRoll != 0) 
 		{
+			//Picks out what pieces are valid - they're already highlighted by the dice roller
 			List<UrPiece> movablePieces = new List<UrPiece>();
 			for (int i = 0; i < enemyPieces.Count; i++) {
 				if (enemyPieces[i].PopulateValidMovesList(urGC.enemyBoardPositions).Count != 0) 
@@ -42,184 +46,78 @@ public class UrAIController : MonoBehaviour
 					movablePieces.Add(enemyPieces[i]);
 				}
 			}
+
+			yield return new WaitForSeconds(midTurnPause);
+
 			bool redoTurn = false;
 			if (movablePieces.Count > 0) 
 			{
-				UrPiece pieceToMove = movablePieces.RandomElement();
+				//Pick what piece to move
+				UrPiece pieceToMove = ChoosePieceToMove(movablePieces);
+				foreach (UrPiece p in movablePieces) 
+				{
+					if (!p.Equals(pieceToMove)) 
+					{
+						p.ShowHighlight(false);
+					}
+				}
+				List<UrGameTile> validMoves = pieceToMove.PopulateValidMovesList(urGC.enemyBoardPositions);
+				foreach (UrGameTile t in validMoves) 
+				{
+					t.ShowHighlight(true, false);
+				}
 				//If we're moving it onto the board, it's only got one potential move. Otherwise, it has two - its current space and the next one
 				int validMovePos = pieceToMove.BoardIndex == -1 ? 0 : 1;
-				UrGameTile nextTile = pieceToMove.PopulateValidMovesList(urGC.enemyBoardPositions)[validMovePos];
-				pieceToMove.transform.position = nextTile.transform.position;
-				if (pieceToMove.BoardIndex != -1) {
-					urGC.enemyBoardPositions[pieceToMove.BoardIndex].Occupied = false;
-				}
-				nextTile.Occupied = true;
+				UrGameTile nextTile = validMoves[validMovePos];
+
+				yield return new WaitForSeconds(midTurnPause);
+
+				//Visually show the move
+				urGC.UnhighlightPieces();
+				pieceToMove.SpawnGhostInPlace();
 				//Since we know that this space + currentRoll is a valid move, we don't have to check it again
-				pieceToMove.BoardIndex += currentRoll;
-				if (nextTile.isRosette) {
+				pieceToMove.ShowPossiblePath(urGC.enemyBoardPositions, pieceToMove.BoardIndex, pieceToMove.BoardIndex + currentRoll);
+				pieceToMove.transform.position = nextTile.transform.position;
+
+				yield return new WaitForSeconds(midTurnPause);
+
+				//Finalize the move
+				pieceToMove.ClearPossiblePath();
+				urGC.UnhighlightBoard();
+				pieceToMove.DestroyGhost();
+
+				if (pieceToMove.BoardIndex < 16 && pieceToMove.BoardIndex + currentRoll >= 16) 
+				{
+					pieceToMove.FlipPiece();
+				}
+
+				if (pieceToMove.BoardIndex != -1) 
+				{
+					urGC.enemyBoardPositions[pieceToMove.BoardIndex].Occupied = false;
+					pieceToMove.BoardIndex += currentRoll;
+				}
+				else 
+				{
+					//If they're at at the beginning, we don't want to set their position to 4 if they rolled a 5
+					pieceToMove.BoardIndex = 0;
+				}
+
+				nextTile.Occupied = true;
+
+				if (nextTile.isRosette) 
+				{
 					urGC.ShowAlertText("Opponent Rolls Again");
 					redoTurn = true;
 				}
 			}
 
-			StartCoroutine(urGC.WaitToSwitchTurn(!redoTurn, 2.5f));
+			StartCoroutine(urGC.WaitToSwitchTurn(!redoTurn, midTurnPause));
 		}
+	}
 
-			//if (ediceValue == 1 && enemyCountersOnBoard == 0) {
-			//	eCounters[0].PlaceOnBoard(enemyBoardPositions[0], false, true, false);
-			//	enemyCountersOnBoard++;
-			//}
-			//else if (ediceValue == 5 && enemyCountersOnBoard == 0) {
-			//	eCounters[0].PlaceOnBoard(enemyBoardPositions[4], false, true, false);
-			//	enemyCountersOnBoard++;
-			//}
-			//else if (ediceValue == 1 && enemyCountersOnBoard > 0 && !IsEnemySpaceOccupied(enemyBoardPositions[0])) {
-			//	eCounters[enemyCountersOnBoard].PlaceOnBoard(enemyBoardPositions[0], false, true, false);
-			//	enemyCountersOnBoard++;
-			//}
-			//else if (ediceValue == 5 && enemyCountersOnBoard > 0 && !IsEnemySpaceOccupied(enemyBoardPositions[4])) {
-			//	eCounters[enemyCountersOnBoard].PlaceOnBoard(enemyBoardPositions[4], false, true, false);
-			//	enemyCountersOnBoard++;
-			//}
-
-		//If the enemy can't move a piece onto the board, but does have some pieces on the board already
-
-		//else if (enemyCountersOnBoard > 0) 
-		//{
-		//	//If the enemy rolled a 1
-		//	if (ediceValue == 1) 
-		//	{
-		//		foreach (UrCounter c in eCounters) 
-		//		{
-		//			//Check if the piece can be moved
-		//			if (c.onBoard && CanEnemyMove(ediceValue, c)) 
-		//			{
-		//				Debug.Log("i get here");
-		//				int index = enemyBoardPositions.IndexOf(c.currentTile);
-		//				//Check if the potential space is unoccupied and not off the end
-		//				if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 1]) && ((index + 1) < 13)) 
-		//				{
-		//					//Move this piece
-		//					c.PlaceOnBoard(enemyBoardPositions[index + 1], false, true, false);
-		//					//If there's already a player piece there, remove it from the board
-		//					if (IsSpaceOccupied(playerBoardPositions[index + 1])) 
-		//					{
-		//						Debug.Log("haha rekt");
-		//						IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).onBoard = false;
-		//						IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).initPosit;
-		//						IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).currentTile = null;
-		//						break;
-		//					}
-		//				}
-		//				//Check if the potential space is unoccupied and is off the board
-		//				else if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 1]) && ((index + 1) >= 13)) 
-		//				{
-		//					//Score a point
-		//					if (index + 1 == 19) 
-		//					{
-		//						PointScored(false);
-		//					}
-		//					//Still move the piece and check for the player (unnecessary)
-		//					c.PlaceOnBoard(enemyBoardPositions[index + 1], true, true, false);
-		//					if (IsSpaceOccupied(playerBoardPositions[index + 1])) 
-		//					{
-		//						Debug.Log("haha rekt");
-		//						IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).onBoard = false;
-		//						IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).initPosit;
-		//						IsSpaceOccupiedCounter(playerBoardPositions[index + 1]).currentTile = null;
-		//						break;
-		//					}
-
-		//				}
-
-		//			}
-
-		//		}
-		//	}
-
-			//The EXACT SAME CODE, but not just using ediceValue instead of a hard-coded number
-				//else if (ediceValue == 4) 
-				//{
-				//	foreach (UrCounter c in eCounters) 
-				//	{
-				//		if (c.onBoard && CanEnemyMove(ediceValue, c)) 
-				//		{
-				//			Debug.Log("i get here");
-				//			int index = enemyBoardPositions.IndexOf(c.currentTile);
-				//			if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 4]) && ((index + 4) < 13)) 
-				//			{
-				//				c.PlaceOnBoard(enemyBoardPositions[index + 4], false, true, false);
-				//				if (IsSpaceOccupied(playerBoardPositions[index + 4])) {
-				//					Debug.Log("haha rekt");
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).onBoard = false;
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).initPosit;
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).currentTile = null;
-				//					break;
-				//				}
-				//			}
-				//			else if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 4]) && ((index + 4) >= 13)) 
-				//			{
-				//				if (index + 4 == 19) {
-				//					PointScored(false);
-				//				}
-				//				c.PlaceOnBoard(enemyBoardPositions[index + 4], true, true, false);
-				//				if (IsSpaceOccupied(playerBoardPositions[index + 4])) 
-				//				{
-				//					Debug.Log("haha rekt");
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).onBoard = false;
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).initPosit;
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 4]).currentTile = null;
-				//					break;
-				//				}
-
-				//			}
-
-				//		}
-				//	}
-				//}
-				//else if (ediceValue == 5) 
-				//{
-				//	foreach (UrCounter c in eCounters) 
-				//	{
-				//		if (c.onBoard && CanEnemyMove(ediceValue, c)) 
-				//		{
-				//			Debug.Log("i get here");
-				//			int index = enemyBoardPositions.IndexOf(c.currentTile);
-				//			if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 5]) && ((index + 5) < 13)) 
-				//			{
-				//				c.PlaceOnBoard(enemyBoardPositions[index + 5], false, true, false);
-				//				if (IsSpaceOccupied(playerBoardPositions[index + 5]))
-				//				{
-				//					Debug.Log("haha rekt");
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).onBoard = false;
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).initPosit;
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).currentTile = null;
-				//					break;
-				//				}
-				//			}
-				//			else if (!IsEnemySpaceOccupied(enemyBoardPositions[index + 5]) && ((index + 5) >= 13)) 
-				//			{
-				//				if (index + 5 == 19) 
-				//				{
-				//					PointScored(false);
-				//				}
-				//				c.PlaceOnBoard(enemyBoardPositions[index + 5], true, true, false);
-				//				if (IsSpaceOccupied(playerBoardPositions[index + 5])) 
-				//				{
-				//					Debug.Log("haha rekt");
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).onBoard = false;
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).transform.position = IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).initPosit;
-				//					IsSpaceOccupiedCounter(playerBoardPositions[index + 5]).currentTile = null;
-				//					break;
-				//				}
-
-				//			}
-
-				//		}
-				//	}
-				//}
-		//}
-		////rollDiceButton.SetActive(true);
+	private UrPiece ChoosePieceToMove(List<UrPiece> movablePieceList) 
+	{
+		return movablePieceList.RandomElement();
 	}
 
 }

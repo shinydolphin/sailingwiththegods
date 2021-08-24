@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1262456346852271986
 RectTransform:
   m_ObjectHideFlags: 0
@@ -58,13 +58,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9339623, g: 0.917982, b: 0.7004717, a: 1}
+  m_Color: {r: 0.93333334, g: 0.91764706, b: 0.7019608, a: 1}
   m_RaycastTarget: 0
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c2eea0fae17c9884f9e6fcf3374f1120, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7027daa88a72e914ca37b4c624c37c5a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -120,7 +120,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRosette: 0
-  highlight: {fileID: 8337628591320906568}
+  playerHighlightColor: {r: 0.93333334, g: 0.91764706, b: 0.7019608, a: 1}
+  enemyHighlightColor: {r: 0.8392157, g: 0.3764706, b: 0.29803923, a: 1}
+  highlight: {fileID: 3578030414475209797}
 --- !u!65 &4697099909213861886
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -152,7 +154,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2579246270700934881
 RectTransform:
   m_ObjectHideFlags: 0

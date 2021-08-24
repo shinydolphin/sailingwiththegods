@@ -13,22 +13,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.31109315, y: 0.021777894, z: 0.31109312}
   m_Center: {x: 0.000000022351742, y: 0.0000000088475645, z: 0.000000059604645}
---- !u!114 &5578898011621166247
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4515166687430434373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10989092f1b0b4f418bbd550582eba5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  highlight: {fileID: 7073804548295158042}
-  ghostPiece: {fileID: 3380173810281442361, guid: c6b0444823ae12747b01822a1d0a8fd9,
-    type: 3}
-  possiblePathLine: {fileID: 0}
 --- !u!95 &177857418297888838
 Animator:
   serializedVersion: 3
@@ -48,6 +32,22 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &5578898011621166247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4515166687430434373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10989092f1b0b4f418bbd550582eba5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  highlight: {fileID: 7073804548295158042}
+  ghostPiece: {fileID: 7652994433082816859, guid: c55a0300e59b3c5439f6b827aeefc82d,
+    type: 3}
+  possiblePathLine: {fileID: 0}
 --- !u!1 &7073804548295158042
 GameObject:
   m_ObjectHideFlags: 0

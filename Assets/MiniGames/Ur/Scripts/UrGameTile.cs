@@ -2,12 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UrGameTile : MonoBehaviour
 {
 	public bool isRosette = false;
+	public Color playerHighlightColor;
+	public Color enemyHighlightColor;
 
-	public GameObject highlight;
+	public Image highlight;
 	private bool occupied = false;
 	private UrPiece currentPiece = null;
 	private UrGameController urGC;
@@ -29,11 +32,25 @@ public class UrGameTile : MonoBehaviour
 		currentPiece = null;
 	}
 
-	public void ShowHighlight(bool toggle) 
+	public void ShowHighlight(bool toggle, bool isPlayer = true) 
 	{
-		if (highlight != null) {
-			highlight.SetActive(toggle);
+		if (toggle) 
+		{
+			if (isPlayer) 
+			{
+				highlight.color = playerHighlightColor;
+			}
+			else {
+				highlight.color = enemyHighlightColor;
+			}
+
 		}
+
+		if (highlight != null) 
+		{
+			highlight.gameObject.SetActive(toggle);
+		}
+
 	}
 
 	public bool Occupied 

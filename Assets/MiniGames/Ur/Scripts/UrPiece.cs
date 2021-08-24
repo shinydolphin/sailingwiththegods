@@ -75,7 +75,7 @@ public class UrPiece : MonoBehaviour
 		return possibleMoves;
 	}
 
-	protected void ShowPossiblePath(List<UrGameTile> allowedPath, int start, int end) 
+	public void ShowPossiblePath(List<UrGameTile> allowedPath, int start, int end) 
 	{
 		if (start != -1) {
 			//We need to add 1 so we include both ending squares
@@ -105,11 +105,11 @@ public class UrPiece : MonoBehaviour
 
 	}
 
-	protected void ClearPossiblePath() 
+	public void ClearPossiblePath() 
 	{
 		possiblePathLine.positionCount = 0;
 	}
-
+	
 	public void FlipPiece() 
 	{
 		anim.SetTrigger("Flip");
@@ -125,6 +125,17 @@ public class UrPiece : MonoBehaviour
 	public void ShowHighlight(bool toggle) 
 	{
 		highlight.SetActive(toggle);
+	}
+
+	public void SpawnGhostInPlace() 
+	{
+		spawnedGhost = Instantiate(ghostPiece, transform.position, transform.rotation);
+	}
+
+	public void DestroyGhost() 
+	{
+		Destroy(spawnedGhost);
+		spawnedGhost = null;
 	}
 
 	public int BoardIndex {

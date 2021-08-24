@@ -75,14 +75,14 @@ public class UrPlayerPiece : UrPiece
 		{
 			selected = true;
 			urGC.UnhighlightPieces();
-			spawnedGhost = Instantiate(ghostPiece, transform.position, transform.rotation);
+			SpawnGhostInPlace();
 			potentialIndex = boardIndex;
 			validMoves = PopulateValidMovesList(urGC.playerBoardPositions);
 			urGC.UnhighlightBoard();
 		
 			foreach (UrGameTile tile in validMoves) 
 			{
-				tile.ShowHighlight(true);
+				tile.ShowHighlight(true, true);
 			}
 		}
 	}
@@ -92,12 +92,12 @@ public class UrPlayerPiece : UrPiece
 		if (urGC.AllowPlayerMove && enabled) 
 		{
 			selected = false;
-			Destroy(spawnedGhost);
+			DestroyGhost();
 			urGC.UnhighlightBoard();
 			ClearPossiblePath();
 
 			//If you moved, check for flip or piece off, then pass the turn
-			if (spawnedGhost != null && boardIndex != potentialIndex) 
+			if (boardIndex != potentialIndex) 
 			{
 				if (boardIndex != -1) {
 					urGC.playerBoardPositions[boardIndex].Occupied = false;
@@ -140,6 +140,5 @@ public class UrPlayerPiece : UrPiece
 			}
 		}
 	}
-
 	
 }
