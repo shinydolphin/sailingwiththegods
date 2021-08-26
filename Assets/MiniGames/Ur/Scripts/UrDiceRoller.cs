@@ -86,7 +86,7 @@ public class UrDiceRoller : MonoBehaviour
 		}
 		else 
 		{
-			if (!urGC.CanPlayerMove(false)) 
+			if (!urGC.CanPlayerMove(false, false)) 
 			{
 				urGC.ShowAlertText("Opponent Has No Moves");
 				StartCoroutine(urGC.WaitToSwitchTurn(true, skipTurnWaitTime));

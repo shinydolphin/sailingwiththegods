@@ -27,41 +27,25 @@ public class UrAIController : MonoBehaviour
 
 	public IEnumerator DoEnemyTurn() 
 	{
-		//Chooses what value the dice roll
-
-		//int[] i = { 0, 1, 4, 5 };
-		//int sel = Random.Range(0, 4);
-		//int ediceValue = i[sel];
-		//dvText.text = "" + ediceValue;
-
-		//If the enemy can move a piece onto the board, do it
-
 		if (currentRoll != 0) 
 		{
 			//Picks out what pieces are valid - they're already highlighted by the dice roller
 			List<UrPiece> movablePieces = new List<UrPiece>();
 			for (int i = 0; i < enemyPieces.Count; i++) {
-				if (enemyPieces[i].PopulateValidMovesList(urGC.enemyBoardPositions).Count != 0) 
+				if (enemyPieces[i].PopulateValidMovesList(urGC.enemyBoardPositions, false).Count != 0) 
 				{
 					movablePieces.Add(enemyPieces[i]);
 				}
 			}
-
-			yield return new WaitForSeconds(midTurnPause);
 
 			bool redoTurn = false;
 			if (movablePieces.Count > 0) 
 			{
 				//Pick what piece to move
 				UrPiece pieceToMove = ChoosePieceToMove(movablePieces);
-				foreach (UrPiece p in movablePieces) 
-				{
-					if (!p.Equals(pieceToMove)) 
-					{
-						p.ShowHighlight(false);
-					}
-				}
-				List<UrGameTile> validMoves = pieceToMove.PopulateValidMovesList(urGC.enemyBoardPositions);
+				pieceToMove.ShowHighlight(true);
+
+				List<UrGameTile> validMoves = pieceToMove.PopulateValidMovesList(urGC.enemyBoardPositions, false);
 				foreach (UrGameTile t in validMoves) 
 				{
 					t.ShowHighlight(true, false);
@@ -82,6 +66,10 @@ public class UrAIController : MonoBehaviour
 				yield return new WaitForSeconds(midTurnPause);
 
 				//Finalize the move
+				if (nextTile.OppositeOccupyingPiece(false)) 
+				{
+					nextTile.RemoveCurrentFromBoard();
+				}
 				pieceToMove.ClearPossiblePath();
 				urGC.UnhighlightBoard();
 				pieceToMove.DestroyGhost();
@@ -93,7 +81,7 @@ public class UrAIController : MonoBehaviour
 
 				if (pieceToMove.BoardIndex != -1) 
 				{
-					urGC.enemyBoardPositions[pieceToMove.BoardIndex].Occupied = false;
+					urGC.enemyBoardPositions[pieceToMove.BoardIndex].ClearOccupied();
 					pieceToMove.BoardIndex += currentRoll;
 				}
 				else 
@@ -102,8 +90,15 @@ public class UrAIController : MonoBehaviour
 					pieceToMove.BoardIndex = 0;
 				}
 
-				nextTile.Occupied = true;
-
+				//If you're moving off the board
+				if (pieceToMove.BoardIndex == urGC.playerBoardPositions.Count - 1) {
+					Debug.Log("Enemy scoring!");
+					urGC.PointScored(false, pieceToMove);
+				}
+				else {
+					nextTile.SetOccupied(pieceToMove);
+				}
+				
 				if (nextTile.isRosette) 
 				{
 					urGC.ShowAlertText("Opponent Rolls Again");

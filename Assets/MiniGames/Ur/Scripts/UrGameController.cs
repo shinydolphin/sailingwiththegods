@@ -17,26 +17,12 @@ public class UrGameController : MonoBehaviour
 	public List<UrGameTile> enemyBoardPositions;
 	public List<UrPiece> playerPieces;
 	public UrDiceRoller dice;
-	//public Text dvText;
 	public Text alertText;
 	public float alertShowTime;
 	public float alertFadeSpeed;
-	//private int diceValue = 0;
-	//public int countersOffBoard = 7;
-	//public int countersOnBoard = 0;
-	//public int enemyCountersOnBoard;
 	public Camera cam;
-	//public bool selectingObject = false;
 
-	//public bool selectingBoardPosition = false;
-	//public UrCounter selectedCounter;
 	public Button rollDiceButton;
-	//public Animator aiAnim;
-	//private Animator playerArms;
-	//public int playerScore = 0;
-	//public int enemyScore = 0;
-	//public Text playerScoreText;
-	//public Text enemyScoreText;
 
 	private bool isGameOver = false;
 	private int currentRoll;
@@ -49,7 +35,6 @@ public class UrGameController : MonoBehaviour
 	private Coroutine fadeCoroutine;
 	
 	public void Awake() {
-		//playerArms = dice.playerAnimator;
 		baseAlertColor = alertText.color;
 		alertOutline = alertText.GetComponent<Outline>();
 		baseOutlineColor = alertOutline.effectColor;
@@ -152,11 +137,17 @@ public class UrGameController : MonoBehaviour
 	{
 		foreach (UrPlayerPiece piece in playerPieces) 
 		{
-			piece.ShowHighlight(false);
+			if (piece != null) {
+				piece.ShowHighlight(false);
+			}
+
 		}
 		foreach (UrPiece piece in enemyAI.enemyPieces) 
 		{
-			piece.ShowHighlight(false);
+			if (piece != null) {
+				piece.ShowHighlight(false);
+			}
+
 		}
 	}
 
@@ -175,7 +166,7 @@ public class UrGameController : MonoBehaviour
 		if (isPlayerTurn) {
 			allowPlayerMove = true;
 		}
-		rollDiceButton.interactable = true;
+		//rollDiceButton.interactable = true;
 	}
 
 	public void SwitchTurn(bool playerTurn) 
@@ -280,7 +271,7 @@ public class UrGameController : MonoBehaviour
 	//	return null;
 	//}
 
-	public bool CanPlayerMove(bool isPlayer) 
+	public bool CanPlayerMove(bool isPlayer, bool highlightPieces = true) 
 	{
 		int movable = 0;
 		List<UrGameTile> checkPath = new List<UrGameTile>();
@@ -293,15 +284,20 @@ public class UrGameController : MonoBehaviour
 			checkPath = enemyBoardPositions;
 			checkPieces = enemyAI.enemyPieces;
 		}
+		
 		foreach(UrPiece p in checkPieces) 
 		{
-			if (p.PopulateValidMovesList(checkPath).Count > 0) 
+			if (p.PopulateValidMovesList(checkPath, isPlayer).Count > 0) 
 			{
-				p.ShowHighlight(true);
+				if (highlightPieces) 
+				{
+					p.ShowHighlight(true);
+				}
+
 				movable++;
 			}
-			//if(c.currentTile != null && (playerBoardPositions.IndexOf(c.currentTile)+ val) < 19) { return true; }
 		}
+
 		return movable > 0;
 	}
 
@@ -393,7 +389,7 @@ public class UrGameController : MonoBehaviour
 			return false;
 	}
 
-	public void PointScored(bool player, UrPlayerPiece c) 
+	public void PointScored(bool player, UrPiece c) 
 	{
 		if (player) 
 		{
@@ -409,7 +405,8 @@ public class UrGameController : MonoBehaviour
 		else 
 		{
 			enemyAI.enemyPieces.Remove(c);
-			Destroy(c.gameObject);
+			c.GetComponent<MeshRenderer>().enabled = false;
+			Destroy(c.gameObject, 1f);
 			Debug.Log("Enemy scored with a piece!");
 			if (enemyAI.enemyPieces.Count == 0) 
 			{

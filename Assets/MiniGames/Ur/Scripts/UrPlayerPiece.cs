@@ -77,7 +77,7 @@ public class UrPlayerPiece : UrPiece
 			urGC.UnhighlightPieces();
 			SpawnGhostInPlace();
 			potentialIndex = boardIndex;
-			validMoves = PopulateValidMovesList(urGC.playerBoardPositions);
+			validMoves = PopulateValidMovesList(urGC.playerBoardPositions, true);
 			urGC.UnhighlightBoard();
 		
 			foreach (UrGameTile tile in validMoves) 
@@ -100,26 +100,31 @@ public class UrPlayerPiece : UrPiece
 			if (boardIndex != potentialIndex) 
 			{
 				if (boardIndex != -1) {
-					urGC.playerBoardPositions[boardIndex].Occupied = false;
+					urGC.playerBoardPositions[boardIndex].ClearOccupied();
 				}
-
-				//We check this now because we won't need to do any more processing if you're moving off the board
-				//We especially don't want to set the end space to occupied!
-				if (potentialIndex == urGC.playerBoardPositions.Count - 1) 
-				{
-					Debug.Log("Scoring!");
-					urGC.PointScored(true, this);
-				}
-
+				
 				//The "bridge" you go back along starts at index 16 for both player and enemy, so I'm hard-coding it in
 				//Again, this is a bad practice, but it shouldn't change so it's probably fine
 				if (boardIndex < 16 && potentialIndex >= 16) 
 				{
 					FlipPiece();
 				}
+
 				boardIndex = potentialIndex;
-				urGC.playerBoardPositions[boardIndex].Occupied = true;
-				
+				if (urGC.playerBoardPositions[boardIndex].OppositeOccupyingPiece(true)) 
+				{
+					urGC.playerBoardPositions[boardIndex].RemoveCurrentFromBoard();
+				}
+
+				//We check this now because we won't need to do any more processing if you're moving off the board
+				//We especially don't want to set the end space to occupied!
+				if (boardIndex == urGC.playerBoardPositions.Count - 1) {
+					Debug.Log("Player scoring!");
+					urGC.PointScored(true, this);
+				}
+				else {
+					urGC.playerBoardPositions[boardIndex].SetOccupied(this);
+				}
 				
 				//If it's a rosette, "switch" to player turn
 				if (urGC.playerBoardPositions[boardIndex].isRosette) 
@@ -131,7 +136,12 @@ public class UrPlayerPiece : UrPiece
 				{
 					StartCoroutine(urGC.WaitToSwitchTurn(false, .75f));
 				}
-				validMoves.Clear();
+
+				//No clue why I would need to check this, but I got an error once out of nowhere!
+				if (validMoves != null) 
+				{
+					validMoves.Clear();
+				}
 			}
 			//If you didn't move, the highlights need to come back
 			else 

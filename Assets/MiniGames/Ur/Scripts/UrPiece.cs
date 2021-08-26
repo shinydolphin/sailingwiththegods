@@ -35,12 +35,13 @@ public class UrPiece : MonoBehaviour
 		highlight.SetActive(false);
 	}
 
-	public List<UrGameTile> PopulateValidMovesList(List<UrGameTile> allowedPath) 
+	public List<UrGameTile> PopulateValidMovesList(List<UrGameTile> allowedPath, bool isPlayer) 
 	{
 		int roll = urGC.CurrentRoll;
 		List<UrGameTile> possibleMoves = new List<UrGameTile>();
 
 		//If this is off the board, it can only move if you have a 1 or 5 and then just to the start
+		//Don't need to check if this one's occupied by the opponent - the start tile is unique to that player
 		if (boardIndex == -1) 
 		{
 			if ((roll == 1 || roll == 5) && !allowedPath[0].Occupied) 
@@ -56,7 +57,7 @@ public class UrPiece : MonoBehaviour
 			//If it's not off the end of the board, you're fine and normal
 			if (nextSpace < allowedPath.Count - 1) 
 			{
-				if (!allowedPath[nextSpace].Occupied) 
+				if (!allowedPath[nextSpace].Occupied || allowedPath[nextSpace].OppositeOccupyingPiece(isPlayer)) 
 				{
 					possibleMoves.Add(allowedPath[boardIndex]);
 					possibleMoves.Add(allowedPath[boardIndex + roll]);

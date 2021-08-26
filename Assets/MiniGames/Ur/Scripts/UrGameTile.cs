@@ -14,22 +14,10 @@ public class UrGameTile : MonoBehaviour
 	private bool occupied = false;
 	private UrPiece currentPiece = null;
 	private UrGameController urGC;
+	
 
 	private void Start() {
 		urGC = GameObject.FindWithTag("GameController").GetComponent<UrGameController>();
-	}
-
-	private void OnTriggerEnter(Collider other) 
-	{
-		UrPiece c = other.GetComponent<UrPiece>();
-		if (c != null) {
-			currentPiece = c;
-		}
-	}
-
-	private void OnTriggerExit(Collider other) 
-	{
-		currentPiece = null;
 	}
 
 	public void ShowHighlight(bool toggle, bool isPlayer = true) 
@@ -50,16 +38,25 @@ public class UrGameTile : MonoBehaviour
 		{
 			highlight.gameObject.SetActive(toggle);
 		}
+	}
 
+	public void SetOccupied(UrPiece p) 
+	{
+		currentPiece = p;
+		occupied = true;
+	}
+
+	public void ClearOccupied() 
+	{
+		occupied = false;
+		currentPiece = null;
 	}
 
 	public bool Occupied 
 	{
-		get {
+		get 
+		{
 			return occupied;
-		}
-		set {
-			occupied = value;
 		}
 	}
 
@@ -69,6 +66,7 @@ public class UrGameTile : MonoBehaviour
 		{
 			currentPiece.RemovePieceFromBoard();
 			currentPiece = null;
+			occupied = false;
 		}
 	}
 
@@ -81,8 +79,8 @@ public class UrGameTile : MonoBehaviour
 	{
 		if (currentPiece == null) 
 		{
-			return true;
+			return false;
 		}
-		return isPlayer ? currentPiece.CompareTag(urGC.enemyTag) : currentPiece.CompareTag(urGC.enemyTag);
+		return isPlayer ? currentPiece.CompareTag(urGC.enemyTag) : currentPiece.CompareTag(urGC.playerTag);
 	}
 }
