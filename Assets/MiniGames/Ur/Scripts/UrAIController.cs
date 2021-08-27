@@ -112,6 +112,76 @@ public class UrAIController : MonoBehaviour
 
 	private UrPiece ChoosePieceToMove(List<UrPiece> movablePieceList) 
 	{
+		//If there's only one piece, just return that without wasting time doing the other processing
+		if (movablePieceList.Count == 1) 
+		{
+			Debug.Log("Only one piece can move, taking that move");
+			return movablePieceList[0];
+		}
+
+		//I've chosen to do this with one list and multiple loops for a few reasons
+		//The method stops as soon as it finds a piece to move
+		//Four lists would be a lot of memory when one works just fine
+		//Singular for-loops are pretty efficient, especially given none of these will ever run more than 3 times
+		//I find this to be nicely readable and debug-able
+		List<UrPiece> potentialPieces = new List<UrPiece>();
+		
+		//1. Move piece off the end of the board
+		for (int i = 0; i < movablePieceList.Count; i++) 
+		{
+			if (movablePieceList[i].BoardIndex + currentRoll == urGC.enemyBoardPositions.Count - 1) 
+			{
+				potentialPieces.Add(movablePieceList[i]);
+			}
+		}
+		if (potentialPieces.Count != 0) 
+		{
+			Debug.Log("At least one piece can move off the board, taking that move");
+			return potentialPieces.RandomElement();
+		}
+
+		//2. Capture one of the player's pieces
+		for (int i = 0; i < movablePieceList.Count; i++) 
+		{
+			if (urGC.enemyBoardPositions[movablePieceList[i].BoardIndex + currentRoll].OppositeOccupyingPiece(false)) {
+				potentialPieces.Add(movablePieceList[i]);
+			}
+		}
+		if (potentialPieces.Count != 0) 
+		{
+			Debug.Log("At least one piece can capture a player piece, taking that move");
+			return potentialPieces.RandomElement();
+		}
+
+		//3. Land on a rosette and roll again
+		for (int i = 0; i < movablePieceList.Count; i++) 
+		{
+			if (urGC.enemyBoardPositions[movablePieceList[i].BoardIndex + currentRoll].isRosette) {
+				potentialPieces.Add(movablePieceList[i]);
+			}
+		}
+		if (potentialPieces.Count != 0) 
+		{
+			Debug.Log("At least one piece can land on a rosette, taking that move");
+			return potentialPieces.RandomElement();
+		}
+
+		//4. Move a piece off of the board onto it
+		for (int i = 0; i < movablePieceList.Count; i++) 
+		{
+			//If it's in this list, it can already be moved, so you just need to check if it's off the board
+			if (movablePieceList[i].BoardIndex == -1) {
+				potentialPieces.Add(movablePieceList[i]);
+			}
+		}
+		if (potentialPieces.Count != 0) 
+		{
+			Debug.Log("At least one piece can move onto the board, taking that move");
+			return potentialPieces.RandomElement();
+		}
+
+		//If no piece can do any of those things, choose at random
+		Debug.Log("No priority moves available, moving a piece at random");
 		return movablePieceList.RandomElement();
 	}
 
