@@ -45,43 +45,6 @@ public class YarnTavern : MonoBehaviour
 	public void GetNumberOfKnownSettlements() {
 		ds.Storage.SetValue("$settlement_number", Globals.GameVars.playerShipVariables.ship.playerJournal.knownSettlements.Count);
 	}
-	#endregion
-
-	#region Yarn Functions - Random (Taverna)
-	[YarnCommand("randomfooddialog")]
-	public void GenerateRandomFoodDialog() {
-		// Begin pulling random food item.
-		List<string> foodList = Globals.GameVars.foodDialogText;
-
-		int i = Random.Range(1, foodList.Count);
-
-		//ds.Storage.SetValue("$food_dialog_item", foodList[i].Item);
-		ds.Storage.SetValue("$food_dialog_quote", foodList[i]);
-	}
-
-	[YarnCommand("randomwine")]
-	public void GenerateRandomWineInfo() {
-		// Begin pulling random wine items
-		List<FoodText> wineList = Globals.GameVars.wineInfoText;
-
-		int i = Random.Range(1, wineList.Count);
-		
-		ds.Storage.SetValue("$random_wine", wineList[i].Item);
-		ds.Storage.SetValue("$wine_quote", wineList[i].Quote);
-	}
-
-
-	[YarnCommand("randomfood")]
-	public void GenerateRandomFoodItem() 
-	{
-		// Begin pulling random food item.
-		List<FoodText> foodList =  Globals.GameVars.foodItemText;
-
-		int i = Random.Range(1, foodList.Count);
-		
-		ds.Storage.SetValue("$random_food", foodList[i].Item);
-		ds.Storage.SetValue("$food_quote", foodList[i].Quote);
-	}
 
 	[YarnCommand("setcitygoods")]
 	public void SetCity() {
@@ -120,6 +83,43 @@ public class YarnTavern : MonoBehaviour
 			Debug.Log("Out of both types of goods");
 			ds.Storage.SetValue("$trade_goods_finished", true);
 		}
+	}
+	#endregion
+
+	#region Yarn Functions - Random (Taverna)
+	[YarnCommand("randomfooddialog")]
+	public void GenerateRandomFoodDialog() {
+		// Begin pulling random food item.
+		List<string> foodList = Globals.GameVars.foodDialogText;
+
+		int i = Random.Range(1, foodList.Count);
+
+		//ds.Storage.SetValue("$food_dialog_item", foodList[i].Item);
+		ds.Storage.SetValue("$food_dialog_quote", foodList[i]);
+	}
+
+	[YarnCommand("randomwine")]
+	public void GenerateRandomWineInfo() {
+		// Begin pulling random wine items
+		List<FoodText> wineList = Globals.GameVars.wineInfoText;
+
+		int i = Random.Range(1, wineList.Count);
+		
+		ds.Storage.SetValue("$random_wine", wineList[i].Item);
+		ds.Storage.SetValue("$wine_quote", wineList[i].Quote);
+	}
+
+
+	[YarnCommand("randomfood")]
+	public void GenerateRandomFoodItem() 
+	{
+		// Begin pulling random food item.
+		List<FoodText> foodList =  Globals.GameVars.foodItemText;
+
+		int i = Random.Range(1, foodList.Count);
+		
+		ds.Storage.SetValue("$random_food", foodList[i].Item);
+		ds.Storage.SetValue("$food_quote", foodList[i].Quote);
 	}
 
 	[YarnCommand("randomQA")]

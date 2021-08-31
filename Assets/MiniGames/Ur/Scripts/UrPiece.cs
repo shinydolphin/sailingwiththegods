@@ -24,8 +24,7 @@ public class UrPiece : MonoBehaviour
 	{
 		AssignVariables();
 	}
-
-
+	
 	protected void AssignVariables() 
 	{
 		anim = GetComponent<Animator>();
@@ -139,7 +138,8 @@ public class UrPiece : MonoBehaviour
 		spawnedGhost = null;
 	}
 
-	public int BoardIndex {
+	public int BoardIndex 
+	{
 		get {
 			return boardIndex;
 		}

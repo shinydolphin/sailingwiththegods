@@ -51,15 +51,7 @@ public class UrGameTile : MonoBehaviour
 		occupied = false;
 		currentPiece = null;
 	}
-
-	public bool Occupied 
-	{
-		get 
-		{
-			return occupied;
-		}
-	}
-
+	
 	public void RemoveCurrentFromBoard() 
 	{
 		if (currentPiece != null) 
@@ -82,5 +74,13 @@ public class UrGameTile : MonoBehaviour
 			return false;
 		}
 		return isPlayer ? currentPiece.CompareTag(urGC.enemyTag) : currentPiece.CompareTag(urGC.playerTag);
+	}
+
+	public bool Occupied 
+	{
+		get 
+		{
+			return occupied;
+		}
 	}
 }

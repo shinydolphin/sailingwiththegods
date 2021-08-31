@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class PetteiaGameController : MonoBehaviour
 {
 	public Vector2Int rewardAmts;
+	public AudioSource moveSound;
 
 	public string playerTag;
 	public string enemyTag;
@@ -16,9 +17,7 @@ public class PetteiaGameController : MonoBehaviour
 	[Header("Game Pieces")]
 	public List<PetteiaPlayerPiece> playerPieces;
 	public PetteiaEnemyAI enemyAI;
-
-	public AudioSource moveSound;
-
+	
 	[Header("Board Positions")]
 	public PetteiaBoardPosition[] squaresRow0 = new PetteiaBoardPosition[8];
 	public PetteiaBoardPosition[] squaresRow1 = new PetteiaBoardPosition[8];
@@ -79,7 +78,7 @@ public class PetteiaGameController : MonoBehaviour
 
 		mgScreen.gameObject.SetActive(true);
 		string text = introText + "\n\n" + instructions + "\n\n" + flavor.RandomElement();
-		mgScreen.DisplayText("Petteia", "Taverna game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaStart);
+		mgScreen.DisplayText("Petteia: An Introduction", "Taverna game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaStart);
 		enemyAI = GetComponent<PetteiaEnemyAI>();
 		playerTurn = true;
 
@@ -114,7 +113,7 @@ public class PetteiaGameController : MonoBehaviour
 	{
 		mgScreen.gameObject.SetActive(true);
 		Time.timeScale = 0;
-		mgScreen.DisplayText("Petteia", "Taverna game", instructions + "\n\n" + history, gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
+		mgScreen.DisplayText("Petteia: Instructions and History", "Taverna game", instructions + "\n\n" + history, gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
 	}
 
 	public void UnpauseMinigame() 
@@ -271,32 +270,43 @@ public class PetteiaGameController : MonoBehaviour
 		//Player win
 		if (enemyAI.pieces.Count <= 1) 
 		{
-			mgScreen.gameObject.SetActive(true);
-
-			//Minimum pieces left to win is 2, maximum is all 8
-			//So we need to map [rewardAmt.x rewardAmt.y] to [2, 8]
-			float oldRange = 6f;
-			float newRange = rewardAmts.y - rewardAmts.x;			
-			int reward = Mathf.CeilToInt(((playerPieces.Count - 2) * (newRange * 1.0f) / oldRange) + rewardAmts.x);
-
-			string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!" + "\n\n" + winFlavor.RandomElement();
-
-			if (Globals.GameVars != null) 
-			{
-				Globals.GameVars.playerShipVariables.ship.AddToFoodAndWater(reward);
-			}
-
-			mgScreen.DisplayText("Petteia Victory", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
-			gameOver = true;
+			WinGame();
 		}
 
 		//Player loss
-		if (playerPieces.Count <= 1) {
-			mgScreen.gameObject.SetActive(true);
-			string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseFlavor.RandomElement();
-			mgScreen.DisplayText("Petteia Loss", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
-			gameOver = true;
+		if (playerPieces.Count <= 1) 
+		{
+			LoseGame();
 		}
+	}
+
+	public void WinGame() 
+	{
+		mgScreen.gameObject.SetActive(true);
+
+		//Minimum pieces left to win is 2, maximum is all 8
+		//So we need to map [rewardAmt.x rewardAmt.y] to [2, 8]
+		float oldRange = 6f;
+		float newRange = rewardAmts.y - rewardAmts.x;
+		int reward = Mathf.CeilToInt(((playerPieces.Count - 2) * (newRange * 1.0f) / oldRange) + rewardAmts.x);
+
+		string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!" + "\n\n" + winFlavor.RandomElement();
+
+		if (Globals.GameVars != null) 
+		{
+			Globals.GameVars.playerShipVariables.ship.AddToFoodAndWater(reward);
+		}
+
+		mgScreen.DisplayText("Petteia: Victory!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+		gameOver = true;
+	}
+
+	public void LoseGame() 
+	{
+		mgScreen.gameObject.SetActive(true);
+		string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseFlavor.RandomElement();
+		mgScreen.DisplayText("Petteia: Defeat!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+		gameOver = true;
 	}
 	
 	public void BlockingGameOver(bool playerBlocked) 
@@ -306,7 +316,7 @@ public class PetteiaGameController : MonoBehaviour
 			Debug.Log("Player is blocked in");
 			mgScreen.gameObject.SetActive(true);
 			string text = blockedFlavor.RandomElement() + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseFlavor.RandomElement();
-			mgScreen.DisplayText("Petteia Loss", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+			mgScreen.DisplayText("Petteia: Defeat!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
 			gameOver = true;
 		}
 		else {
