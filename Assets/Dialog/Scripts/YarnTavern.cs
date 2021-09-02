@@ -197,8 +197,7 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("hirenavigator")]
 	public void SetSettlementWaypoint()
 	{
-		nav.SetDestination(ds.Storage.GetValue("$known_city").AsString, Globals.Game.Session.availableCrew.RandomElement().ID);
-		nav.SetDestination(ds.Storage.GetValue("$known_city").AsString, Globals.Game.Session.availableCrew.RandomElement().ID);
+		nav.SetDestination(ds.Storage.GetValue("$known_city").AsString, Globals.Game.Session.currentSettlement.availableCrew.RandomElement().ID);
 	}
 	#endregion
 
