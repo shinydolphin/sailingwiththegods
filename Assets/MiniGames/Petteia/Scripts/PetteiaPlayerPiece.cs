@@ -23,7 +23,10 @@ public class PetteiaPlayerPiece : MonoBehaviour
 
 	void Start()
     {
-		real.enabled = true;
+		if (real != null) {
+			real.enabled = true;
+		}
+
 
 		mask = LayerMask.GetMask("GameSquare");
 

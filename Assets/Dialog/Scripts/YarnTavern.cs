@@ -10,13 +10,12 @@ using Yarn.Unity;
 public class YarnTavern : MonoBehaviour
 {
 	private DialogScreen ds;
-	private Navigation _Nav;
+	public Navigation nav;
 
 	void Start() 
 	{
 		ds = GetComponent<DialogScreen>();
 		ds.Runner.AddCommandHandler("displayknownsettlements", GenerateKnownSettlementUI);
-		_Nav = GameObject.Find("Nav").GetComponent<Navigation>();
 	}
 
 	#region Yarn Functions - Set Variables (Taverna)
@@ -198,7 +197,8 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("hirenavigator")]
 	public void SetSettlementWaypoint()
 	{
-		_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.Game.Session.AllNonCrew.RandomElement().ID);		
+		nav.SetDestination(ds.Storage.GetValue("$known_city").AsString, Globals.Game.Session.availableCrew.RandomElement().ID);
+		nav.SetDestination(ds.Storage.GetValue("$known_city").AsString, Globals.Game.Session.availableCrew.RandomElement().ID);
 	}
 	#endregion
 
