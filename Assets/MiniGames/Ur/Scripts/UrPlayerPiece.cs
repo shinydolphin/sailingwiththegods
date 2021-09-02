@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class UrPlayerPiece : UrPiece
 {
+	private bool selected = false;
+	private int mask;
 
 	private void Start() 
 	{
 		AssignVariables();
+		mask = LayerMask.GetMask("GameSquare");
 	}
 
 	private void Update() 
@@ -15,7 +18,7 @@ public class UrPlayerPiece : UrPiece
 		if (selected) 
 		{
 			RaycastHit hit;
-			Ray ray = urGC.cam.ScreenPointToRay(Input.mousePosition);
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
 			if (Physics.Raycast(ray, out hit, 300f, mask, QueryTriggerInteraction.Collide)) 
 			{

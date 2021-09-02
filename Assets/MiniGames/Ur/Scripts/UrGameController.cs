@@ -12,12 +12,12 @@ public class UrGameController : MonoBehaviour
 	public string playerTag;
 	public List<UrPiece> playerPieces;
 	public List<UrGameTile> playerBoardPositions;
-	public GameObject playerPathImage;
+	public GameObject playerPathLine;
 
 	[Header("Enemy")]
 	public string enemyTag;
 	public List<UrGameTile> enemyBoardPositions;
-	public GameObject enemyPathImage;
+	public GameObject enemyPathLine;
 	
 	[Header("UI")]
 	public MiniGameInfoScreen mgScreen;
@@ -25,7 +25,6 @@ public class UrGameController : MonoBehaviour
 	public TavernaMiniGameDialog playerBarks;
 	public TavernaEnemyDialog enemyBarks;
 	public float barkChance = 0.25f;
-	public Camera cam;
 	public Button rollDiceButton;
 	public Text alertText;
 	public float alertShowTime;
@@ -71,7 +70,7 @@ public class UrGameController : MonoBehaviour
 
 		if (Globals.GameVars != null) 
 		{
-
+			//Load the lists in from GameVars
 		}
 		else 
 		{
@@ -107,24 +106,6 @@ public class UrGameController : MonoBehaviour
 
 	public void RestartMinigame() {
 		TavernaController.ReloadTavernaGame("Ur");
-	}
-
-	/// <summary>
-	/// Turns off all board tile highlights
-	/// </summary>
-	/// <param name="ugt">Board tile to keep highlighted</param>
-	public void UnhighlightBoard(UrGameTile ugt) 
-	{
-		foreach (UrGameTile tile in playerBoardPositions) {
-			if (!tile.Equals(ugt)) {
-				tile.ShowHighlight(false);
-			}
-		}
-		foreach (UrGameTile tile in enemyBoardPositions) {
-			if (!tile.Equals(ugt)) {
-				tile.ShowHighlight(false);
-			}
-		}
 	}
 
 	/// <summary>
@@ -169,9 +150,7 @@ public class UrGameController : MonoBehaviour
 	{
 		rollDiceButton.interactable = false;
 		currentRoll = dice.RollDice(isPlayerTurn);
-		if (isPlayerTurn) {
-			StartCoroutine(WaitToSwitchTurn(false, 1.75f));
-		}
+
 		return currentRoll;
 	}
 
@@ -193,8 +172,8 @@ public class UrGameController : MonoBehaviour
 		allowPlayerMove = false;
 		rollDiceButton.interactable = isPlayerTurn;
 
-		playerPathImage.SetActive(isPlayerTurn);
-		enemyPathImage.SetActive(!isPlayerTurn);
+		playerPathLine.SetActive(isPlayerTurn);
+		enemyPathLine.SetActive(!isPlayerTurn);
 
 		UnhighlightBoard();
 		UnhighlightPieces();
@@ -292,17 +271,9 @@ public class UrGameController : MonoBehaviour
 		o.effectColor = baseOutlineColor;
 	}
 
-	bool IsPlayingAnimation(Animator anim, string stateName) 
+	public void PointScored(bool isPlayer, UrPiece c) 
 	{
-		if (anim.GetCurrentAnimatorStateInfo(0).IsName(stateName))
-			return true;
-		else
-			return false;
-	}
-
-	public void PointScored(bool player, UrPiece c) 
-	{
-		if (player) 
+		if (isPlayer) 
 		{
 			playerPieces.Remove(c);
 			c.GetComponent<MeshRenderer>().enabled = false;
@@ -324,7 +295,7 @@ public class UrGameController : MonoBehaviour
 		}
 	}
 
-	public void WinGame() 
+	private void WinGame() 
 	{
 		isGameOver = true;
 		rollDiceButton.interactable = false;
@@ -334,12 +305,15 @@ public class UrGameController : MonoBehaviour
 
 		//Calculate how much of a reward you get based on how many pieces your opponent still has
 		int reward = Random.Range(rewardAmts.x, rewardAmts.y + 1);
+		if (Globals.GameVars != null) {
+			Globals.GameVars.playerShipVariables.ship.AddToFoodAndWater(reward);
+		}
 
 		string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!" + "\n\n" + winFlavor.RandomElement();
 		mgScreen.DisplayText("The Game of Ur: Victory!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
 	}
 
-	public void LoseGame() 
+	private void LoseGame() 
 	{
 		isGameOver = false;
 		rollDiceButton.interactable = false;

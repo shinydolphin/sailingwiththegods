@@ -10,8 +10,6 @@ public class UrPiece : MonoBehaviour
 
 	protected Vector3 startPos;
 
-	protected bool selected = false;
-	protected int mask;
 	protected UrGameController urGC;
 	protected GameObject spawnedGhost;
 
@@ -30,10 +28,15 @@ public class UrPiece : MonoBehaviour
 		anim = GetComponent<Animator>();
 		urGC = GameObject.FindWithTag("GameController").GetComponent<UrGameController>();
 		startPos = transform.position;
-		mask = LayerMask.GetMask("GameSquare");
 		highlight.SetActive(false);
 	}
 
+	/// <summary>
+	/// Calculates a list of all valid moves for the current piece
+	/// </summary>
+	/// <param name="allowedPath"></param>
+	/// <param name="isPlayer"></param>
+	/// <returns></returns>
 	public List<UrGameTile> PopulateValidMovesList(List<UrGameTile> allowedPath, bool isPlayer) 
 	{
 		int roll = urGC.CurrentRoll;
@@ -75,6 +78,12 @@ public class UrPiece : MonoBehaviour
 		return possibleMoves;
 	}
 
+	/// <summary>
+	/// Displays a path between the current and potential new tiles
+	/// </summary>
+	/// <param name="allowedPath"></param>
+	/// <param name="start"></param>
+	/// <param name="end"></param>
 	public void ShowPossiblePath(List<UrGameTile> allowedPath, int start, int end) 
 	{
 		if (start != -1) {
@@ -134,8 +143,11 @@ public class UrPiece : MonoBehaviour
 
 	public void DestroyGhost() 
 	{
-		Destroy(spawnedGhost);
-		spawnedGhost = null;
+		if (spawnedGhost != null) 
+		{
+			Destroy(spawnedGhost);
+			spawnedGhost = null;
+		}
 	}
 
 	public int BoardIndex 

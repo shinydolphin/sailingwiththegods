@@ -29,7 +29,7 @@ public class UrAIController : MonoBehaviour
 	{
 		if (currentRoll != 0) 
 		{
-			//Picks out what pieces are valid - they're already highlighted by the dice roller
+			//Picks out what pieces are valid
 			List<UrPiece> movablePieces = new List<UrPiece>();
 			for (int i = 0; i < enemyPieces.Count; i++) {
 				if (enemyPieces[i].PopulateValidMovesList(urGC.enemyBoardPositions, false).Count != 0) 
@@ -106,7 +106,7 @@ public class UrAIController : MonoBehaviour
 				}
 			}
 
-			StartCoroutine(urGC.WaitToSwitchTurn(!redoTurn, midTurnPause));
+			StartCoroutine(urGC.WaitToSwitchTurn(!redoTurn, endTurnPause));
 		}
 	}
 

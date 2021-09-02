@@ -8,12 +8,11 @@ using UnityEngine.UI;
 public class UrDiceRoller : MonoBehaviour
 {
 	public float skipTurnWaitTime = 1.5f;
+
 	public Text diceResultText;
-	public Animator[] diceModels;
-	public Transform[] markUpPositions;
-	public Transform[] blankUpPositions;
 	public float diceSpinTime;
-	public float diceSpeed;
+	public Animator[] diceModels;
+
 
 	private UrGameController urGC;
 
@@ -23,6 +22,9 @@ public class UrDiceRoller : MonoBehaviour
 
 	private IEnumerator RollAndRotate(Animator anim, string trigger) 
 	{
+		//The reset trigger is needed so it goes back to idle for a frame and can then animate again
+		//But if it gets called at a certain point, it could stay triggered when we don't want it to
+		//which is why we call ResetTrigger
 		yield return null;
 		anim.SetTrigger("Reset");
 		anim.transform.rotation = Quaternion.identity;
@@ -30,6 +32,7 @@ public class UrDiceRoller : MonoBehaviour
 		yield return null;
 		anim.ResetTrigger("Reset");
 		yield return null;
+		//Rotates at random y so the dice don't all look the same
 		anim.transform.eulerAngles += Vector3.up * Random.Range(1f, 361f);
 	}
 
@@ -82,7 +85,6 @@ public class UrDiceRoller : MonoBehaviour
 				urGC.ShowAlertText("No Available Moves");
 				StartCoroutine(urGC.WaitToSwitchTurn(false, skipTurnWaitTime));
 			}
-			
 		}
 		else 
 		{
@@ -96,7 +98,6 @@ public class UrDiceRoller : MonoBehaviour
 				StartCoroutine(urGC.enemyAI.DoEnemyTurn());
 			}
 		}
-
 	}
 }
 

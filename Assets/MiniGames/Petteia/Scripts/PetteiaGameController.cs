@@ -280,7 +280,7 @@ public class PetteiaGameController : MonoBehaviour
 		}
 	}
 
-	public void WinGame() 
+	private void WinGame() 
 	{
 		mgScreen.gameObject.SetActive(true);
 
@@ -301,7 +301,7 @@ public class PetteiaGameController : MonoBehaviour
 		gameOver = true;
 	}
 
-	public void LoseGame() 
+	private void LoseGame() 
 	{
 		mgScreen.gameObject.SetActive(true);
 		string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseFlavor.RandomElement();

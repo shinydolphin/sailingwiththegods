@@ -60,7 +60,7 @@ GameObject:
   - component: {fileID: 269207969943561836}
   - component: {fileID: 5606642437176276195}
   m_Layer: 9
-  m_Name: Cylinder
+  m_Name: Highlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

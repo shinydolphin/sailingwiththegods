@@ -7,10 +7,10 @@ using UnityEngine.UI;
 public class UrGameTile : MonoBehaviour
 {
 	public bool isRosette = false;
+	public Image highlight;
 	public Color playerHighlightColor;
 	public Color enemyHighlightColor;
 
-	public Image highlight;
 	private bool occupied = false;
 	private UrPiece currentPiece = null;
 	private UrGameController urGC;
