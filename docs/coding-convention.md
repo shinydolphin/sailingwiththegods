@@ -50,3 +50,4 @@ Only show things in the inspector that should actually be set in the inspector. 
 * Use properties or `[HideInInspector]` for things that are accessed in other scripts but aren't meant to be set in the inspector. Prefer properties when possible.
 * Use `[ReadOnly]` for things that are shown in the inspector but are just there for debug and aren't accessed in other scripts
 * Use `[SerializeField]` if not accessed publicly, exception for legacy code already using public. Convert when convenient.
+  * Use `[SerializeField] GameObject _myReferenceObject = null;` to avoid warning 0649 "Field is never assigned to". Leaving off the = null on private fields gives this warning.
