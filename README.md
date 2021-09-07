@@ -33,6 +33,11 @@ While the main game code is open source, the game depends on a private repo for 
 * Copy paste the fork's HTTPS url into the URL field on the Clone screen
 * Choose manager-core on the popup that appear, and choose "Always use this"
 * If you get errors cloning the submodule, try going to Repository -> Respository Settings and double click your remote, and make sure Remote Account is your Github, not Generic
+* Click Repository -> Repository Settings
+* Click Add
+* Type "upstream" as the remote name, and paste https://github.com/kddressel/sailingwiththegods.git in as the URL, change to your github account for remote account and click OK
+* Fetch -> And make sure you fetch all remotes (this is the default setting)
+* If needed, right click upstream/branchname and merge into your fork's branch
 
 ## Git Setup for Windows
 
