@@ -15,12 +15,15 @@ This game is designed to:
 
 # Setup
 
-This Build uses Unity 2019.4.9f1
+This Build uses Unity [2019.4.9f1](unityhub://2019.4.9f1/50fe8a171dd9)
+
+Clicking that version link will auto-launch the installer in [Unity Hub](https://unity3d.com/get-unity/download), which we recommend.
 
 While the main game code is open source, the game depends on a private repo for assets purchased from the Unity Asset Store. This should go in the ```Assets/_Proprietary``` folder. Access to the proprietary repo is limited, but if it is missing the project will populate with open source fallback assets upon loading for the first time in Unity.
 
 ## Setup Using SourceTree (recommended)
-* Check if you have / need access to the proprietary repo
+* Check if you have / need access to the proprietary repo, and create a Github account if you have not
+  * Send your Github username to Kevin for access
 * Download and Install SourceTree
   * If asked, say you want embedded git, and you don't want mercurial
   * When asked if you want Bitbucket Server or Bitbucket, click "Skip"
@@ -31,12 +34,12 @@ While the main game code is open source, the game depends on a private repo for 
   * Click Refresh OAuth Token
   * Authenticate Github in the browser
 * Clone the Repo
-  * Make your own fork of the repository on the GitHub website
+  * [Make your own fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the repository on the GitHub website
   * Click the Clone button
   * Copy paste the fork's HTTPS url into the URL field on the Clone screen
   * Choose manager-core on the popup that appear, and choose "Always use this"
   * If you get errors cloning the submodule, try going to Repository -> Respository Settings and double click your remote, and make sure Remote Account is your Github, not Generic
-* Add Upstream Repo to your repository
+* Add the kddressel repo as upstream remote
   * Click Repository -> Repository Settings
   * Click Add
   * Type "upstream" as the remote name, and paste https://github.com/kddressel/sailingwiththegods.git in as the URL, change to your github account for remote account and click OK
