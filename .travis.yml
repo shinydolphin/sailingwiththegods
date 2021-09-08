@@ -17,7 +17,7 @@ git:
 # https://stackoverflow.com/questions/48346696/travis-ci-loading-private-submodule
 before_install:
 - chmod a+x ./travis-build/*.sh
-- sed -i 's/https:\/\/github.com/https:\/\/$GIT_USER:$GIT_TOKEN@github.com/' .gitmodules
+- sed -i '' 's/https:\/\/github.com/https:\/\/$GIT_USER:$GIT_TOKEN@github.com/' .gitmodules
 - git submodule update --init --recursive
 
 install:
