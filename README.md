@@ -15,9 +15,10 @@ This game is designed to:
 
 # Setup
 
-This Build uses Unity [2019.4.9f1](unityhub://2019.4.9f1/50fe8a171dd9)
+This Build uses Unity **2019.4.9f1**
+unityhub://2019.4.9f1/50fe8a171dd9
 
-Clicking that version link will auto-launch the installer in [Unity Hub](https://unity3d.com/get-unity/download), which we recommend.
+Pasting that version link into a browser will auto-launch the installer in [Unity Hub](https://unity3d.com/get-unity/download), which we recommend.
 
 While the main game code is open source, the game depends on a private repo for assets purchased from the Unity Asset Store. This should go in the ```Assets/_Proprietary``` folder. Access to the proprietary repo is limited, but if it is missing the project will populate with open source fallback assets upon loading for the first time in Unity.
 
