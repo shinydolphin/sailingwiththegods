@@ -11,9 +11,14 @@ cache:
   directories:
     - $UNITY_DOWNLOAD_CACHE
 
-    
+git:
+  submodules: false
+  
+# https://stackoverflow.com/questions/48346696/travis-ci-loading-private-submodule
 before_install:
 - chmod a+x ./travis-build/*.sh
+- sed -i 's/git@github.com:/https:\/\/$GIT_USER:$GIT_TOKEN@github.com\//' .gitmodules
+- git submodule update --init --recursive
 
 install:
 - ./travis-build/install-unity.sh
