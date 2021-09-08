@@ -23,6 +23,7 @@ While the main game code is open source, the game depends on a private repo for 
 * Check if you have / need access to the proprietary repo
 * Download SourceTree
 * If asked, say you want embedded git, and you don't want mercurial
+* When asked if you want Bitbucket Server or Bitbucket, click "Skip"
 * So no when asked about loading an SSH key
 * Tools -> Options -> Authentication -> Add
 * Select Github for Hosting Service, leave everything else as it is (HTTPS, OAuth)
@@ -38,6 +39,14 @@ While the main game code is open source, the game depends on a private repo for 
 * Type "upstream" as the remote name, and paste https://github.com/kddressel/sailingwiththegods.git in as the URL, change to your github account for remote account and click OK
 * Fetch -> And make sure you fetch all remotes (this is the default setting)
 * If needed, right click upstream/branchname and merge into your fork's branch
+
+## Unzip the Navmesh
+
+The Main Scene has a NavMesh that's over 100 MB so we have it committed to git as a ZIP file and the actual NavMesh asset is gitignored. After pulling for the first time, you need to unzip. You should see a "Zipped assets have been updated, extract them?" popup. Choose "Yes (recommended)" to automatically extract the zip file.
+
+If you do not see this popup or need to manually unzip, you can either use the SWTG -> Unzip Assets menu, or you can unzip the file manually:
+
+```Assets/_Scenes/Main Scene/NavMesh.zip```
 
 ## Git Setup for Windows
 
@@ -63,13 +72,6 @@ git submodule update --init
 
 Most of the team is using https, but if you would like to use SSH authentication, follow [this guide](docs/ssh-auth.md).
 
-## Unzip the Navmesh
-
-The Main Scene has a NavMesh that's over 100 MB so we have it committed to git as a ZIP file and the actual NavMesh asset is gitignored. After pulling for the first time, you need to unzip. You should see a "Zipped assets have been updated, extract them?" popup. Choose "Yes (recommended)" to automatically extract the zip file.
-
-If you do not see this popup or need to manually unzip, you can either use the SWTG -> Unzip Assets menu, or you can unzip the file manually:
-
-```Assets/_Scenes/Main Scene/NavMesh.zip```
 
 # Documentation
 
