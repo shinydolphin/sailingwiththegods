@@ -16,6 +16,7 @@ This game is designed to:
 # Setup
 
 This Build uses Unity **2019.4.9f1**
+
 unityhub://2019.4.9f1/50fe8a171dd9
 
 Pasting that version link into a browser will auto-launch the installer in [Unity Hub](https://unity3d.com/get-unity/download), which we recommend.
