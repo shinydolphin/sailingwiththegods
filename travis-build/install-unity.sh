@@ -26,8 +26,8 @@
 # to get download URLs
 UNITY_DOWNLOAD_CACHE="$(pwd)/unity_download_cache"
 UNITY_OSX_PACKAGE_URL="https://download.unity3d.com/download_unity/50fe8a171dd9/MacEditorInstaller/Unity-2019.4.9f1.pkg"
-UNITY_WINDOWS_TARGET_PACKAGE_URL="http://beta.unity3d.com/download/50fe8a171dd9/TargetSupportInstaller/UnitySetup-Windows-IL2CPP-Support-for-Editor-2019.4.9f1.exe"
-UNITY_OSX_TARGET_PACKAGE_URL="http://beta.unity3d.com/download/50fe8a171dd9/TargetSupportInstaller/UnitySetup-Mac-Mono-Support-for-Editor-2019.4.9f1.exe"
+UNITY_WINDOWS_TARGET_PACKAGE_URL="http://beta.unity3d.com/download/50fe8a171dd9/MacEditorTargetInstaller/UnitySetup-Windows-Mono-Support-for-Editor-2019.4.9f1.pkg"
+UNITY_OSX_TARGET_PACKAGE_URL="http://beta.unity3d.com/download/50fe8a171dd9/MacEditorTargetInstaller/UnitySetup-Mac-IL2CPP-Support-for-Editor-2019.4.9f1.pkg"
 
 
 # Downloads a file if it does not exist
