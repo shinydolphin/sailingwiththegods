@@ -38,7 +38,7 @@ public class TavernaMiniGameDialog : MonoBehaviour
 		{
 			//ur brag/insult
 			if (Globals.GameVars != null) {
-				insultingTexts = Globals.GameVars.tavernaGameInsults;
+				insultingTexts = Globals.GameVars.urGameInsults;
 				braggingTexts = Globals.GameVars.tavernaGameBragging;
 			}
 			else {
@@ -64,6 +64,12 @@ public class TavernaMiniGameDialog : MonoBehaviour
 		Time.timeScale = 0;
 		textBackground.SetActive(true);
 		dialog.text = braggingTexts.RandomElement();
+	}
+
+	public void DisplayFromList(List<string> barkList) {
+		Time.timeScale = 0;
+		textBackground.SetActive(true);
+		dialog.text = barkList.RandomElement();
 	}
 
 	public void CloseDialog() {

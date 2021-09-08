@@ -211,6 +211,16 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public List<string> petteiaGameLost;
 	[HideInInspector] public List<string> petteiaGameBlocked;
 
+	[HideInInspector] public List<string> urGameRosette;
+	[HideInInspector] public List<string> urGameCapture;
+	[HideInInspector] public List<string> urGameFlip;
+	[HideInInspector] public List<string> urGameMoveOff;
+	[HideInInspector] public List<string> urGameMoveOn;
+	[HideInInspector] public List<string> urGameLost;
+	[HideInInspector] public List<string> urGameWin;
+	[HideInInspector] public List<string> urGameInsults;
+	[HideInInspector] public List<string> urGameIntro;
+
 
 	// high level game systems
 	public Trade Trade { get; private set; }
@@ -252,11 +262,6 @@ public class GameVars : MonoBehaviour
 	[ReadOnly] public int DEBUG_currentQuestLeg = 0;
 	[HideInInspector] public bool DEBUG_MODE_ON = false;
 
-
-
-
-
-
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
 	//  INITIALIZE THE GAME WORLD
@@ -296,8 +301,12 @@ public class GameVars : MonoBehaviour
 		portDialogText = CSVLoader.LoadPortDialog();
 
 		CSVLoader.LoadTavernaGameBarks(out tavernaGameInsults, out tavernaGameBragging);
-		CSVLoader.LoadTavernaDialog(out networkDialogText, out pirateDialogText, out mythDialogText, out guideDialogText, out foodDialogText, out foodItemText, out wineInfoText);
-		CSVLoader.LoadPetteiaText(out petteiaGameFlavor, out petteiaGameInsults, out petteiaGameBragging, out petteiaGameWin, out petteiaGameLost, out petteiaGameBlocked);
+		CSVLoader.LoadTavernaDialog(out networkDialogText, out pirateDialogText, out mythDialogText, out guideDialogText, out foodDialogText, 
+			out foodItemText, out wineInfoText);
+		CSVLoader.LoadPetteiaText(out petteiaGameFlavor, out petteiaGameInsults, out petteiaGameBragging, out petteiaGameWin, 
+			out petteiaGameLost, out petteiaGameBlocked);
+		CSVLoader.LoadUrText(out urGameIntro, out urGameRosette, out urGameCapture, out urGameFlip, out urGameMoveOff, out urGameMoveOn,
+			out urGameLost, out urGameWin, out urGameInsults);
 
 		// Mylo's Addition
 		//networkDialogText = CSVLoader.LoadNetworkDialog();

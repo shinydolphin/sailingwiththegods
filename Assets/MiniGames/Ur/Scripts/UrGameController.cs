@@ -55,9 +55,14 @@ public class UrGameController : MonoBehaviour
 	private Color baseOutlineColor;
 	private Coroutine fadeCoroutine;
 
-	private List<string> flavor;
+	private List<string> introFlavor;
 	private List<string> winFlavor;
 	private List<string> loseFlavor;
+	private List<string> rosetteFlavor;
+	private List<string> captureFlavor;
+	private List<string> flipFlavor;
+	private List<string> moveOffFlavor;
+	private List<string> moveOnFlavor;
 
 	public void Awake() 
 	{
@@ -71,15 +76,28 @@ public class UrGameController : MonoBehaviour
 		if (Globals.GameVars != null) 
 		{
 			//Load the lists in from GameVars
+			introFlavor = Globals.GameVars.urGameIntro;
+			winFlavor = Globals.GameVars.urGameWin;
+			loseFlavor = Globals.GameVars.urGameLost;
+			rosetteFlavor = Globals.GameVars.urGameRosette;
+			captureFlavor = Globals.GameVars.urGameCapture;
+			flipFlavor = Globals.GameVars.urGameFlip;
+			moveOffFlavor = Globals.GameVars.urGameMoveOff;
+			moveOnFlavor = Globals.GameVars.urGameMoveOn;
 		}
 		else 
 		{
-			flavor = new List<string> { "Ur intro flavor 1", "Ur intro flavor 2", "Ur intro flavor 3" };
+			introFlavor = new List<string> { "Ur intro flavor 1", "Ur intro flavor 2", "Ur intro flavor 3" };
 			winFlavor = new List<string> { "Ur win flavor 1", "Ur win flavor 2", "Ur win flavor 3" };
 			loseFlavor = new List<string> { "Ur lose flavor 1", "Ur lose flavor 2", "Ur lose flavor 3" };
+			rosetteFlavor = new List<string> { "Ur rosette flavor 1", "Ur rosette flavor 2", "Ur rosette flavor 3" };
+			captureFlavor = new List<string> { "Ur capture flavor 1", "Ur capture flavor 2", "Ur capture flavor 3" };
+			flipFlavor = new List<string> { "Ur flip flavor 1", "Ur flip flavor 2", "Ur flip flavor 3" };
+			moveOffFlavor = new List<string> { "Ur move off flavor 1", "Ur move off flavor 2", "Ur move off flavor 3" };
+			moveOnFlavor = new List<string> { "Ur move on flavor 1", "Ur move on flavor 3", "Ur move on flavor 3" };
 		}
 
-		string text = introText + "\n\n" + instructions + "\n\n" + flavor.RandomElement();
+		string text = introText + "\n\n" + instructions + "\n\n" + introFlavor.RandomElement();
 		mgScreen.DisplayText("The Game of Ur: An Introduction", "Taverna game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaStart);
 
 		//Set up the baseline for the alert colors

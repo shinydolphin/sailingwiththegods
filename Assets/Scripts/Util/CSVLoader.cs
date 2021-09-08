@@ -590,7 +590,63 @@ public static class CSVLoader
 					break;
 			}
 		}
+	}
 
+	public static void LoadUrText(out List<string> intros, out List<string> rosette, out List<string> capture, out List<string> flip, out List<string> moveOff,
+		out List<string> moveOn, out List<string> lose, out List<string> win, out List<string> insult) 
+	{
+		intros = new List<string>();
+		rosette = new List<string>();
+		capture = new List<string>();
+		flip = new List<string>();
+		moveOff = new List<string>();
+		moveOn = new List<string>();
+		lose = new List<string>();
+		win = new List<string>();
+		insult = new List<string>();
+
+		char[] lineDelimiter = new char[] { '@' };
+		char newline = '%';
+		string filename = "ur_text";
+
+		string[] fileByLine = TryLoadListFromGameFolder(filename);
+
+		for (int i = 0; i < fileByLine.Length; i++) {
+			string[] texts = fileByLine[i].Split(lineDelimiter);
+			string content = StripAndAddNewlines(texts[0], newline);
+			switch (texts[1]) {
+				case "rosette":
+					rosette.Add(content);
+					break;
+				case "capture":
+					capture.Add(content);
+					break;
+				case "flip":
+					flip.Add(content);
+					break;
+				case "off":
+					moveOff.Add(content);
+					break;
+				case "on":
+					moveOn.Add(content);
+					break;
+				case "lose":
+					lose.Add(content);
+					break;
+				case "win":
+					win.Add(content);
+					break;
+				case "insult":
+					insult.Add(content);
+					break;
+				case "intro":
+					insult.Add(content);
+					break;
+				default:
+					Debug.Log($"Ur text line {i} not marked correctly: {texts[1]}!");
+					break;
+			}
+		}
 	}
 
 	public static void LoadTavernaDialog(out List<DialogPair> network, out List<DialogPair> pirates, out List<DialogPair> myths, out List<string> guide, 

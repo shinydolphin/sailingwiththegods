@@ -311,10 +311,16 @@ MonoBehaviour:
   alertText: {fileID: 224972504}
   alertShowTime: 1.5
   alertFadeSpeed: 2
-  introText: A colorful board game and the sailor sitting behind it catch your eye
-    in the taverna. He spots you looking and grins, "Heard of the Game of Ur? Those
-    who can strategize well enough to excell are well-known indeed. I'm looking for
-    a new opponent - play me and I'll give you some supplies if you win!"
+  introText: "A colorful board game and the sailor sitting behind it catch your eye
+    in the taverna. He spots you looking and grins, \"Come play the game 5000 years
+    old! Are you swift as a speeding ship, faster than race horses, as cunning\r
+    as Gilgamesh? No traveling trader, no wandering hero, no noble pirate is worth
+    their salt if they can\u2019t win\r here! Come show me here how you triumphed
+    in the harbors of Cyprus, the inns of Ur, the dusty\r backroads the Hittites
+    once ruled. Think you can seize your opponent\u2019s piece? Will you be the first
+    to get\r your pieces to the goal? The crowd is ready to place their bets! And
+    if you\u2019re lucky the gods will show\r you your fate: prophetic power lurks
+    in these shining squares.\""
   instructions: 'Click the "Roll" button to roll the dice, then click and drag your
     pieces to highlighted squares to move them.
 
