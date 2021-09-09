@@ -40,7 +40,7 @@ echo "Building project for Windows..."
   -batchmode
   -nographics
   -silent-crashes
-  -logFile -
+  -logFile
   -projectPath "$PROJECT_PATH"
   -buildWindows64Player  "$(pwd)/build/win/$project.exe"
   -quit
@@ -62,7 +62,7 @@ mkdir $UNITY_BUILD_DIR
   -batchmode
   -nographics
   -silent-crashes
-  -logFile -
+  -logFile
   -projectPath $(pwd)
   -buildOSXUniversalPlayer "$(pwd)/build/osx/$project.app" 
   -quit
