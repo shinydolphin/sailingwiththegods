@@ -36,13 +36,13 @@ mkdir $UNITY_BUILD_DIR
 ############################
 
 echo "Building project for Windows..."
-/Applications/Unity/Unity.app/Contents/MacOS/Unity
-  -batchmode
-  -nographics
-  -silent-crashes
-  -logFile
-  -projectPath "$PROJECT_PATH"
-  -buildWindows64Player  "$(pwd)/build/win/$project.exe"
+/Applications/Unity/Unity.app/Contents/MacOS/Unity \
+  -batchmode \
+  -nographics \
+  -silent-crashes \
+  -logFile \
+  -projectPath "$PROJECT_PATH" \
+  -buildWindows64Player "$(pwd)/build/win/$project.exe" \
   -quit
   
 if [ $? = 0 ] ; then
@@ -57,14 +57,13 @@ fi
 ###########################
 
 echo "Building project for OSX..."
-mkdir $UNITY_BUILD_DIR
-/Applications/Unity/Unity.app/Contents/MacOS/Unity
-  -batchmode
-  -nographics
-  -silent-crashes
-  -logFile
-  -projectPath $(pwd)
-  -buildOSXUniversalPlayer "$(pwd)/build/osx/$project.app" 
+/Applications/Unity/Unity.app/Contents/MacOS/Unity \
+  -batchmode \
+  -nographics \
+  -silent-crashes \
+  -logFile \
+  -projectPath "$PROJECT_PATH" \
+  -buildOSXUniversalPlayer "$(pwd)/build/osx/$project.app" \
   -quit
 
 if [ $? = 0 ] ; then
@@ -80,7 +79,7 @@ fi
 
 echo 'Attempting to zip builds'
 zip -r $(pwd)/Build/mac.zip $(pwd)/build/osx/
-zip -r $(pwd)/Build/windows.zip $(pwd)/build/windows/
+zip -r $(pwd)/Build/win.zip $(pwd)/build/win/
 
 
 
