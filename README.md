@@ -19,6 +19,26 @@ This Build uses Unity 2019.4.9f1
 
 While the main game code is open source, the game depends on a private repo for assets purchased from the Unity Asset Store. This should go in the ```Assets/_Proprietary``` folder. Access to the proprietary repo is limited, but if it is missing the project will populate with open source fallback assets upon loading for the first time in Unity.
 
+## Setup Using SourceTree (recommended)
+* Check if you have / need access to the proprietary repo
+* Download SourceTree
+* If asked, say you want embedded git, and you don't want mercurial
+* So no when asked about loading an SSH key
+* Tools -> Options -> Authentication -> Add
+* Select Github for Hosting Service, leave everything else as it is (HTTPS, OAuth)
+* Click Refresh OAuth Token
+* Authenticate Github in the browser
+* Click the Clone button
+* Make your own fork of the repository on the GitHub website
+* Copy paste the fork's HTTPS url into the URL field on the Clone screen
+* Choose manager-core on the popup that appear, and choose "Always use this"
+* If you get errors cloning the submodule, try going to Repository -> Respository Settings and double click your remote, and make sure Remote Account is your Github, not Generic
+* Click Repository -> Repository Settings
+* Click Add
+* Type "upstream" as the remote name, and paste https://github.com/kddressel/sailingwiththegods.git in as the URL, change to your github account for remote account and click OK
+* Fetch -> And make sure you fetch all remotes (this is the default setting)
+* If needed, right click upstream/branchname and merge into your fork's branch
+
 ## Git Setup for Windows
 
 * Install [Git for Windows](https://git-scm.com/download/win) using **default settings**

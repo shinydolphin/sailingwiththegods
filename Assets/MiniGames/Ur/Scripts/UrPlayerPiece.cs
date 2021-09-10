@@ -105,24 +105,30 @@ public class UrPlayerPiece : UrPiece
 				if (boardIndex != -1) {
 					urGC.playerBoardPositions[boardIndex].ClearOccupied();
 				}
+				else {
+					urGC.TriggerBark(true, urGC.MoveOnFlavor);
+				}
 				
 				//The "bridge" you go back along starts at index 16 for both player and enemy, so I'm hard-coding it in
 				//Again, this is a bad practice, but it shouldn't change so it's probably fine
 				if (boardIndex < 16 && potentialIndex >= 16) 
 				{
 					FlipPiece();
+					urGC.TriggerBark(true, urGC.FlipFlavor);
 				}
 
 				boardIndex = potentialIndex;
 				if (urGC.playerBoardPositions[boardIndex].OppositeOccupyingPiece(true)) 
 				{
 					urGC.playerBoardPositions[boardIndex].RemoveCurrentFromBoard();
+					urGC.TriggerBark(true, urGC.CaptureFlavor);
 				}
 
 				//We check this now because we won't need to do any more processing if you're moving off the board
 				//We especially don't want to set the end space to occupied!
-				if (boardIndex == urGC.playerBoardPositions.Count - 1) {
-					Debug.Log("Player scoring!");
+				if (boardIndex == urGC.playerBoardPositions.Count - 1) 
+				{
+					urGC.TriggerBark(true, urGC.MoveOffFlavor, true);
 					urGC.PointScored(true, this);
 				}
 				else {
@@ -133,6 +139,7 @@ public class UrPlayerPiece : UrPiece
 				if (urGC.playerBoardPositions[boardIndex].isRosette) 
 				{
 					urGC.ShowAlertText("Roll Again");
+					urGC.TriggerBark(true, urGC.RosetteFlavor);
 					urGC.SwitchTurn(true);
 				}
 				else 
@@ -152,6 +159,5 @@ public class UrPlayerPiece : UrPiece
 				urGC.CanPlayerMove(true);
 			}
 		}
-	}
-	
+	}	
 }

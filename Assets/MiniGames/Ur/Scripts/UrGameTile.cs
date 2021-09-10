@@ -31,7 +31,6 @@ public class UrGameTile : MonoBehaviour
 			else {
 				highlight.color = enemyHighlightColor;
 			}
-
 		}
 
 		if (highlight != null) 

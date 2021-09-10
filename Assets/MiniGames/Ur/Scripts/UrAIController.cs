@@ -66,10 +66,14 @@ public class UrAIController : MonoBehaviour
 				yield return new WaitForSeconds(midTurnPause);
 
 				//Finalize the move
+
+				//Check for a capture
 				if (nextTile.OppositeOccupyingPiece(false)) 
 				{
 					nextTile.RemoveCurrentFromBoard();
+					urGC.TriggerBark(false, urGC.CaptureFlavor);
 				}
+
 				pieceToMove.ClearPossiblePath();
 				urGC.UnhighlightBoard();
 				pieceToMove.DestroyGhost();
@@ -77,6 +81,7 @@ public class UrAIController : MonoBehaviour
 				if (pieceToMove.BoardIndex < 16 && pieceToMove.BoardIndex + currentRoll >= 16) 
 				{
 					pieceToMove.FlipPiece();
+					urGC.TriggerBark(false, urGC.FlipFlavor);
 				}
 
 				if (pieceToMove.BoardIndex != -1) 
@@ -88,11 +93,13 @@ public class UrAIController : MonoBehaviour
 				{
 					//If they're at at the beginning, we don't want to set their position to 4 if they rolled a 5
 					pieceToMove.BoardIndex = 0;
+					urGC.TriggerBark(false, urGC.MoveOnFlavor);
 				}
 
 				//If you're moving off the board
-				if (pieceToMove.BoardIndex == urGC.playerBoardPositions.Count - 1) {
-					Debug.Log("Enemy scoring!");
+				if (pieceToMove.BoardIndex == urGC.playerBoardPositions.Count - 1) 
+				{
+					urGC.TriggerBark(false, urGC.MoveOffFlavor, true);
 					urGC.PointScored(false, pieceToMove);
 				}
 				else {
@@ -102,6 +109,7 @@ public class UrAIController : MonoBehaviour
 				if (nextTile.isRosette) 
 				{
 					urGC.ShowAlertText("Opponent Rolls Again");
+					urGC.TriggerBark(false, urGC.RosetteFlavor);
 					redoTurn = true;
 				}
 			}

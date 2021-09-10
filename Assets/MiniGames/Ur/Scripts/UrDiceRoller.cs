@@ -27,7 +27,7 @@ public class UrDiceRoller : MonoBehaviour
 		//which is why we call ResetTrigger
 		yield return null;
 		anim.SetTrigger("Reset");
-		anim.transform.rotation = Quaternion.identity;
+		anim.transform.eulerAngles = new Vector3(0f, anim.transform.eulerAngles.y, 0f);
 		anim.SetTrigger(trigger);
 		yield return null;
 		anim.ResetTrigger("Reset");

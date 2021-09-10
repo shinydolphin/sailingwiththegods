@@ -243,7 +243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d05758436a2950845887ee1c70e11c4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rewardAmts: {x: 0, y: 0}
+  rewardAmts: {x: 10, y: 20}
   playerTag: PlayerPiece
   playerPieces:
   - {fileID: 1963955072}
@@ -306,21 +306,21 @@ MonoBehaviour:
   gameIcon: {fileID: 21300000, guid: f30e2c48dbe1f094e8f3b8b25b9f6d29, type: 3}
   playerBarks: {fileID: 1081637349}
   enemyBarks: {fileID: 1081637350}
-  barkChance: 0.25
+  barkChance: 0.5
+  bragToInsultRatio: 0.66
   rollDiceButton: {fileID: 1492511150}
   alertText: {fileID: 224972504}
   alertShowTime: 1.5
   alertFadeSpeed: 2
-  introText: "A colorful board game and the sailor sitting behind it catch your eye
-    in the taverna. He spots you looking and grins, \"Come play the game 5000 years
-    old! Are you swift as a speeding ship, faster than race horses, as cunning\r
-    as Gilgamesh? No traveling trader, no wandering hero, no noble pirate is worth
-    their salt if they can\u2019t win\r here! Come show me here how you triumphed
-    in the harbors of Cyprus, the inns of Ur, the dusty\r backroads the Hittites
-    once ruled. Think you can seize your opponent\u2019s piece? Will you be the first
-    to get\r your pieces to the goal? The crowd is ready to place their bets! And
-    if you\u2019re lucky the gods will show\r you your fate: prophetic power lurks
-    in these shining squares.\""
+  introText: 'A colorful board game and the sailor sitting behind it catch your eye
+    in the taverna. He spots you looking and grins, "Come play the game 5000 years
+    old! Are you swift as a speeding ship, faster than race horses, as cunning as
+    Gilgamesh? No traveling trader, no wandering hero, no noble pirate is worth their
+    salt if they can''t win here! Come show me here how you triumphed in the harbors
+    of Cyprus, the inns of Ur, the dusty backroads the Hittites once ruled. Think
+    you can seize your opponent''s piece? Will you be the first to get your pieces
+    to the goal? The crowd is ready to place their bets! And if you''re lucky the
+    gods will show you your fate: prophetic power lurks in these shining squares."'
   instructions: 'Click the "Roll" button to roll the dice, then click and drag your
     pieces to highlighted squares to move them.
 
@@ -348,25 +348,24 @@ MonoBehaviour:
     Once pieces reach the back of the bridge and begin the last
     path to the end of the board, they are flipped over to show they are close to
     finishing.'
-  history: "The Royal Game of Ur  - also known as Twenty Squares - has a history
-    that stretches over five millennia! Its earliest boards date back to 2500 BC,
-    and over 100 examples have been found in archaeological sites in Iraq, Iran,
-    Israel, Syria, Jordan, Lebanon, Turkey, Cyprus, Egypt, and Crete. Sir Leonard
-    Woolley excavated the first example at the Royal Cemetery of Ur in the 1920s;
-    it was inlaid with shell plaques, some sculpted with rosettes, others with an
-    eye. The game changed slightly in the early 2nd millennium, when the smaller
-    block of six squares was joined to the block of twelve by a bridge, affording
-    a continuous run of 8 squares on the length of the board. The rule and the meaning
-    for the game, however, come from a much later source \u2013 a clay cuneiform
-    tablet dated to the time of the Seleucid dynasty, 177-176 BC. This tablet, just
-    10 cm x 9.4 cm x 2.8 cm in size, was written by Itti-Marduk-balatu, member of
-    a prominent Babylonian scribal family which had written on astronomy and other
-    learned matters for six generations.  His tablet is a copy of one made by another
-    scholarly family, known as Iddin-Bel. You can see Itti-Marduk-balatu\u2019s tablet
-    at the British Museum, BM33333B.  It is inscribed on the back with omens from
-    the flights of birds, including the swallow (summatu) and the raven (ugagu).
-    A second tablet, several centuries earlier, has some of the same material, and
-    may have come from Uruk."
+  history: The Royal Game of Ur - also known as Twenty Squares - has a history that
+    stretches over five millennia! Its earliest boards date back to 2500 BC, and
+    over 100 examples have been found in archaeological sites in Iraq, Iran, Israel,
+    Syria, Jordan, Lebanon, Turkey, Cyprus, Egypt, and Crete. Sir Leonard Woolley
+    excavated the first example at the Royal Cemetery of Ur in the 1920s; it was
+    inlaid with shell plaques, some sculpted with rosettes, others with an eye. The
+    game changed slightly in the early 2nd millennium, when the smaller block of
+    six squares was joined to the block of twelve by a bridge, affording a continuous
+    run of 8 squares on the length of the board. The rules and the meaning for the
+    game, however, come from a much later source - a clay cuneiform tablet dated
+    to the time of the Seleucid dynasty, 177-176 BC. This tablet, just 10 cm x 9.4
+    cm x 2.8 cm in size, was written by Itti-Marduk-balatu, member of a prominent
+    Babylonian scribal family which had written on astronomy and other learned matters
+    for six generations.  His tablet is a copy of one made by another scholarly family,
+    known as Iddin-Bel. You can see Itti-Marduk-balatu's tablet at the British Museum,
+    BM33333B.  It is inscribed on the back with omens from the flights of birds,
+    including the swallow (summatu) and the raven (ugagu). A second tablet, several
+    centuries earlier, has some of the same material, and may have come from Uruk.
   winText: Your opponent grimaces for a second, but seems happy to have met his match.
     "Well done, then! As promised, a bit of food and water for your ship and crew.
     Perhaps next time we meet I'll defeat you!"
@@ -400,7 +399,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fdc2344a23af744db810a1680b4bf69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skipTurnWaitTime: 1.5
+  skipTurnWaitTime: 1.25
   diceResultText: {fileID: 1127306566}
   diceSpinTime: 1
   diceModels:
@@ -423,8 +422,8 @@ MonoBehaviour:
   - {fileID: 1437719359}
   - {fileID: 305896350}
   - {fileID: 1462798565}
-  midTurnPause: 0.5
-  endTurnPause: 1
+  midTurnPause: 0.35
+  endTurnPause: 0.75
 --- !u!114 &221550595 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1926386179592450417, guid: 306f11222e282894d8f0ed0d86113035,
@@ -1750,7 +1749,7 @@ PrefabInstance:
     - target: {fileID: 344618622530691063, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
       propertyPath: m_SortingOrder
-      value: -1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 380314680170063175, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
@@ -2678,6 +2677,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5220106615631579442, guid: 7bddbb20614417b4d982059e874b4a90,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5220106615631579442, guid: 7bddbb20614417b4d982059e874b4a90,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 14.700012
       objectReference: {fileID: 0}
     - target: {fileID: 5220106615671237914, guid: 7bddbb20614417b4d982059e874b4a90,
         type: 3}
@@ -3866,7 +3875,7 @@ Transform:
   - {fileID: 1925059010}
   - {fileID: 1136401872}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1256083482 stripped
 MonoBehaviour:
@@ -4176,7 +4185,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!224 &1329962180
 RectTransform:
@@ -4192,7 +4201,7 @@ RectTransform:
   - {fileID: 1492511149}
   - {fileID: 224972502}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
