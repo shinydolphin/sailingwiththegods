@@ -6,10 +6,10 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class PetteiaGameController : MonoBehaviour
+public class PetteiaGameController : TavernaGameControllerParent
 {
+	[Header("Petteia Variables")]
 	public Vector2Int rewardAmts;
-	public AudioSource moveSound;
 
 	public string playerTag;
 	public string enemyTag;
@@ -28,29 +28,10 @@ public class PetteiaGameController : MonoBehaviour
 	public PetteiaBoardPosition[] squaresRow6 = new PetteiaBoardPosition[8];
 	public PetteiaBoardPosition[] squaresRow7 = new PetteiaBoardPosition[8];
 	[HideInInspector] public int[,] positions = new int[8, 8];
-
-	[Header("UI")]
-	public MiniGameInfoScreen mgScreen;
-	public TavernaMiniGameDialog playerBarks;
-	public TavernaEnemyDialog enemyBarks;
-	public Sprite gameIcon;
-	public float barkChance = 0.25f;
-
-	[Header("Text")]
-	[TextArea(2, 30)]
-	public string introText;
-	[TextArea(2, 30)]
-	public string instructions;
-	[TextArea(2, 30)]
-	public string history;
-	[TextArea(2, 30)]
-	public string winText;
-	[TextArea(2, 30)]
-	public string loseText;
 	
 	[Header("Debug")]
-	[TextArea(1, 8)]
-	public string debugPiecePositions;
+	
+	[ReadOnly] [TextArea(0, 8)] public string debugPiecePositions;
 	
 	private bool playerTurn;
 	private bool gameOver = false;
@@ -109,25 +90,13 @@ public class PetteiaGameController : MonoBehaviour
 		}
 	}
 
-	public void PauseMinigame() 
+	public override void PauseMinigame() 
 	{
-		mgScreen.gameObject.SetActive(true);
-		Time.timeScale = 0;
+		base.PauseMinigame();
 		mgScreen.DisplayText("Petteia: Instructions and History", "Taverna game", instructions + "\n\n" + history, gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
 	}
 
-	public void UnpauseMinigame() 
-	{
-		mgScreen.gameObject.SetActive(false);
-		Time.timeScale = 1;
-	}
-
-	public void ExitMinigame() 
-	{
-		TavernaController.BackToTavernaMenu();
-	}
-
-	public void RestartMinigame() 
+	public override void RestartMinigame() 
 	{
 		TavernaController.ReloadTavernaGame("Petteia");
 	}
@@ -174,15 +143,6 @@ public class PetteiaGameController : MonoBehaviour
 		foreach (PetteiaPlayerPiece p in playerPieces) {
 			p.ToggleHighlight(toggle);
 		}
-	}
-
-	/// <summary>
-	/// Plays the movement sound at a random pitch
-	/// </summary>
-	public void PlayMoveSound() 
-	{
-		moveSound.pitch = Random.Range(0.7f, 1.1f);
-		moveSound.Play();
 	}
 
 	private void InitalStateSetup() 

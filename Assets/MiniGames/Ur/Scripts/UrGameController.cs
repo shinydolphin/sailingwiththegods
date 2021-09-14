@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UrGameController : MonoBehaviour
+public class UrGameController : TavernaGameControllerParent
 {
+	[Header("Ur Variables")]
 	public Vector2Int rewardAmts;
 
 	[Header("Player")]
@@ -20,30 +21,12 @@ public class UrGameController : MonoBehaviour
 	public GameObject enemyPathLine;
 	
 	[Header("UI")]
-	public MiniGameInfoScreen mgScreen;
-	public Sprite gameIcon;
-	public TavernaMiniGameDialog playerBarks;
-	public TavernaEnemyDialog enemyBarks;
-	[Range(0f, 1f)]
-	public float barkChance = 0.75f;
 	[Range(0f, 1f)]
 	public float bragToInsultRatio = 0.66f;
 	public Button rollDiceButton;
 	public Text alertText;
 	public float alertShowTime;
 	public float alertFadeSpeed;
-
-	[Header("Text")]
-	[TextArea(2, 30)]
-	public string introText;
-	[TextArea(2, 30)]
-	public string instructions;
-	[TextArea(2, 30)]
-	public string history;
-	[TextArea(2, 30)]
-	public string winText;
-	[TextArea(2, 30)]
-	public string loseText;
 
 	private bool isGameOver = false;
 	private int currentRoll;
@@ -110,22 +93,12 @@ public class UrGameController : MonoBehaviour
 		alertText.text = "";
 	}
 
-	public void PauseMinigame() {
-		mgScreen.gameObject.SetActive(true);
-		Time.timeScale = 0;
+	public override void PauseMinigame() {
+		base.PauseMinigame();
 		mgScreen.DisplayText("The Game of Ur: Instructions and History", "Taverna game", instructions + "\n\n" + history, gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
 	}
 
-	public void UnpauseMinigame() {
-		mgScreen.gameObject.SetActive(false);
-		Time.timeScale = 1;
-	}
-
-	public void ExitMinigame() {
-		TavernaController.BackToTavernaMenu();
-	}
-
-	public void RestartMinigame() {
+	public override void RestartMinigame() {
 		TavernaController.ReloadTavernaGame("Ur");
 	}
 

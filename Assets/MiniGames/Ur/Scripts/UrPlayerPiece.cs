@@ -102,6 +102,8 @@ public class UrPlayerPiece : UrPiece
 			//If you moved, check for flip or piece off, then pass the turn
 			if (boardIndex != potentialIndex) 
 			{
+				urGC.PlayMoveSound();
+
 				if (boardIndex != -1) {
 					urGC.playerBoardPositions[boardIndex].ClearOccupied();
 				}

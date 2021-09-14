@@ -67,6 +67,8 @@ public class UrAIController : MonoBehaviour
 
 				//Finalize the move
 
+				urGC.PlayMoveSound();
+
 				//Check for a capture
 				if (nextTile.OppositeOccupyingPiece(false)) 
 				{

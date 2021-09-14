@@ -224,6 +224,7 @@ GameObject:
   - component: {fileID: 206646156}
   - component: {fileID: 206646158}
   - component: {fileID: 206646159}
+  - component: {fileID: 206646160}
   m_Layer: 0
   m_Name: UrGameController
   m_TagString: GameController
@@ -243,75 +244,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d05758436a2950845887ee1c70e11c4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rewardAmts: {x: 10, y: 20}
-  playerTag: PlayerPiece
-  playerPieces:
-  - {fileID: 1963955072}
-  - {fileID: 1423817633}
-  - {fileID: 1421610672}
-  playerBoardPositions:
-  - {fileID: 588773615}
-  - {fileID: 127149975}
-  - {fileID: 521625476}
-  - {fileID: 1809738410}
-  - {fileID: 728903323}
-  - {fileID: 321580552}
-  - {fileID: 237721788}
-  - {fileID: 1102514068}
-  - {fileID: 2070030655}
-  - {fileID: 122778790}
-  - {fileID: 657719416}
-  - {fileID: 725073531}
-  - {fileID: 492893922}
-  - {fileID: 2131095415}
-  - {fileID: 1798228389}
-  - {fileID: 1639566490}
-  - {fileID: 657719416}
-  - {fileID: 122778790}
-  - {fileID: 2070030655}
-  - {fileID: 1102514068}
-  - {fileID: 237721788}
-  - {fileID: 321580552}
-  - {fileID: 728903323}
-  - {fileID: 914053088}
-  playerPathLine: {fileID: 1419999713}
-  enemyTag: EnemyPiece
-  enemyBoardPositions:
-  - {fileID: 221550595}
-  - {fileID: 1636233110}
-  - {fileID: 1256083482}
-  - {fileID: 410198625}
-  - {fileID: 728903323}
-  - {fileID: 321580552}
-  - {fileID: 237721788}
-  - {fileID: 1102514068}
-  - {fileID: 2070030655}
-  - {fileID: 122778790}
-  - {fileID: 657719416}
-  - {fileID: 1639566490}
-  - {fileID: 1798228389}
-  - {fileID: 2131095415}
-  - {fileID: 492893922}
-  - {fileID: 725073531}
-  - {fileID: 657719416}
-  - {fileID: 122778790}
-  - {fileID: 2070030655}
-  - {fileID: 1102514068}
-  - {fileID: 237721788}
-  - {fileID: 321580552}
-  - {fileID: 728903323}
-  - {fileID: 914053088}
-  enemyPathLine: {fileID: 1660020837}
+  moveSound: {fileID: 206646160}
   mgScreen: {fileID: 1081637347}
   gameIcon: {fileID: 21300000, guid: f30e2c48dbe1f094e8f3b8b25b9f6d29, type: 3}
   playerBarks: {fileID: 1081637349}
   enemyBarks: {fileID: 1081637350}
   barkChance: 0.5
-  bragToInsultRatio: 0.66
-  rollDiceButton: {fileID: 1492511150}
-  alertText: {fileID: 224972504}
-  alertShowTime: 1.5
-  alertFadeSpeed: 2
   introText: 'A colorful board game and the sailor sitting behind it catch your eye
     in the taverna. He spots you looking and grins, "Come play the game 5000 years
     old! Are you swift as a speeding ship, faster than race horses, as cunning as
@@ -372,6 +310,70 @@ MonoBehaviour:
   loseText: Your opponent nods smugly from the other side of the game board. "A nice
     try, lad. But not nearly enough! Though if you want to give it another try, you'll
     have no trouble finding willing players to train against."
+  rewardAmts: {x: 10, y: 20}
+  playerTag: PlayerPiece
+  playerPieces:
+  - {fileID: 1963955072}
+  - {fileID: 1423817633}
+  - {fileID: 1421610672}
+  playerBoardPositions:
+  - {fileID: 588773615}
+  - {fileID: 127149975}
+  - {fileID: 521625476}
+  - {fileID: 1809738410}
+  - {fileID: 728903323}
+  - {fileID: 321580552}
+  - {fileID: 237721788}
+  - {fileID: 1102514068}
+  - {fileID: 2070030655}
+  - {fileID: 122778790}
+  - {fileID: 657719416}
+  - {fileID: 725073531}
+  - {fileID: 492893922}
+  - {fileID: 2131095415}
+  - {fileID: 1798228389}
+  - {fileID: 1639566490}
+  - {fileID: 657719416}
+  - {fileID: 122778790}
+  - {fileID: 2070030655}
+  - {fileID: 1102514068}
+  - {fileID: 237721788}
+  - {fileID: 321580552}
+  - {fileID: 728903323}
+  - {fileID: 914053088}
+  playerPathLine: {fileID: 1419999713}
+  enemyTag: EnemyPiece
+  enemyBoardPositions:
+  - {fileID: 221550595}
+  - {fileID: 1636233110}
+  - {fileID: 1256083482}
+  - {fileID: 410198625}
+  - {fileID: 728903323}
+  - {fileID: 321580552}
+  - {fileID: 237721788}
+  - {fileID: 1102514068}
+  - {fileID: 2070030655}
+  - {fileID: 122778790}
+  - {fileID: 657719416}
+  - {fileID: 1639566490}
+  - {fileID: 1798228389}
+  - {fileID: 2131095415}
+  - {fileID: 492893922}
+  - {fileID: 725073531}
+  - {fileID: 657719416}
+  - {fileID: 122778790}
+  - {fileID: 2070030655}
+  - {fileID: 1102514068}
+  - {fileID: 237721788}
+  - {fileID: 321580552}
+  - {fileID: 728903323}
+  - {fileID: 914053088}
+  enemyPathLine: {fileID: 1660020837}
+  bragToInsultRatio: 0.66
+  rollDiceButton: {fileID: 1492511150}
+  alertText: {fileID: 224972504}
+  alertShowTime: 1.5
+  alertFadeSpeed: 2
   enemyAI: {fileID: 206646159}
 --- !u!4 &206646157
 Transform:
@@ -424,6 +426,102 @@ MonoBehaviour:
   - {fileID: 1462798565}
   midTurnPause: 0.35
   endTurnPause: 0.75
+--- !u!82 &206646160
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206646155}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 541ea086eb05c0d4e9990583c9c5e97e, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.8
+  m_Pitch: 0.8
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &221550595 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1926386179592450417, guid: 306f11222e282894d8f0ed0d86113035,
