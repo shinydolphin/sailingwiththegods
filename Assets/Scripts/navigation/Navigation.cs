@@ -124,19 +124,24 @@ namespace Nav {
 			string Saildirecation = "Current direction of the ship is sail to the " + FindDirection(angle2) + ".";
 			return Saildirecation;
 		}
-		string getAIPath(Vector3 target,float radius) {
+		string getAIPath(Vector3 target,float radius) 
+		{
 			navAgent.stoppingDistance = radius;
 			navAgent.SetDestination(target);
 			Vector3[] path = navAgent.path.corners;
 			lineRenderer.positionCount = navAgent.path.corners.Length;
 			//NavMeshAgent.SetDestination is asynchronous, so "the path may not become available until after a few frames later" so check if there is a path first 
 			if (path.Length <= 1) {
+			
 				return "";
 			}
-			if(lineRendererON){
+			if (lineRendererON) {
 				for (int i = 0; i < path.Length; i++) {
-				lineRenderer.SetPosition(i, path[i]);
+					lineRenderer.SetPosition(i, path[i]);
+				}
 			}
+			else {
+				lineRenderer.enabled = false;
 			}
 			//get next point
 			if (path.Length > 3) {

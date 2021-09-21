@@ -127,6 +127,9 @@ MonoBehaviour:
   ghostPiece: {fileID: 3380173810281442361, guid: c6b0444823ae12747b01822a1d0a8fd9,
     type: 3}
   possiblePathLine: {fileID: 0}
+  mask:
+    serializedVersion: 2
+    m_Bits: 8388608
 --- !u!1001 &4464392935327191443
 PrefabInstance:
   m_ObjectHideFlags: 0

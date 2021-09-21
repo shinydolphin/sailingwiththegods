@@ -4,13 +4,19 @@ using UnityEngine;
 
 public class UrPlayerPiece : UrPiece
 {
+	//I really wish this could be a private variable and just set LayerMask.GetMask("GameSquare")!
+	//But for some reason, feeding the Physics.Raycast call with just an int makes it also raycast onto the terrain?
+	//So for some reason passing it an int breaks it, but giving it mask.value - an int! - doesn't??
+	//I don't know what's wrong with it
+	public LayerMask mask;
+
 	private bool selected = false;
-	private int mask;
 
 	private void Start() 
 	{
 		AssignVariables();
-		mask = LayerMask.GetMask("GameSquare");
+		//mask = LayerMask.GetMask("GameSquare");
+		//mask = ~0;
 	}
 
 	private void Update() 
@@ -18,10 +24,12 @@ public class UrPlayerPiece : UrPiece
 		if (selected) 
 		{
 			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-			if (Physics.Raycast(ray, out hit, 300f, mask, QueryTriggerInteraction.Collide)) 
+			Ray ray = urGC.mainCam.ScreenPointToRay(Input.mousePosition);
+			
+			if (Physics.Raycast(ray, out hit, 300f, mask.value, QueryTriggerInteraction.Collide)) 
 			{
+				Debug.Log($"Piece raycast hit {hit.collider.gameObject.name}");
+
 				UrGameTile ugt = hit.collider.GetComponent<UrGameTile>();
 				if (ugt != null && validMoves.Contains(ugt)) 
 				{

@@ -19,8 +19,9 @@ public class UrGameController : TavernaGameControllerParent
 	public string enemyTag;
 	public List<UrGameTile> enemyBoardPositions;
 	public GameObject enemyPathLine;
-	
+
 	[Header("UI")]
+	public Camera mainCam;
 	[Range(0f, 1f)]
 	public float bragToInsultRatio = 0.66f;
 	public Button rollDiceButton;
