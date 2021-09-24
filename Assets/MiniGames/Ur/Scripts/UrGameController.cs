@@ -209,13 +209,18 @@ public class UrGameController : TavernaGameControllerParent
 		SwitchTurn(playerTurn);
 	}
 
+	public bool CanPlayerMove(bool isPlayer, bool highlightPieces = true) 
+	{
+		return CanPlayerMove(isPlayer, currentRoll, highlightPieces);
+	}
+
 	/// <summary>
 	/// Checks if the specified player can move any of their pieces
 	/// </summary>
 	/// <param name="isPlayer">Whether to check the player or not</param>
 	/// <param name="highlightPieces">Whether to highlight any mobile pieces</param>
 	/// <returns></returns>
-	public bool CanPlayerMove(bool isPlayer, bool highlightPieces = true) 
+	public bool CanPlayerMove(bool isPlayer, int roll, bool highlightPieces = true) 
 	{
 		int movable = 0;
 		List<UrGameTile> checkPath = new List<UrGameTile>();
@@ -234,7 +239,7 @@ public class UrGameController : TavernaGameControllerParent
 		
 		foreach(UrPiece p in checkPieces) 
 		{
-			if (p.PopulateValidMovesList(checkPath, isPlayer).Count > 0) 
+			if (p.PopulateValidMovesList(checkPath, isPlayer, roll).Count > 0) 
 			{
 				if (highlightPieces) 
 				{

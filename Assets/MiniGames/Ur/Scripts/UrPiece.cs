@@ -31,15 +31,19 @@ public class UrPiece : MonoBehaviour
 		highlight.SetActive(false);
 	}
 
+	public List<UrGameTile> PopulateValidMovesList(List<UrGameTile> allowedPath, bool isPlayer) 
+	{
+		return PopulateValidMovesList(allowedPath, isPlayer, urGC.CurrentRoll);
+	}
+
 	/// <summary>
 	/// Calculates a list of all valid moves for the current piece
 	/// </summary>
 	/// <param name="allowedPath"></param>
 	/// <param name="isPlayer"></param>
 	/// <returns></returns>
-	public List<UrGameTile> PopulateValidMovesList(List<UrGameTile> allowedPath, bool isPlayer) 
+	public List<UrGameTile> PopulateValidMovesList(List<UrGameTile> allowedPath, bool isPlayer, int roll) 
 	{
-		int roll = urGC.CurrentRoll;
 		List<UrGameTile> possibleMoves = new List<UrGameTile>();
 
 		//If this is off the board, it can only move if you have a 1 or 5 and then just to the start

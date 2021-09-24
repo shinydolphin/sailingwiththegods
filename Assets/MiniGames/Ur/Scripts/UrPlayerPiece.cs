@@ -28,8 +28,6 @@ public class UrPlayerPiece : UrPiece
 			
 			if (Physics.Raycast(ray, out hit, 300f, mask.value, QueryTriggerInteraction.Collide)) 
 			{
-				Debug.Log($"Piece raycast hit {hit.collider.gameObject.name}");
-
 				UrGameTile ugt = hit.collider.GetComponent<UrGameTile>();
 				if (ugt != null && validMoves.Contains(ugt)) 
 				{

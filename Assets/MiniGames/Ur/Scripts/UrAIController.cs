@@ -125,7 +125,7 @@ public class UrAIController : MonoBehaviour
 		//If there's only one piece, just return that without wasting time doing the other processing
 		if (movablePieceList.Count == 1) 
 		{
-			Debug.Log("Only one piece can move, taking that move");
+			//Debug.Log("Only one piece can move, taking that move");
 			return movablePieceList[0];
 		}
 
@@ -146,7 +146,7 @@ public class UrAIController : MonoBehaviour
 		}
 		if (potentialPieces.Count != 0) 
 		{
-			Debug.Log("At least one piece can move off the board, taking that move");
+			//Debug.Log("At least one piece can move off the board, taking that move");
 			return potentialPieces.RandomElement();
 		}
 
@@ -159,7 +159,7 @@ public class UrAIController : MonoBehaviour
 		}
 		if (potentialPieces.Count != 0) 
 		{
-			Debug.Log("At least one piece can capture a player piece, taking that move");
+			//Debug.Log("At least one piece can capture a player piece, taking that move");
 			return potentialPieces.RandomElement();
 		}
 
@@ -172,7 +172,7 @@ public class UrAIController : MonoBehaviour
 		}
 		if (potentialPieces.Count != 0) 
 		{
-			Debug.Log("At least one piece can land on a rosette, taking that move");
+			//Debug.Log("At least one piece can land on a rosette, taking that move");
 			return potentialPieces.RandomElement();
 		}
 
@@ -186,12 +186,13 @@ public class UrAIController : MonoBehaviour
 		}
 		if (potentialPieces.Count != 0) 
 		{
-			Debug.Log("At least one piece can move onto the board, taking that move");
+			//Debug.Log("At least one piece can move onto the board, taking that move");
 			return potentialPieces.RandomElement();
 		}
 
 		//If no piece can do any of those things, choose at random
-		Debug.Log("No priority moves available, moving a piece at random");
+
+		//Debug.Log("No priority moves available, moving a piece at random");
 		return movablePieceList.RandomElement();
 	}
 

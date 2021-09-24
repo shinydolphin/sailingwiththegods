@@ -8,16 +8,21 @@ using UnityEngine.UI;
 public class UrDiceRoller : MonoBehaviour
 {
 	public float skipTurnWaitTime = 1.5f;
-
+	[Range(0f, 1f)] public float availableMoveBaseWeight = .25f;
+	[Range(0f, 1f)] public float availableMoveWeightIncrease = 0.1f;
 	public Text diceResultText;
 	public float diceSpinTime;
 	public Animator[] diceModels;
 
 
 	private UrGameController urGC;
+	private float playerWeight;
+	private float enemyWeight;
 
 	private void Start() {
 		urGC = GetComponent<UrGameController>();
+		playerWeight = availableMoveBaseWeight;
+		enemyWeight = availableMoveBaseWeight;
 	}
 
 	private IEnumerator RollAndRotate(Animator anim, string trigger) 
@@ -33,7 +38,7 @@ public class UrDiceRoller : MonoBehaviour
 		anim.ResetTrigger("Reset");
 		yield return null;
 		//Rotates at random y so the dice don't all look the same
-		anim.transform.eulerAngles += Vector3.up * Random.Range(1f, 361f);
+		anim.transform.eulerAngles += Vector3.up * Random.Range(1f, 360f);
 	}
 
 	public int RollDice(bool playerTurn)
@@ -41,7 +46,8 @@ public class UrDiceRoller : MonoBehaviour
 		//1 is a blank, 2 is a mark
 		int[] diceRolls = new int[diceModels.Length];
 
-		for (int i = 0; i < diceRolls.Length; i++) {
+		for (int i = 0; i < diceRolls.Length; i++) 
+		{
 			diceRolls[i] = Random.Range(1, 3);
 		}
 
@@ -49,6 +55,54 @@ public class UrDiceRoller : MonoBehaviour
 		int marks = (diceRolls[0] % 2 == 0 ? 1 : 0) + (diceRolls[1] % 2 == 0 ? 1 : 0) + (diceRolls[2] % 2 == 0 ? 1 : 0);
 		int roll = marks == 3 ? 5 : marks;
 
+		//If you can't move
+		if (roll == 0 || !urGC.CanPlayerMove(playerTurn, roll, false)) {
+			//Check if you reach the weight to reroll for a better roll
+			float rand = Random.Range(0f, 1f);
+			float threshold = playerTurn ? playerWeight : enemyWeight;
+
+			//If you do qualify for a reroll
+			if (rand < threshold) {
+				//Keep rerolling until you get a move that works
+				do {
+					for (int i = 0; i < diceRolls.Length; i++) {
+						diceRolls[i] = Random.Range(1, 3);
+					}
+
+					marks = (diceRolls[0] % 2 == 0 ? 1 : 0) + (diceRolls[1] % 2 == 0 ? 1 : 0) + (diceRolls[2] % 2 == 0 ? 1 : 0);
+					roll = marks == 3 ? 5 : marks;
+
+				} while (!urGC.CanPlayerMove(playerTurn, roll, false));
+
+				//Make sure to reset the weight
+				if (playerTurn) {
+					playerWeight = availableMoveBaseWeight;
+				}
+				else {
+					enemyWeight = availableMoveBaseWeight;
+				}
+			}
+			//If you don't, keep this roll but increase the weight so you're less likely to miss a turn again
+			else {
+				if (playerTurn) {
+					playerWeight += availableMoveWeightIncrease;
+				}
+				else {
+					enemyWeight += availableMoveWeightIncrease;
+				}
+			}
+		}
+		else {
+			//Reset the weights here as well - we only want it increasing for bad rolls in a row
+			if (playerTurn) {
+				playerWeight = availableMoveBaseWeight;
+			}
+			else {
+				enemyWeight = availableMoveBaseWeight;
+			}
+		}
+
+		//Once the roll is finalized, then send it on to the visuals
 		if (!urGC.IsGameOver) 
 		{
 			StartCoroutine(VisualDiceRoll(diceRolls, roll, playerTurn));
