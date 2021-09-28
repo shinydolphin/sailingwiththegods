@@ -126,10 +126,12 @@ public class UrPlayerPiece : UrPiece
 				}
 
 				boardIndex = potentialIndex;
+				//Capture
 				if (urGC.playerBoardPositions[boardIndex].OppositeOccupyingPiece(true)) 
 				{
 					urGC.playerBoardPositions[boardIndex].RemoveCurrentFromBoard();
 					urGC.TriggerBark(true, urGC.CaptureFlavor);
+					urGC.PlaySoundFX(UrGameController.SoundTrigger.Capture, true);
 				}
 
 				//We check this now because we won't need to do any more processing if you're moving off the board
@@ -138,6 +140,7 @@ public class UrPlayerPiece : UrPiece
 				{
 					urGC.TriggerBark(true, urGC.MoveOffFlavor, true);
 					urGC.PointScored(true, this);
+					urGC.PlaySoundFX(UrGameController.SoundTrigger.OffBoard, true);
 				}
 				else {
 					urGC.playerBoardPositions[boardIndex].SetOccupied(this);
@@ -148,6 +151,7 @@ public class UrPlayerPiece : UrPiece
 				{
 					urGC.ShowAlertText("Roll Again");
 					urGC.TriggerBark(true, urGC.RosetteFlavor);
+					urGC.PlaySoundFX(UrGameController.SoundTrigger.Rosette, true);
 					urGC.SwitchTurn(true);
 				}
 				else 

@@ -29,6 +29,13 @@ public class UrGameController : TavernaGameControllerParent
 	public float alertShowTime;
 	public float alertFadeSpeed;
 
+	[Header("Audio")]
+	public AudioSource sfxAud;
+	public AudioClip[] rosetteSounds;
+	public AudioClip[] captureSounds;
+	public AudioClip[] lostTurnSounds;
+	public AudioClip[] offBoardSounds;
+
 	private bool isGameOver = false;
 	private int currentRoll;
 	private bool isPlayerTurn = true;
@@ -51,8 +58,7 @@ public class UrGameController : TavernaGameControllerParent
 	private List<string> moveOffFlavor;
 	private List<string> moveOnFlavor;
 
-	public void Awake() 
-	{
+	public void Awake() {
 		//Assign variables
 		enemyAI = GetComponent<UrAIController>();
 		dice = GetComponent<UrDiceRoller>();
@@ -60,8 +66,7 @@ public class UrGameController : TavernaGameControllerParent
 		//Show the UI
 		mgScreen.gameObject.SetActive(true);
 
-		if (Globals.GameVars != null) 
-		{
+		if (Globals.GameVars != null) {
 			//Load the lists in from GameVars
 			introFlavor = Globals.GameVars.urGameIntro;
 			winFlavor = Globals.GameVars.urGameWin;
@@ -72,8 +77,7 @@ public class UrGameController : TavernaGameControllerParent
 			moveOffFlavor = Globals.GameVars.urGameMoveOff;
 			moveOnFlavor = Globals.GameVars.urGameMoveOn;
 		}
-		else 
-		{
+		else {
 			introFlavor = new List<string> { "Ur intro flavor 1", "Ur intro flavor 2", "Ur intro flavor 3" };
 			winFlavor = new List<string> { "Ur win flavor 1", "Ur win flavor 2", "Ur win flavor 3" };
 			loseFlavor = new List<string> { "Ur lose flavor 1", "Ur lose flavor 2", "Ur lose flavor 3" };
@@ -106,30 +110,24 @@ public class UrGameController : TavernaGameControllerParent
 	/// <summary>
 	/// Turns off all board tile highlights
 	/// </summary>
-	public void UnhighlightBoard() 
-	{
-		foreach (UrGameTile tile in playerBoardPositions) 
-		{
+	public void UnhighlightBoard() {
+		foreach (UrGameTile tile in playerBoardPositions) {
 			tile.ShowHighlight(false);
 		}
 
-		foreach (UrGameTile tile in enemyBoardPositions) 
-		{
+		foreach (UrGameTile tile in enemyBoardPositions) {
 			tile.ShowHighlight(false);
 		}
 	}
 
-	public void UnhighlightPieces() 
-	{
-		foreach (UrPlayerPiece piece in playerPieces) 
-		{
+	public void UnhighlightPieces() {
+		foreach (UrPlayerPiece piece in playerPieces) {
 			if (piece != null) {
 				piece.ShowHighlight(false);
 			}
 
 		}
-		foreach (UrPiece piece in enemyAI.enemyPieces) 
-		{
+		foreach (UrPiece piece in enemyAI.enemyPieces) {
 			if (piece != null) {
 				piece.ShowHighlight(false);
 			}
@@ -141,8 +139,7 @@ public class UrGameController : TavernaGameControllerParent
 	/// Rolls the dice and returns the result
 	/// </summary>
 	/// <returns></returns>
-	public int GetDiceRoll() 
-	{
+	public int GetDiceRoll() {
 		rollDiceButton.interactable = false;
 		currentRoll = dice.RollDice(isPlayerTurn);
 
@@ -152,11 +149,9 @@ public class UrGameController : TavernaGameControllerParent
 	/// <summary>
 	/// Rolls the dice - used for the button
 	/// </summary>
-	public void RollDice() 
-	{
+	public void RollDice() {
 		//Prevents button from being pressed if there's a bark onscreen
-		if (Time.timeScale != 0) 
-		{
+		if (Time.timeScale != 0) {
 			rollDiceButton.interactable = false;
 			currentRoll = dice.RollDice(isPlayerTurn);
 			if (isPlayerTurn) {
@@ -165,8 +160,7 @@ public class UrGameController : TavernaGameControllerParent
 		}
 	}
 
-	public void SwitchTurn(bool playerTurn) 
-	{
+	public void SwitchTurn(bool playerTurn) {
 		isPlayerTurn = playerTurn;
 		allowPlayerMove = false;
 		rollDiceButton.interactable = isPlayerTurn;
@@ -203,14 +197,12 @@ public class UrGameController : TavernaGameControllerParent
 
 	}
 
-	public IEnumerator WaitToSwitchTurn(bool playerTurn, float waitTime) 
-	{
+	public IEnumerator WaitToSwitchTurn(bool playerTurn, float waitTime) {
 		yield return new WaitForSeconds(waitTime);
 		SwitchTurn(playerTurn);
 	}
 
-	public bool CanPlayerMove(bool isPlayer, bool highlightPieces = true) 
-	{
+	public bool CanPlayerMove(bool isPlayer, bool highlightPieces = true) {
 		return CanPlayerMove(isPlayer, currentRoll, highlightPieces);
 	}
 
@@ -220,29 +212,23 @@ public class UrGameController : TavernaGameControllerParent
 	/// <param name="isPlayer">Whether to check the player or not</param>
 	/// <param name="highlightPieces">Whether to highlight any mobile pieces</param>
 	/// <returns></returns>
-	public bool CanPlayerMove(bool isPlayer, int roll, bool highlightPieces = true) 
-	{
+	public bool CanPlayerMove(bool isPlayer, int roll, bool highlightPieces = true) {
 		int movable = 0;
 		List<UrGameTile> checkPath = new List<UrGameTile>();
 		List<UrPiece> checkPieces = new List<UrPiece>();
 
-		if (isPlayer) 
-		{
+		if (isPlayer) {
 			checkPath = playerBoardPositions;
 			checkPieces = playerPieces;
 		}
-		else 
-		{
+		else {
 			checkPath = enemyBoardPositions;
 			checkPieces = enemyAI.enemyPieces;
 		}
-		
-		foreach(UrPiece p in checkPieces) 
-		{
-			if (p.PopulateValidMovesList(checkPath, isPlayer, roll).Count > 0) 
-			{
-				if (highlightPieces) 
-				{
+
+		foreach (UrPiece p in checkPieces) {
+			if (p.PopulateValidMovesList(checkPath, isPlayer, roll).Count > 0) {
+				if (highlightPieces) {
 					p.ShowHighlight(true);
 				}
 
@@ -253,16 +239,13 @@ public class UrGameController : TavernaGameControllerParent
 		return movable > 0;
 	}
 
-	public void ShowAlertText(string alert) 
-	{
+	public void ShowAlertText(string alert) {
 		StartCoroutine(DoShowAlertText(alertText, alertOutline, alert));
 	}
 
-	private IEnumerator DoShowAlertText(Text t, Outline o, string alert) 
-	{
+	private IEnumerator DoShowAlertText(Text t, Outline o, string alert) {
 		//For some reason, just calling StopCoroutine(FadeText(t, o)) doesn't work, so we have to do it this way
-		if (fadeCoroutine != null) 
-		{
+		if (fadeCoroutine != null) {
 			StopCoroutine(fadeCoroutine);
 			fadeCoroutine = null;
 		}
@@ -274,8 +257,7 @@ public class UrGameController : TavernaGameControllerParent
 		fadeCoroutine = StartCoroutine(FadeText(t, o));
 	}
 
-	private IEnumerator FadeText(Text t, Outline o) 
-	{
+	private IEnumerator FadeText(Text t, Outline o) {
 		yield return new WaitForSeconds(alertShowTime);
 		Color clearColor = new Color(baseAlertColor.r, baseAlertColor.g, baseAlertColor.b, 0f);
 		Color clearOutline = new Color(baseOutlineColor.r, baseOutlineColor.g, baseOutlineColor.b, 0f);
@@ -283,8 +265,7 @@ public class UrGameController : TavernaGameControllerParent
 		//I had a lot of trouble with this for some reason - Lerp didn't want to cooperate
 		//I've seen people do something like Color.Lerp(t.color, endColor, t) with t as the for loop iterater,
 		//but for some reason that wasn't giving the right results here
-		for (float i = 0; i <= 1; i += Time.deltaTime * alertFadeSpeed) 
-		{
+		for (float i = 0; i <= 1; i += Time.deltaTime * alertFadeSpeed) {
 			t.color = Color.Lerp(baseAlertColor, clearColor, i);
 			o.effectColor = Color.Lerp(baseOutlineColor, clearOutline, i);
 			yield return null;
@@ -295,8 +276,7 @@ public class UrGameController : TavernaGameControllerParent
 		o.effectColor = baseOutlineColor;
 	}
 
-	public void TriggerBark(bool isPlayer, List<string> triggerType, bool autoTrigger = false) 
-	{
+	public void TriggerBark(bool isPlayer, List<string> triggerType, bool autoTrigger = false) {
 		float rand = Random.Range(0f, 1f);
 
 		//If we want this to disregard the random element, just manually set it to 0 so it's always below barkChance
@@ -305,10 +285,8 @@ public class UrGameController : TavernaGameControllerParent
 		}
 
 		//If you've actually triggered one, you can either do the corresponding brag or an insult
-		if (rand <= barkChance) 
-		{
-			if (Random.Range(0f, 1f) <= bragToInsultRatio || autoTrigger) 
-			{
+		if (rand <= barkChance) {
+			if (Random.Range(0f, 1f) <= bragToInsultRatio || autoTrigger) {
 				//If the player did the cool thing, the player brags
 				if (isPlayer) {
 					playerBarks.DisplayFromList(triggerType);
@@ -318,8 +296,7 @@ public class UrGameController : TavernaGameControllerParent
 					enemyBarks.DisplayFromList(triggerType);
 				}
 			}
-			else 
-			{
+			else {
 				//If you're going to do the insult instead, it's the opposite
 				if (isPlayer) {
 					enemyBarks.DisplayInsult();
@@ -331,28 +308,53 @@ public class UrGameController : TavernaGameControllerParent
 		}
 	}
 
-	public void PointScored(bool isPlayer, UrPiece c) 
-	{
-		if (isPlayer) 
-		{
+	public void PointScored(bool isPlayer, UrPiece c) {
+		if (isPlayer) {
 			playerPieces.Remove(c);
 			c.GetComponent<MeshRenderer>().enabled = false;
 			Destroy(c.gameObject, 1f);
-			if (playerPieces.Count == 0) 
-			{
+			if (playerPieces.Count == 0) {
 				WinGame();
 			}
 		}
-		else 
-		{
+		else {
 			enemyAI.enemyPieces.Remove(c);
 			c.GetComponent<MeshRenderer>().enabled = false;
 			Destroy(c.gameObject, 1f);
-			if (enemyAI.enemyPieces.Count == 0) 
-			{
+			if (enemyAI.enemyPieces.Count == 0) {
 				LoseGame();
 			}
 		}
+	}
+
+	public enum SoundTrigger {Rosette, Capture, LostTurn, OffBoard };
+	public void PlaySoundFX(SoundTrigger type, bool isPlayer) 
+	{
+		AudioClip[] sounds = null;
+
+		switch (type) {
+			case (SoundTrigger.Rosette):
+				sounds = rosetteSounds;
+				break;
+			case (SoundTrigger.Capture):
+				sounds = captureSounds;
+				break;
+			case (SoundTrigger.LostTurn):
+				sounds = lostTurnSounds;
+				break;
+			case (SoundTrigger.OffBoard):
+				sounds = offBoardSounds;
+				break;
+		}
+
+		if (isPlayer) {
+			sfxAud.clip = sounds[0];
+		}
+		else {
+			sfxAud.clip = sounds[1];
+		}
+
+		sfxAud.Play();
 	}
 
 	private void WinGame() 

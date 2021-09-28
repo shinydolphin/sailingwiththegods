@@ -74,18 +74,21 @@ public class UrAIController : MonoBehaviour
 				{
 					nextTile.RemoveCurrentFromBoard();
 					urGC.TriggerBark(false, urGC.CaptureFlavor);
+					urGC.PlaySoundFX(UrGameController.SoundTrigger.Capture, false);
 				}
 
 				pieceToMove.ClearPossiblePath();
 				urGC.UnhighlightBoard();
 				pieceToMove.DestroyGhost();
 
+				//Flip
 				if (pieceToMove.BoardIndex < 16 && pieceToMove.BoardIndex + currentRoll >= 16) 
 				{
 					pieceToMove.FlipPiece();
 					urGC.TriggerBark(false, urGC.FlipFlavor);
 				}
 
+				//Not moving onto the board for the first time
 				if (pieceToMove.BoardIndex != -1) 
 				{
 					urGC.enemyBoardPositions[pieceToMove.BoardIndex].ClearOccupied();
@@ -103,6 +106,7 @@ public class UrAIController : MonoBehaviour
 				{
 					urGC.TriggerBark(false, urGC.MoveOffFlavor, true);
 					urGC.PointScored(false, pieceToMove);
+					urGC.PlaySoundFX(UrGameController.SoundTrigger.OffBoard, false);
 				}
 				else {
 					nextTile.SetOccupied(pieceToMove);
@@ -112,6 +116,7 @@ public class UrAIController : MonoBehaviour
 				{
 					urGC.ShowAlertText("Opponent Rolls Again");
 					urGC.TriggerBark(false, urGC.RosetteFlavor);
+					urGC.PlaySoundFX(UrGameController.SoundTrigger.Rosette, false);
 					redoTurn = true;
 				}
 			}

@@ -137,6 +137,7 @@ public class UrDiceRoller : MonoBehaviour
 			if (!urGC.CanPlayerMove(true)) 
 			{
 				urGC.ShowAlertText("No Available Moves");
+				urGC.PlaySoundFX(UrGameController.SoundTrigger.LostTurn, true);
 				StartCoroutine(urGC.WaitToSwitchTurn(false, skipTurnWaitTime));
 			}
 		}
@@ -145,6 +146,7 @@ public class UrDiceRoller : MonoBehaviour
 			if (!urGC.CanPlayerMove(false, false)) 
 			{
 				urGC.ShowAlertText("Opponent Has No Moves");
+				urGC.PlaySoundFX(UrGameController.SoundTrigger.LostTurn, false);
 				StartCoroutine(urGC.WaitToSwitchTurn(true, skipTurnWaitTime));
 			}
 			else 
