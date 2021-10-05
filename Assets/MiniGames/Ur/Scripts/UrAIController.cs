@@ -11,6 +11,7 @@ public class UrAIController : MonoBehaviour
 
 	private UrGameController urGC;
 	private int currentRoll;
+	private bool showingBark = false;
 
 	private void Start() 
 	{
@@ -29,6 +30,7 @@ public class UrAIController : MonoBehaviour
 	{
 		if (currentRoll != 0) 
 		{
+			showingBark = false;
 			//Picks out what pieces are valid
 			List<UrPiece> movablePieces = new List<UrPiece>();
 			for (int i = 0; i < enemyPieces.Count; i++) {
@@ -69,11 +71,18 @@ public class UrAIController : MonoBehaviour
 
 				urGC.PlayMoveSound();
 
+				bool captureThisTurn = false;
 				//Check for a capture
 				if (nextTile.OppositeOccupyingPiece(false)) 
 				{
 					nextTile.RemoveCurrentFromBoard();
-					urGC.TriggerBark(false, urGC.CaptureFlavor);
+					captureThisTurn = true;
+					urGC.ShowAlertText("Captured by the enemy!");
+					if (!showingBark) {
+						urGC.TriggerBark(false, urGC.CaptureFlavor);
+						showingBark = true;
+					}
+
 					urGC.PlaySoundFX(UrGameController.SoundTrigger.Capture, false);
 				}
 
@@ -85,7 +94,11 @@ public class UrAIController : MonoBehaviour
 				if (pieceToMove.BoardIndex < 16 && pieceToMove.BoardIndex + currentRoll >= 16) 
 				{
 					pieceToMove.FlipPiece();
-					urGC.TriggerBark(false, urGC.FlipFlavor);
+					if (!showingBark) {
+						urGC.TriggerBark(false, urGC.FlipFlavor);
+						showingBark = true;
+					}
+
 				}
 
 				//Not moving onto the board for the first time
@@ -98,12 +111,17 @@ public class UrAIController : MonoBehaviour
 				{
 					//If they're at at the beginning, we don't want to set their position to 4 if they rolled a 5
 					pieceToMove.BoardIndex = 0;
-					urGC.TriggerBark(false, urGC.MoveOnFlavor);
+					if (!showingBark) {
+						urGC.TriggerBark(false, urGC.MoveOnFlavor);
+						showingBark = true;
+					}
+					
 				}
 
 				//If you're moving off the board
 				if (pieceToMove.BoardIndex == urGC.playerBoardPositions.Count - 1) 
 				{
+					//We don't have to check for other barks here because if you're moving off the board, you're not moving on, or hitting a rosette, or capturing
 					urGC.TriggerBark(false, urGC.MoveOffFlavor, true);
 					urGC.PointScored(false, pieceToMove);
 					urGC.PlaySoundFX(UrGameController.SoundTrigger.OffBoard, false);
@@ -114,8 +132,18 @@ public class UrAIController : MonoBehaviour
 				
 				if (nextTile.isRosette) 
 				{
-					urGC.ShowAlertText("Opponent Rolls Again");
-					urGC.TriggerBark(false, urGC.RosetteFlavor);
+					if (captureThisTurn) {
+						urGC.ShowAlertText("Captured! And Opponent Rolls Again!");
+					}
+					else {
+						urGC.ShowAlertText("Opponent Rolls Again");
+					}
+
+					if (!showingBark) {
+						urGC.TriggerBark(false, urGC.RosetteFlavor);
+						showingBark = true;
+					}
+
 					urGC.PlaySoundFX(UrGameController.SoundTrigger.Rosette, false);
 					redoTurn = true;
 				}

@@ -52,7 +52,7 @@ public class TavernaMiniGameDialog : MonoBehaviour
 	/// Displays an insult
 	/// </summary>
 	public void DisplayInsult() {
-		Time.timeScale = 0;
+		//Time.timeScale = 0;
 		textBackground.SetActive(true);
 		dialog.text = insultingTexts.RandomElement();
 	}
@@ -61,19 +61,19 @@ public class TavernaMiniGameDialog : MonoBehaviour
 	/// Displays a brag
 	/// </summary>
 	public void DisplayBragging() {
-		Time.timeScale = 0;
+		//Time.timeScale = 0;
 		textBackground.SetActive(true);
 		dialog.text = braggingTexts.RandomElement();
 	}
 
 	public void DisplayFromList(List<string> barkList) {
-		Time.timeScale = 0;
+		//Time.timeScale = 0;
 		textBackground.SetActive(true);
 		dialog.text = barkList.RandomElement();
 	}
 
 	public void CloseDialog() {
-		Time.timeScale = 1;
+		//Time.timeScale = 1;
 		textBackground.SetActive(false);
 	}
 }

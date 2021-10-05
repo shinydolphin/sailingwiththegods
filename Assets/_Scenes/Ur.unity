@@ -248,7 +248,7 @@ MonoBehaviour:
   gameIcon: {fileID: 21300000, guid: f30e2c48dbe1f094e8f3b8b25b9f6d29, type: 3}
   playerBarks: {fileID: 1081637349}
   enemyBarks: {fileID: 1081637350}
-  barkChance: 0.5
+  barkChance: 0.2
   introText: 'A colorful board game and the sailor sitting behind it catch your eye
     in the taverna. He spots you looking and grins, "Come play the game 5000 years
     old! Are you swift as a speeding ship, faster than race horses, as cunning as
@@ -1587,7 +1587,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 0.35
   m_Pitch: 0.8
   Loop: 0
   Mute: 0
@@ -4098,7 +4098,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 3749fccabf3653a4e95426d500eeda88, type: 3}
+  m_audioClip: {fileID: 8300000, guid: c60dcc2ee2f2c8449b7f9885bd64785a, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.15
   m_Pitch: 1

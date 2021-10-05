@@ -11,6 +11,7 @@ public class UrPlayerPiece : UrPiece
 	public LayerMask mask;
 
 	private bool selected = false;
+	private bool showingBark = false;
 
 	private void Start() 
 	{
@@ -108,13 +109,18 @@ public class UrPlayerPiece : UrPiece
 			//If you moved, check for flip or piece off, then pass the turn
 			if (boardIndex != potentialIndex) 
 			{
+				showingBark = false;
 				urGC.PlayMoveSound();
 
 				if (boardIndex != -1) {
 					urGC.playerBoardPositions[boardIndex].ClearOccupied();
 				}
 				else {
-					urGC.TriggerBark(true, urGC.MoveOnFlavor);
+					if (!showingBark) {
+						urGC.TriggerBark(true, urGC.MoveOnFlavor);
+						showingBark = true;
+					}
+
 				}
 				
 				//The "bridge" you go back along starts at index 16 for both player and enemy, so I'm hard-coding it in
@@ -122,15 +128,26 @@ public class UrPlayerPiece : UrPiece
 				if (boardIndex < 16 && potentialIndex >= 16) 
 				{
 					FlipPiece();
-					urGC.TriggerBark(true, urGC.FlipFlavor);
+					if (!showingBark) {
+						urGC.TriggerBark(true, urGC.FlipFlavor);
+						showingBark = true;
+					}
+
 				}
 
 				boardIndex = potentialIndex;
 				//Capture
+				bool captureThisTurn = false;
 				if (urGC.playerBoardPositions[boardIndex].OppositeOccupyingPiece(true)) 
 				{
+					captureThisTurn = true;
 					urGC.playerBoardPositions[boardIndex].RemoveCurrentFromBoard();
-					urGC.TriggerBark(true, urGC.CaptureFlavor);
+					urGC.ShowAlertText("Captured the enemy!");
+					if (!showingBark) {
+						urGC.TriggerBark(true, urGC.CaptureFlavor);
+						showingBark = true;
+					}
+
 					urGC.PlaySoundFX(UrGameController.SoundTrigger.Capture, true);
 				}
 
@@ -149,8 +166,18 @@ public class UrPlayerPiece : UrPiece
 				//If it's a rosette, "switch" to player turn
 				if (urGC.playerBoardPositions[boardIndex].isRosette) 
 				{
-					urGC.ShowAlertText("Roll Again");
-					urGC.TriggerBark(true, urGC.RosetteFlavor);
+					if (captureThisTurn) {
+						urGC.ShowAlertText("Captured the enemy! And Roll Again!");
+					}
+					else {
+						urGC.ShowAlertText("Roll Again");
+					}
+
+					if (!showingBark) {
+						urGC.TriggerBark(true, urGC.RosetteFlavor);
+						showingBark = true;
+					}
+
 					urGC.PlaySoundFX(UrGameController.SoundTrigger.Rosette, true);
 					urGC.SwitchTurn(true);
 				}
