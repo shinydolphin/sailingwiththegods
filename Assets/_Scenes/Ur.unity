@@ -1587,7 +1587,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.35
+  m_Volume: 0.8
   m_Pitch: 0.8
   Loop: 0
   Mute: 0
@@ -3826,6 +3826,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tavernaListener: {fileID: 0}
+  portAudio: Dashboard
 --- !u!114 &1081637347 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7223701339653763312, guid: 7bddbb20614417b4d982059e874b4a90,
@@ -4073,7 +4074,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1174311924
 Transform:
   m_ObjectHideFlags: 0

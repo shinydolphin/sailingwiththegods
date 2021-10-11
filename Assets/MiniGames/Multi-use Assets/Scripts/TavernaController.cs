@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class TavernaController : MonoBehaviour
 {
 	public AudioListener tavernaListener;
+	public string portAudio = "Dashboard";
 
 	private Scene thisScene;
 
@@ -33,7 +34,7 @@ public class TavernaController : MonoBehaviour
 	}
 
 	public void StartTavernaConvo() {
-		LeaveTavernaScene();
+		LeaveTavernaScene(true);
 		Globals.UI.Show<DialogScreen>().StartDialog("Start_Taverna", "taverna");
 	}
 
@@ -114,7 +115,12 @@ public class TavernaController : MonoBehaviour
 		SceneManager.SetActiveScene(scene);
 	}
 
-	public void LeaveTavernaScene() {
+	public void LeaveTavernaScene(bool keepTavernaAudio = false) {
+		if (Globals.GameVars != null && !keepTavernaAudio) 
+		{
+			Globals.GameVars.audioManager.PlaySound(portAudio);
+			Globals.GameVars.playerShipVariables.ToggleBirdsong(true);
+		}
 		Globals.MiniGames.Exit();
 	}
 

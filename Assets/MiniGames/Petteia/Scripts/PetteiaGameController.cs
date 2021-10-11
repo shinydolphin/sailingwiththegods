@@ -14,6 +14,10 @@ public class PetteiaGameController : TavernaGameControllerParent
 	public string playerTag;
 	public string enemyTag;
 
+	public AudioClip playerCaptureSound;
+	public AudioClip enemyCaptureSound;
+	public AudioSource captureSounds;
+
 	[Header("Game Pieces")]
 	public List<PetteiaPlayerPiece> playerPieces;
 	public PetteiaEnemyAI enemyAI;
@@ -182,7 +186,7 @@ public class PetteiaGameController : TavernaGameControllerParent
 						&& positions[x - 1, y] == 2) 
 					{
 						Debug.Log("Enemy captured by player vertically");
-						CapturePiece(x, y);
+						StartCoroutine(CapturePiece(x, y));
 					}
 					
 					if (positions[x, y] == 2
@@ -190,7 +194,7 @@ public class PetteiaGameController : TavernaGameControllerParent
 						&& positions[x - 1, y] == 1) 
 					{
 						Debug.Log("Player captured by enemy vertically");
-						CapturePiece(x, y);
+						StartCoroutine(CapturePiece(x, y));
 					}
 					
 				}
@@ -202,7 +206,7 @@ public class PetteiaGameController : TavernaGameControllerParent
 						&& positions[x, y - 1] == 2) 
 					{
 						Debug.Log("Enemy captured by player horizontally");
-						CapturePiece(x, y);
+						StartCoroutine(CapturePiece(x, y));
 					}
 					
 					if (positions[x, y] == 2
@@ -210,7 +214,7 @@ public class PetteiaGameController : TavernaGameControllerParent
 						&& positions[x, y - 1] == 1) 
 					{
 						Debug.Log("Player captured by enemy horizontally");
-						CapturePiece(x, y);
+						StartCoroutine(CapturePiece(x, y));
 					}
 				}
 			}
@@ -242,6 +246,7 @@ public class PetteiaGameController : TavernaGameControllerParent
 
 	private void WinGame() 
 	{
+		gameOver = true;
 		mgScreen.gameObject.SetActive(true);
 
 		//Minimum pieces left to win is 2, maximum is all 8
@@ -258,26 +263,28 @@ public class PetteiaGameController : TavernaGameControllerParent
 		}
 
 		mgScreen.DisplayText("Petteia: Victory!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
-		gameOver = true;
+
 	}
 
 	private void LoseGame() 
 	{
+		gameOver = true;
 		mgScreen.gameObject.SetActive(true);
 		string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseFlavor.RandomElement();
 		mgScreen.DisplayText("Petteia: Defeat!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
-		gameOver = true;
+
 	}
 	
 	public void BlockingGameOver(bool playerBlocked) 
 	{
 		if (playerBlocked) {
 			//player can't move, has therefore lost
+			gameOver = true;
 			Debug.Log("Player is blocked in");
 			mgScreen.gameObject.SetActive(true);
 			string text = blockedFlavor.RandomElement() + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseFlavor.RandomElement();
 			mgScreen.DisplayText("Petteia: Defeat!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
-			gameOver = true;
+
 		}
 		else {
 			//enemy can't move, player has therefore won
@@ -310,12 +317,23 @@ public class PetteiaGameController : TavernaGameControllerParent
 	/// </summary>
 	/// <param name="i"></param>
 	/// <param name="j"></param>
-	private void CapturePiece(int i, int j) 
+	private IEnumerator CapturePiece(int i, int j) 
 	{
 		BoardSquares[i, j].DestroyPiece();
 		int enemyDone = 0;
 		enemyDone = enemyAI.CheckPieces();
 		int tries = 0;
+
+		//if [i, j] == 1, it's the player capturing the enemy
+		//otherwise, if [i, j] == 2, it's the enemy capturing the player
+		if (positions[i, j] == 1) {
+			captureSounds.clip = playerCaptureSound;
+			captureSounds.Play();
+		}
+		else if (positions[i, j] == 2) {
+			captureSounds.clip = enemyCaptureSound;
+			captureSounds.Play();
+		}
 
 		//This is some really weird code that might not be necessary
 		//Originally, I had this as a coroutine with yield return enemyAI.CheckPieces()
@@ -329,8 +347,12 @@ public class PetteiaGameController : TavernaGameControllerParent
 		{
 			Debug.Log("Waited too long for the enemy to check its pieces");
 		}
-		
-		if (Random.Range(0f, 1f) < barkChance) 
+
+		yield return null;
+		yield return null;
+
+		//If this is the last move of the game and is going to end it, we don't want a bark to pop up underneath the ending UI
+		if (Random.Range(0f, 1f) < barkChance && (enemyAI.pieces.Count > 1 && playerPieces.Count > 1)) 
 		{
 			if (Random.Range(0f, 1f) > 0.5f) 
 			{

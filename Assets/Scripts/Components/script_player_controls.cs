@@ -72,6 +72,7 @@ public class script_player_controls : MonoBehaviour
 	[HideInInspector] public List<string> zonesList = new List<string>();
 
 	private bool checkedStarvingThirsty = false;
+	private bool allowBirdsong = true;
 
 	[Header("Playtesting Bools")]
 	//make sure these are false in Unity's "Inspector" tab before making builds 
@@ -220,8 +221,15 @@ public class script_player_controls : MonoBehaviour
 		UpdateShipSpeed();
 
 		//check for bird song
-		if (rayCheck_playBirdSong) SFX_birdsong.enabled = true;
-		else SFX_birdsong.enabled = false;
+		if (rayCheck_playBirdSong && allowBirdsong) 
+		{
+			SFX_birdsong.enabled = true;
+		}
+		else 
+		{
+			SFX_birdsong.enabled = false;
+		}
+			
 
 
 		// TODO: Make a game state system instead of all these booleans
@@ -330,6 +338,9 @@ public class script_player_controls : MonoBehaviour
 
 	}
 
+	public void ToggleBirdsong(bool toggle) {
+		allowBirdsong = toggle;
+	}
 
 	public void CheckForPlayerNavigationCursor() {
 

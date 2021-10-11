@@ -71,8 +71,9 @@ public class GameVars : MonoBehaviour
 	public GameObject[] sails = new GameObject[6];
 	public GameObject[] shipLevels;
 
-	[Header("Ununorganized Scene Refs")]
+	[Header("Unorganized Scene Refs")]
 	public List<CrewMember> currentlyAvailableCrewMembersAtPort; // updated every time ship docks at port
+	public MenuSwitcherSounds audioManager;
 
 	[Header("GUI Scene Refs")]
 	public script_GUI MasterGUISystem;
