@@ -15,29 +15,46 @@ This game is designed to:
 
 # Setup
 
-This Build uses Unity 2019.4.9f1
+This Build uses Unity **2019.4.9f1**
+
+unityhub://2019.4.9f1/50fe8a171dd9
+
+Pasting that version link into a browser will auto-launch the installer in [Unity Hub](https://unity3d.com/get-unity/download), which we recommend.
 
 While the main game code is open source, the game depends on a private repo for assets purchased from the Unity Asset Store. This should go in the ```Assets/_Proprietary``` folder. Access to the proprietary repo is limited, but if it is missing the project will populate with open source fallback assets upon loading for the first time in Unity.
 
 ## Setup Using SourceTree (recommended)
-* Check if you have / need access to the proprietary repo
-* Download SourceTree
-* If asked, say you want embedded git, and you don't want mercurial
-* So no when asked about loading an SSH key
-* Tools -> Options -> Authentication -> Add
-* Select Github for Hosting Service, leave everything else as it is (HTTPS, OAuth)
-* Click Refresh OAuth Token
-* Authenticate Github in the browser
-* Click the Clone button
-* Make your own fork of the repository on the GitHub website
-* Copy paste the fork's HTTPS url into the URL field on the Clone screen
-* Choose manager-core on the popup that appear, and choose "Always use this"
-* If you get errors cloning the submodule, try going to Repository -> Respository Settings and double click your remote, and make sure Remote Account is your Github, not Generic
-* Click Repository -> Repository Settings
-* Click Add
-* Type "upstream" as the remote name, and paste https://github.com/kddressel/sailingwiththegods.git in as the URL, change to your github account for remote account and click OK
-* Fetch -> And make sure you fetch all remotes (this is the default setting)
-* If needed, right click upstream/branchname and merge into your fork's branch
+* Check if you have / need access to the proprietary repo, and create a Github account if you have not
+  * Send your Github username to Kevin for access
+* Download and Install SourceTree
+  * If asked, say you want embedded git, and you don't want mercurial
+  * When asked if you want Bitbucket Server or Bitbucket, click "Skip"
+  * So no when asked about loading an SSH key
+* Add Github Account to SourceTree
+  * Tools -> Options -> Authentication -> Add
+  * Select Github for Hosting Service, leave everything else as it is (HTTPS, OAuth)
+  * Click Refresh OAuth Token
+  * Authenticate Github in the browser
+* Clone the Repo
+  * [Make your own fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the repository on the GitHub website
+  * Click the Clone button
+  * Copy paste the fork's HTTPS url into the URL field on the Clone screen
+  * Choose manager-core on the popup that appear, and choose "Always use this"
+  * If you get errors cloning the submodule, try going to Repository -> Respository Settings and double click your remote, and make sure Remote Account is your Github, not Generic
+* Add the kddressel repo as upstream remote
+  * Click Repository -> Repository Settings
+  * Click Add
+  * Type "upstream" as the remote name, and paste https://github.com/kddressel/sailingwiththegods.git in as the URL, change to your github account for remote account and click OK
+  * Fetch -> And make sure you fetch all remotes (this is the default setting)
+  * If needed, right click upstream/branchname and merge into your fork's branch
+
+## Unzip the Navmesh
+
+The Main Scene has a NavMesh that's over 100 MB so we have it committed to git as a ZIP file and the actual NavMesh asset is gitignored. After pulling for the first time, you need to unzip. You should see a "Zipped assets have been updated, extract them?" popup. Choose "Yes (recommended)" to automatically extract the zip file.
+
+If you do not see this popup or need to manually unzip, you can either use the SWTG -> Unzip Assets menu, or you can unzip the file manually:
+
+```Assets/_Scenes/Main Scene/NavMesh.zip```
 
 ## Git Setup for Windows
 
@@ -63,13 +80,6 @@ git submodule update --init
 
 Most of the team is using https, but if you would like to use SSH authentication, follow [this guide](docs/ssh-auth.md).
 
-## Unzip the Navmesh
-
-The Main Scene has a NavMesh that's over 100 MB so we have it committed to git as a ZIP file and the actual NavMesh asset is gitignored. After pulling for the first time, you need to unzip. You should see a "Zipped assets have been updated, extract them?" popup. Choose "Yes (recommended)" to automatically extract the zip file.
-
-If you do not see this popup or need to manually unzip, you can either use the SWTG -> Unzip Assets menu, or you can unzip the file manually:
-
-```Assets/_Scenes/Main Scene/NavMesh.zip```
 
 # Documentation
 
