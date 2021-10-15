@@ -248,7 +248,7 @@ MonoBehaviour:
   gameIcon: {fileID: 21300000, guid: f30e2c48dbe1f094e8f3b8b25b9f6d29, type: 3}
   playerBarks: {fileID: 1081637349}
   enemyBarks: {fileID: 1081637350}
-  barkChance: 0.2
+  barkChance: 0.1
   introText: 'A colorful board game and the sailor sitting behind it catch your eye
     in the taverna. He spots you looking and grins, "Come play the game 5000 years
     old! Are you swift as a speeding ship, faster than race horses, as cunning as
@@ -424,6 +424,27 @@ MonoBehaviour:
   - {fileID: 1132440432}
   - {fileID: 674797826}
   - {fileID: 589689530}
+  diceSounds:
+  - {fileID: 8300000, guid: 70b933949f09d4d4cb39a955eb6af5ae, type: 3}
+  - {fileID: 8300000, guid: 996b492ac457c8b4788fc4a681554071, type: 3}
+  - {fileID: 8300000, guid: 784c218ec62556043a9475dfbf0ca916, type: 3}
+  - {fileID: 8300000, guid: 035b7c24282ed0e4283b6ff289ed4c51, type: 3}
+  - {fileID: 8300000, guid: b96d0537a5c47564fa3059078776d5cf, type: 3}
+  - {fileID: 8300000, guid: 239790e902902ee4784ea17f99d14dd2, type: 3}
+  - {fileID: 8300000, guid: 9973d0601b4d5c848b9f6ee119d929e5, type: 3}
+  - {fileID: 8300000, guid: 8fccbc3e2eb03624fbec81893ede7c40, type: 3}
+  - {fileID: 8300000, guid: f990e3336f710944a820ceeff1b84e60, type: 3}
+  - {fileID: 8300000, guid: 2f03bfd803a252a4ebe29d52de973dc6, type: 3}
+  - {fileID: 8300000, guid: ac5a4a6cb61b1da4ebf93378e8e3dad9, type: 3}
+  - {fileID: 8300000, guid: 8cb41883694b65340b7f303dc8d5a7c6, type: 3}
+  - {fileID: 8300000, guid: ec965a0c04e7dca4594154464694710f, type: 3}
+  - {fileID: 8300000, guid: ccf5d642c1d4ac6438d7c60493ca27e4, type: 3}
+  - {fileID: 8300000, guid: e2527568d1ca10544801fc0888f90e16, type: 3}
+  - {fileID: 8300000, guid: 1139fd21454efb64aa20ee403c78c14c, type: 3}
+  - {fileID: 8300000, guid: e52441025d5794b4a9f721ab426ec740, type: 3}
+  - {fileID: 8300000, guid: f92e2ad2ea4840148a93c79cf8992588, type: 3}
+  - {fileID: 8300000, guid: 3e7422413d071eb4a8878f1816b67aee, type: 3}
+  diceSource: {fileID: 1128154921}
 --- !u!114 &206646159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1167,6 +1188,7 @@ Transform:
   - {fileID: 1174311924}
   - {fileID: 576595532}
   - {fileID: 933970870}
+  - {fileID: 1128154920}
   m_Father: {fileID: 206646157}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1587,7 +1609,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.8
+  m_Volume: 0.75
   m_Pitch: 0.8
   Loop: 0
   Mute: 0
@@ -3969,6 +3991,133 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127306563}
   m_CullTransparentMesh: 0
+--- !u!1 &1128154919
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1128154920}
+  - component: {fileID: 1128154921}
+  m_Layer: 0
+  m_Name: DiceSFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1128154920
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128154919}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 689094468}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1128154921
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128154919}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 0.8
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!95 &1132440432 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 1561764041359147879, guid: f1a79682b9df9fd4ca39684691b40bed,

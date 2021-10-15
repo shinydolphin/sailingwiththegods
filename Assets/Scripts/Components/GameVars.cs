@@ -1167,6 +1167,11 @@ public class GameVars : MonoBehaviour
 	//    PLAYER MODIFICATION FUNCTIONS
 	//====================================================================================================   
 
+	/// <summary>
+	/// Changes the player's clout score
+	/// </summary>
+	/// <param name="cloutAdjustment">Change in the clout</param>
+	/// <param name="useMod">If you are writing new code, set this to false</param>
 	public void AdjustPlayerClout(int cloutAdjustment, bool useMod = true) {
 		int cloutModifier = useMod? 100 : 1; //We have a modifier to help link the new system in with the old functions.
 		int clout = (int)playerShipVariables.ship.playerClout;

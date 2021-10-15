@@ -13,6 +13,8 @@ public class UrDiceRoller : MonoBehaviour
 	public Text diceResultText;
 	public float diceSpinTime;
 	public Animator[] diceModels;
+	public AudioClip[] diceSounds;
+	public AudioSource diceSource;
 
 
 	private UrGameController urGC;
@@ -32,8 +34,10 @@ public class UrDiceRoller : MonoBehaviour
 		//which is why we call ResetTrigger
 		yield return null;
 		anim.SetTrigger("Reset");
-		anim.transform.eulerAngles = new Vector3(0f, anim.transform.eulerAngles.y, 0f);
+		anim.transform.eulerAngles = new Vector3(0f, Random.Range(1f, 360f), 0f);
 		anim.SetTrigger(trigger);
+		diceSource.clip = diceSounds[Random.Range(0, diceSounds.Length)];
+		diceSource.Play();
 		yield return null;
 		anim.ResetTrigger("Reset");
 		yield return null;
