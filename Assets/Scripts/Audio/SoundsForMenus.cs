@@ -6,11 +6,12 @@ using UnityEngine.Audio;
 
 public class SoundsForMenus : MonoBehaviour
 {
+#pragma warning disable 0649
 	[SerializeField] private AudioMixerGroup mixer;
 
 	[SerializeField] private Sound[] menuSounds;
 	public static SoundsForMenus instance;
-
+#pragma warning restore 0649
 	// Start is called before the first frame update
 	void Awake() {
 		///////////////////////////////////////////////////////////////////////////
@@ -33,7 +34,6 @@ public class SoundsForMenus : MonoBehaviour
 		foreach (Sound s in menuSounds) {
 			s.source = gameObject.AddComponent<AudioSource>();
 			s.source.outputAudioMixerGroup = mixer;
-
 			s.source.clip = s.clip;
 			s.source.volume = s.volume;
 			s.source.pitch = s.pitch;
@@ -60,6 +60,16 @@ public class SoundsForMenus : MonoBehaviour
 			return;
 		}
 		s.source.Stop();
+	}
+
+	public void StopAllSounds() {
+		foreach (var s in menuSounds) 
+		{
+			if (s.source.isPlaying) 
+			{
+				StopSound(s.name);
+			}
+		}
 	}
 
 	public bool GetSoundIsPlaying(string name) {

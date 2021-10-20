@@ -2,33 +2,84 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UrGameTile : MonoBehaviour
 {
-	public Transform nextTile;
-	public Transform prevTile;
+	public bool isRosette = false;
+	public Image highlight;
+	public Color playerHighlightColor;
+	public Color enemyHighlightColor;
 
-	public Transform nextTileAL;
-	public Transform prevTileAL;
+	private bool occupied = false;
+	private UrPiece currentPiece = null;
+	private UrGameController urGC;
+	
 
-	public bool rosette = false;
-	public int timesLandedOn = 0;
-
-	public GameObject isAvailable;
-
-	private void Awake() {
-		isAvailable = transform.GetChild(0).gameObject;
+	private void Start() {
+		urGC = GameObject.FindWithTag("GameController").GetComponent<UrGameController>();
 	}
-	//public void ShowAvailablePositions(int drv) {
-	//	List<GameTile> aTiles = new List<GameTile>();
-	//	aTiles.Add(nextTile.GetComponent<GameTile>());
-	//	for (int i = 0; i< drv; i++) {
-	//		aTiles[i].available.SetActive(true);
-	//	}
-		
-	//}
 
-	public void ShowAvailable() {
-		isAvailable.SetActive(!isAvailable.activeSelf);
+	public void ShowHighlight(bool toggle, bool isPlayer = true) 
+	{
+		if (toggle) 
+		{
+			if (isPlayer) 
+			{
+				highlight.color = playerHighlightColor;
+			}
+			else {
+				highlight.color = enemyHighlightColor;
+			}
+		}
+
+		if (highlight != null) 
+		{
+			highlight.gameObject.SetActive(toggle);
+		}
+	}
+
+	public void SetOccupied(UrPiece p) 
+	{
+		currentPiece = p;
+		occupied = true;
+	}
+
+	public void ClearOccupied() 
+	{
+		occupied = false;
+		currentPiece = null;
+	}
+	
+	public void RemoveCurrentFromBoard() 
+	{
+		if (currentPiece != null) 
+		{
+			currentPiece.RemovePieceFromBoard();
+			currentPiece = null;
+			occupied = false;
+		}
+	}
+
+	/// <summary>
+	/// Returns true if the piece on the occupying square is not controlled by the player indicated by isPlayer
+	/// </summary>
+	/// <param name="isPlayer"></param>
+	/// <returns></returns>
+	public bool OppositeOccupyingPiece(bool isPlayer) 
+	{
+		if (currentPiece == null) 
+		{
+			return false;
+		}
+		return isPlayer ? currentPiece.CompareTag(urGC.enemyTag) : currentPiece.CompareTag(urGC.playerTag);
+	}
+
+	public bool Occupied 
+	{
+		get 
+		{
+			return occupied;
+		}
 	}
 }

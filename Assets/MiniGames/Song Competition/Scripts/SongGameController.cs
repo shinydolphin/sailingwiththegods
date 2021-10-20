@@ -53,7 +53,7 @@ public class SongGameController : MonoBehaviour
 	public Text scoreText;
     public Text multiText;
    // public Text lyricsText;
-	private Color lyricsColor;
+	//private Color lyricsColor;
 
     //Made static so that there is only one instance of mattsGameManager at a time
     public static SongGameController instance;
@@ -117,7 +117,7 @@ public class SongGameController : MonoBehaviour
 		//not sure if this is used now
         instance = this;
         //lyricsColor = lyricsText.color;  //  sets color to object
-        lyricsColor.a = 0.0f; // makes the color transparent
+        //lyricsColor.a = 0.0f; // makes the color transparent
         
 		
 		//josh's notes set the ending target (may not be used after the last cchanges)

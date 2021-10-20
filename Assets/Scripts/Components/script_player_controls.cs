@@ -72,6 +72,7 @@ public class script_player_controls : MonoBehaviour
 	[HideInInspector] public List<string> zonesList = new List<string>();
 
 	private bool checkedStarvingThirsty = false;
+	private bool allowBirdsong = true;
 
 	[Header("Playtesting Bools")]
 	//make sure these are false in Unity's "Inspector" tab before making builds 
@@ -131,8 +132,8 @@ public class script_player_controls : MonoBehaviour
 		//initialize players ghost route
 		UpdatePlayerGhostRouteLineRenderer(GameVars.IS_NEW_GAME);
 
-		// setup teleport debug tool options (see inspector)
-		teleportToSettlementOptions = GameVars.settlement_masterList.Select(s => s.name).ToList();
+		// setup teleport debug tool options (see inspector)s
+		teleportToSettlementOptions = Globals.GameVars.settlement_masterList.Select(s => s.name).ToList();
 	}
 
 	// Use this for initialization
@@ -220,12 +221,18 @@ public class script_player_controls : MonoBehaviour
 		UpdateShipSpeed();
 
 		//check for bird song
-		if (rayCheck_playBirdSong) SFX_birdsong.enabled = true;
-		else SFX_birdsong.enabled = false;
+		if (rayCheck_playBirdSong && allowBirdsong) 
+		{
+			SFX_birdsong.enabled = true;
+		}
+		else 
+		{
+			SFX_birdsong.enabled = false;
+		}
+			
 
 
 		// TODO: Make a game state system instead of all these booleans
-
 		//TODO: need to update all references to controlsLocked to the MGV.controlsLocked
 		//controlsLocked = MGV.controlsLocked;
 		//If NOT Game Over then go with the regular logic
@@ -331,6 +338,9 @@ public class script_player_controls : MonoBehaviour
 
 	}
 
+	public void ToggleBirdsong(bool toggle) {
+		allowBirdsong = toggle;
+	}
 
 	public void CheckForPlayerNavigationCursor() {
 
@@ -512,8 +522,7 @@ public class script_player_controls : MonoBehaviour
 	public void TravelToSelectedTarget(Vector3 destination) {
 		//Let's slowly rotate the ship towards the direction it's traveling and then allow the ship to move
 		if (!shipTravelStartRotationFinished) {
-
-
+			
 			destination = new Vector3(destination.x, shipTransform.position.y, destination.z);
 			Vector3 temprot = Vector3.RotateTowards(shipTransform.forward, Vector3.Normalize(destination - shipTransform.position), .1f, 0.0F);
 			Vector3 targetDirection = Vector3.Normalize(destination - shipTransform.position);

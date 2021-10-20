@@ -9,7 +9,7 @@ using TMPro;
 namespace Nav {
 	public class Navigation : MonoBehaviour
 	{
-
+#pragma warning disable 0649
 		[SerializeField] private GameObject titleScreen = null;
 		Transform player;
 		private NavCity cities;
@@ -26,9 +26,9 @@ namespace Nav {
 		private bool startNavigation = false;
 		private bool coroutineOn = false;
 		private Vector3 nextPoint;
-		private String position;
+		private string position;
 		private int? _crewID;
-
+#pragma warning restore 0649
 
 		private void Start() {
 			cities = new NavCity();
@@ -124,19 +124,24 @@ namespace Nav {
 			string Saildirecation = "Current direction of the ship is sail to the " + FindDirection(angle2) + ".";
 			return Saildirecation;
 		}
-		string getAIPath(Vector3 target,float radius) {
+		string getAIPath(Vector3 target,float radius) 
+		{
 			navAgent.stoppingDistance = radius;
 			navAgent.SetDestination(target);
 			Vector3[] path = navAgent.path.corners;
 			lineRenderer.positionCount = navAgent.path.corners.Length;
 			//NavMeshAgent.SetDestination is asynchronous, so "the path may not become available until after a few frames later" so check if there is a path first 
 			if (path.Length <= 1) {
+			
 				return "";
 			}
-			if(lineRendererON){
+			if (lineRendererON) {
 				for (int i = 0; i < path.Length; i++) {
-				lineRenderer.SetPosition(i, path[i]);
+					lineRenderer.SetPosition(i, path[i]);
+				}
 			}
+			else {
+				lineRenderer.enabled = false;
 			}
 			//get next point
 			if (path.Length > 3) {
