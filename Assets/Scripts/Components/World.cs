@@ -51,6 +51,8 @@ public class World : MonoBehaviour
 
 	[Header("Ununorganized Scene Refs")]
 	public List<CrewMember> currentlyAvailableCrewMembersAtPort; // updated every time ship docks at port
+	public MenuSwitcherSounds audioManager;
+
 	[Header("GUI Scene Refs")]
 	public GameObject selection_ring;
 

@@ -52,6 +52,37 @@ public class CityDetailsViewModel : CityViewModel
 
 	}
 
+	public static List<Resource> AbundantResource(Settlement city) 
+	{
+		PriceInfo[] PriceInfos = city.cargo.Select(resource => new PriceInfo {
+					Resource = resource,
+					Price = Globals.Game.Session.Trade.GetPriceOfResource(resource.name, city),
+					AvgPrice = Globals.Game.Session.Trade.GetAvgPriceOfResource(resource.name)
+				}).ToArray();
+
+		IEnumerable<PriceInfo> mostAbundant = PriceInfos.OrderBy(o => o.Price - o.AvgPrice).Take(5);
+		List<Resource> mostAbundantResources = new List<Resource>();
+		foreach (PriceInfo p in mostAbundant) {
+			mostAbundantResources.Add(p.Resource);
+		}
+		return mostAbundantResources;
+	}
+
+	public static List<Resource> ScarceResource(Settlement city) {
+		PriceInfo[] PriceInfos = city.cargo.Select(resource => new PriceInfo {
+			Resource = resource,
+			Price = Globals.Game.Session.Trade.GetPriceOfResource(resource.name, city),
+			AvgPrice = Globals.Game.Session.Trade.GetAvgPriceOfResource(resource.name)
+		}).ToArray();
+
+		IEnumerable<PriceInfo> mostScarce = PriceInfos.OrderByDescending(o => o.Price - o.AvgPrice).Take(5);
+		List<Resource> mostScarceResources = new List<Resource>();
+		foreach (PriceInfo p in mostScarce) {
+			mostScarceResources.Add(p.Resource);
+		}
+		return mostScarceResources;
+	}
+
 	void OnCrewClicked(CrewManagementMemberViewModel crew) {
 
 		// hide a previous details view if one was already showing so they don't stack on top of eachother and confuse the user

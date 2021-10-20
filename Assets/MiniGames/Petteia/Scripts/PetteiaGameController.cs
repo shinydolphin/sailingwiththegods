@@ -6,16 +6,22 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class PetteiaGameController : MonoBehaviour
+public class PetteiaGameController : TavernaGameControllerParent
 {
+	[Header("Petteia Variables")]
 	public Vector2Int rewardAmts;
+
+	public string playerTag;
+	public string enemyTag;
+
+	public AudioClip playerCaptureSound;
+	public AudioClip enemyCaptureSound;
+	public AudioSource captureSounds;
 
 	[Header("Game Pieces")]
 	public List<PetteiaPlayerPiece> playerPieces;
 	public PetteiaEnemyAI enemyAI;
-
-	public AudioSource moveSound;
-
+	
 	[Header("Board Positions")]
 	public PetteiaBoardPosition[] squaresRow0 = new PetteiaBoardPosition[8];
 	public PetteiaBoardPosition[] squaresRow1 = new PetteiaBoardPosition[8];
@@ -26,32 +32,38 @@ public class PetteiaGameController : MonoBehaviour
 	public PetteiaBoardPosition[] squaresRow6 = new PetteiaBoardPosition[8];
 	public PetteiaBoardPosition[] squaresRow7 = new PetteiaBoardPosition[8];
 	[HideInInspector] public int[,] positions = new int[8, 8];
-
-	[Header("UI")]
-	public MiniGameInfoScreen mgScreen;
-	public TavernaMiniGameDialog playerBarks;
-	public TavernaEnemyDialog enemyBarks;
-	public Sprite gameIcon;
-	public float barkChance = 0.25f;
-
-	[Header("Text")]
-	public string introText;
-	[TextArea(2, 30)]
-	public string instructions;
-	public string winText;
-	public string loseText;
 	
-	[TextArea(1, 8)]
-	public string debugPiecePositions;
+	[Header("Debug")]
+	
+	[ReadOnly] [TextArea(0, 8)] public string debugPiecePositions;
 	
 	private bool playerTurn;
 	private bool gameOver = false;
+	private List<string> flavor;
+	private List<string> winFlavor;
+	private List<string> loseFlavor;
+	private List<string> blockedFlavor;
 	
 	void Start() 
 	{
+		if (Globals.Database != null) 
+		{
+			flavor = Globals.Database.petteiaGameFlavor;
+			winFlavor = Globals.Database.petteiaGameWin;
+			loseFlavor = Globals.Database.petteiaGameLost;
+			blockedFlavor = Globals.Database.petteiaGameBlocked;
+		}
+		else 
+		{
+			flavor = new List<string> { "Petteia flavor 1", "Petteia flavor 2", "Petteia flavor 3" };
+			winFlavor = new List<string> { "Petteia win flavor 1", "Petteia win flavor 2", "Petteia win flavor 3" };
+			loseFlavor = new List<string> { "Petteia lose flavor 1", "Petteia lose flavor 2", "Petteia lose flavor 3" };
+			blockedFlavor = new List<string> { "Petteia blocked flavor 1", "Petteia blocked flavor 2", "Petteia blocked flavor 3" };
+		}
+
 		mgScreen.gameObject.SetActive(true);
-		string text = introText + "\n\n" + instructions + "\n\n" + "flavor";
-		mgScreen.DisplayText("Petteia", "Taverna game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaStart);
+		string text = introText + "\n\n" + instructions + "\n\n" + flavor.RandomElement();
+		mgScreen.DisplayText("Petteia: An Introduction", "Taverna game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaStart);
 		enemyAI = GetComponent<PetteiaEnemyAI>();
 		playerTurn = true;
 
@@ -82,25 +94,13 @@ public class PetteiaGameController : MonoBehaviour
 		}
 	}
 
-	public void PauseMinigame() 
+	public override void PauseMinigame() 
 	{
-		mgScreen.gameObject.SetActive(true);
-		Time.timeScale = 0;
-		mgScreen.DisplayText("Petteia", "Taverna game", instructions, gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
+		base.PauseMinigame();
+		mgScreen.DisplayText("Petteia: Instructions and History", "Taverna game", instructions + "\n\n" + history, gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
 	}
 
-	public void UnpauseMinigame() 
-	{
-		mgScreen.gameObject.SetActive(false);
-		Time.timeScale = 1;
-	}
-
-	public void ExitMinigame() 
-	{
-		TavernaController.BackToTavernaMenu();
-	}
-
-	public void RestartMinigame() 
+	public override void RestartMinigame() 
 	{
 		TavernaController.ReloadTavernaGame("Petteia");
 	}
@@ -149,15 +149,6 @@ public class PetteiaGameController : MonoBehaviour
 		}
 	}
 
-	/// <summary>
-	/// Plays the movement sound at a random pitch
-	/// </summary>
-	public void PlayMoveSound() 
-	{
-		moveSound.pitch = Random.Range(0.7f, 1.1f);
-		moveSound.Play();
-	}
-
 	private void InitalStateSetup() 
 	{
 		//1 - enemy
@@ -195,7 +186,7 @@ public class PetteiaGameController : MonoBehaviour
 						&& positions[x - 1, y] == 2) 
 					{
 						Debug.Log("Enemy captured by player vertically");
-						CapturePiece(x, y);
+						StartCoroutine(CapturePiece(x, y));
 					}
 					
 					if (positions[x, y] == 2
@@ -203,7 +194,7 @@ public class PetteiaGameController : MonoBehaviour
 						&& positions[x - 1, y] == 1) 
 					{
 						Debug.Log("Player captured by enemy vertically");
-						CapturePiece(x, y);
+						StartCoroutine(CapturePiece(x, y));
 					}
 					
 				}
@@ -215,7 +206,7 @@ public class PetteiaGameController : MonoBehaviour
 						&& positions[x, y - 1] == 2) 
 					{
 						Debug.Log("Enemy captured by player horizontally");
-						CapturePiece(x, y);
+						StartCoroutine(CapturePiece(x, y));
 					}
 					
 					if (positions[x, y] == 2
@@ -223,7 +214,7 @@ public class PetteiaGameController : MonoBehaviour
 						&& positions[x, y - 1] == 1) 
 					{
 						Debug.Log("Player captured by enemy horizontally");
-						CapturePiece(x, y);
+						StartCoroutine(CapturePiece(x, y));
 					}
 				}
 			}
@@ -243,43 +234,57 @@ public class PetteiaGameController : MonoBehaviour
 		//Player win
 		if (enemyAI.pieces.Count <= 1) 
 		{
-			mgScreen.gameObject.SetActive(true);
-
-			//Minimum pieces left to win is 2, maximum is all 8
-			//So we need to map [rewardAmt.x rewardAmt.y] to [2, 8]
-			float oldRange = 6f;
-			float newRange = rewardAmts.y - rewardAmts.x;			
-			int reward = Mathf.CeilToInt(((playerPieces.Count - 2) * (newRange * 1.0f) / oldRange) + rewardAmts.x);
-
-			string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!";
-
-			if (Globals.World != null) 
-			{
-				Globals.Game.Session.playerShipVariables.ship.AddToFoodAndWater(reward);
-			}
-
-			mgScreen.DisplayText("Petteia Victory", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
-			gameOver = true;
+			WinGame();
 		}
 
 		//Player loss
-		if (playerPieces.Count <= 1) {
-			mgScreen.gameObject.SetActive(true);
-			string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!";
-			mgScreen.DisplayText("Petteia Loss", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
-			gameOver = true;
+		if (playerPieces.Count <= 1) 
+		{
+			LoseGame();
 		}
+	}
+
+	private void WinGame() 
+	{
+		gameOver = true;
+		mgScreen.gameObject.SetActive(true);
+
+		//Minimum pieces left to win is 2, maximum is all 8
+		//So we need to map [rewardAmt.x rewardAmt.y] to [2, 8]
+		float oldRange = 6f;
+		float newRange = rewardAmts.y - rewardAmts.x;
+		int reward = Mathf.CeilToInt(((playerPieces.Count - 2) * (newRange * 1.0f) / oldRange) + rewardAmts.x);
+
+		string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!" + "\n\n" + winFlavor.RandomElement();
+
+		if (Globals.Game.Session != null) 
+		{
+			Globals.Game.Session.playerShipVariables.ship.AddToFoodAndWater(reward);
+		}
+
+		mgScreen.DisplayText("Petteia: Victory!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+
+	}
+
+	private void LoseGame() 
+	{
+		gameOver = true;
+		mgScreen.gameObject.SetActive(true);
+		string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseFlavor.RandomElement();
+		mgScreen.DisplayText("Petteia: Defeat!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+
 	}
 	
 	public void BlockingGameOver(bool playerBlocked) 
 	{
 		if (playerBlocked) {
 			//player can't move, has therefore lost
+			gameOver = true;
 			Debug.Log("Player is blocked in");
 			mgScreen.gameObject.SetActive(true);
-			string text = "Lost because of blocking" + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!";
-			mgScreen.DisplayText("Petteia Loss", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
-			gameOver = true;
+			string text = blockedFlavor.RandomElement() + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseFlavor.RandomElement();
+			mgScreen.DisplayText("Petteia: Defeat!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+
 		}
 		else {
 			//enemy can't move, player has therefore won
@@ -312,12 +317,23 @@ public class PetteiaGameController : MonoBehaviour
 	/// </summary>
 	/// <param name="i"></param>
 	/// <param name="j"></param>
-	private void CapturePiece(int i, int j) 
+	private IEnumerator CapturePiece(int i, int j) 
 	{
 		BoardSquares[i, j].DestroyPiece();
 		int enemyDone = 0;
 		enemyDone = enemyAI.CheckPieces();
 		int tries = 0;
+
+		//if [i, j] == 1, it's the player capturing the enemy
+		//otherwise, if [i, j] == 2, it's the enemy capturing the player
+		if (positions[i, j] == 1) {
+			captureSounds.clip = playerCaptureSound;
+			captureSounds.Play();
+		}
+		else if (positions[i, j] == 2) {
+			captureSounds.clip = enemyCaptureSound;
+			captureSounds.Play();
+		}
 
 		//This is some really weird code that might not be necessary
 		//Originally, I had this as a coroutine with yield return enemyAI.CheckPieces()
@@ -331,8 +347,12 @@ public class PetteiaGameController : MonoBehaviour
 		{
 			Debug.Log("Waited too long for the enemy to check its pieces");
 		}
-		
-		if (Random.Range(0f, 1f) < barkChance) 
+
+		yield return null;
+		yield return null;
+
+		//If this is the last move of the game and is going to end it, we don't want a bark to pop up underneath the ending UI
+		if (Random.Range(0f, 1f) < barkChance && (enemyAI.pieces.Count > 1 && playerPieces.Count > 1)) 
 		{
 			if (Random.Range(0f, 1f) > 0.5f) 
 			{
@@ -401,7 +421,7 @@ public class PetteiaGameController : MonoBehaviour
 	public void MovePiece(Vector2Int oldPos, Vector2Int newPos, string tag) 
 	{
 		positions[oldPos.x, oldPos.y] = 0;
-		positions[newPos.x, newPos.y] = tag == "PetteiaW" ? 2 : 1;
+		positions[newPos.x, newPos.y] = tag == playerTag ? 2 : 1;
 	}
 
 	

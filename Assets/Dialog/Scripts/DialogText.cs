@@ -39,9 +39,9 @@ public class DialogText
 
 	private Type textType;
 	private Emotion textEmotion;
-	private string cityType;
+	//private string cityName;
 	private string text;
-	private string[] textQA;
+	//private string[] textQA;
 
 	public DialogText(Type t, Emotion e, string s) 
 	{
@@ -50,11 +50,11 @@ public class DialogText
 		text = s;
 	}
 
-	public DialogText(string c, string[] s) 
-	{
-		cityType = c;
-		textQA = s;
-	}
+	//public DialogText(string city, string[] textQuestionAnswer) 
+	//{
+	//	cityName = city;
+	//	textQA = textQuestionAnswer;
+	//}
 
 	public DialogText(string t, string e, string s) 
 	{
@@ -78,16 +78,16 @@ public class DialogText
 		get { return text; }
 	}
 
-	public string CityType 
-	{
-		get { return cityType; }
-	}
+	//public string CityType 
+	//{
+	//	get { return cityName; }
+	//}
 
-	public string[] TextQA 
-	{
-		get { return textQA;  }
-		set { textQA = value; }
-	}
+	//public string[] TextQA 
+	//{
+	//	get { return textQA;  }
+	//	set { textQA = value; }
+	//}
 
 	/// <summary>
 	/// Returns a random emotion other than neutral

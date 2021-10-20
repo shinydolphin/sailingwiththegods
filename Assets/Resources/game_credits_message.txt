@@ -26,6 +26,9 @@ Sara E. Palmer – Digital Text Specialist, Emory Center for Digital Scholarship
 
 Sara Palmer received an MA in Film and Media Studies from Emory University in 2012. At the Emory Center for Digital Scholarship, she consults with researchers on creating online exhibits, designing databases, generating network visualizations, and performing textual markup and analysis.
 
+Evie Wang Edmundson – Freelance Composer and Producer
+
+Evie Wang Edmundson graduated from Agnes Scott College in 2018 with a BA in Music and a minor in Classical Civilization. She created the ambience soundtrack for the taverna as well as mini-game sound effects in Sailing with the Gods.
 
 Craig Brasco – Visual Interface Collaborator, Kennesaw State University, Assistant Professor of Art | Graphic Communications
 
@@ -45,6 +48,46 @@ Olivia Te Kolste - SIRE student and 3D modeler, Emory University (2020-)
 Olivia Te Kolste is an undergraduate at Emory University, working on the Sailing with the Gods project through Emory's SIRE program for 2020-2021. Olivia will be working on developing historically informed 3D models of environments and mythical elements for the game.
 
 
+Josh Bowdoin – Game Design and Programming, Kennesaw State University (2021-)
+
+Josh Bowdoin is a student at Kennesaw State University (2021). He is programming the second version of the Greek singing contest Taverna game, which will be playable in port (version 5.6+). You can find out more about him and his work on his portfolio site: https://joshuabowdoin.com/.
+
+
+Benjamin Rigg – Game Design and Programming, Kennesaw State University (2021)
+
+Benjamin Rigg is a student at Kennesaw State University (2021) and is working with Leroyia Payne, Tuan Trinh, and Kenny Tran.
+
+
+Leroyia Payne – Game Design and Programming, Kennesaw State University (2021)
+
+Leroyia Payne is a student at Kennesaw State University (2021) and is working with Benjamin Rigg, Tuan Trinh, and Kenny Tran.
+
+
+Kenny Tran – Game Design and Programming, Kennesaw State University (2021)
+
+Kenny Tran is a student at Kennesaw State University (2021) and is working with Leroyia Payne, Tuan Trinh, and Benjamin Rigg.
+
+
+Tuan Trinh – Game Design and Programming, Kennesaw State University (2021)
+
+Tuan Trinh is a student at Kennesaw State University (2021) and is working with Benjamin Rigg, Leroyia Payne, and Kenny Tran.
+
+
+Meagan Denton – Game Design and Programming, Kennesaw State University (2021)
+
+Meagan Denton is a student at Kennesaw State University (2021) and is working with Colton Hall and Roman Mazzoni.
+
+
+Colton Hall – Game Design and Programming, Kennesaw State University (2021)
+
+Colton Hall is a student at Kennesaw State University (2021) and is working with Meagan Denton and Roman Mazzoni.
+
+
+Roman Mazzoni – Game Design and Programming, Kennesaw State University (2021)
+
+Roman Mazzoni is a student at Kennesaw State University (2021) and is working with Colton Hall and Meagan Denton.
+
+
 Hakeem Thomas – Game Design and Programming, Kennesaw State University (2021)
 
 Hakeem Thomas is a student at Kennesaw State University (2021). He is developing the kottabos game for the Taverna, which will be playable in port (version 5.6+).
@@ -58,11 +101,6 @@ Jarid Coronado is a student at Kennesaw State University (2021). He is adding an
 Jinsong Jiang – Game Design and Programming, Kennesaw State University (2021)
 
 Jinsong Jiang is a student at Kennesaw State University (2021). He is programming a new interactive guide, who can be hired in the Taverna or gotten from among the player's crew, to guide the player to a new port. This will be playable throughout the game (version 5.6+).
-
-
-Josh Bowdoin – Game Design and Programming, Kennesaw State University (2021)
-
-Josh Bowdoin is a student at Kennesaw State University (2021). He is programming the second version of the Greek singing contest Taverna game, which will be playable in port (version 5.6+).
 
 
 Matt Mitchell – Game Design and Programming, Kennesaw State University (2020)
@@ -119,6 +157,15 @@ Robert Bryant was the Lead Programmer and Simulation Designer behind the Samothr
 
 Dr. Rongkai Guo – Outreach and Consultant, Kennesaw State University, Assistant Professor in the Department of Software Engineering and Game Development (2019-2020)
 
+
+Game Music:
+
+Special thanks to Dr. John Franklin, Professor and Chair of the Department of Classics at the University of Vermont, for providing recordings of his ancient Greek musical impressions. These can be heard during the singing competition game in the Taverna at port (game version 5.4+). See further https://soundcloud.com/slymoonbeast/sets/the-cyprosyrian-girl.
+
+The audio tracks of creaking boards on the boat and at dock, as well as the soundtrack of the Town menu were created by Jarid Coronado (game version 5.6+).
+
+The Taverna ambience soundtrack, as well as sound effects used in Ur and other mini-games were created by Evie Wang Edmundson (game version 5.6+).
+
 Illustrations:
 
 Some game illustrations are licensed by the artists. Individual licenses will be listed here. A Creative Commons Attribution Non-Commerical 4.0 License (cc-by-nc) is applicable to any illustrations for which a license is not specified.
@@ -157,6 +204,16 @@ Additional Illustrations:
     Additional Coin Illustrations: The coins from Kos, Miletus, Tegea, Pherae, Phthia, Phylace, and Karthaia are from Brøndsted, Peter Oluf. 1826. Reisen und Untersuchungen in Griechenland nebst Darstellung und Erklärung vieler neuentdeckten Denkmäler griechischen Styls, und einer kritischen übersicht aller unternehmungen dieser Art, von Pausanias bis auf unsere Zeiten. In acht Büchern. Paris: Firmin Didot. http://catalog.hathitrust.org/api/volumes/oclc/3852457.html. CC-PD
 
     Taverna Illustration: Bompiani, Roberto. 19th century. A Roman Feast. https://www.getty.edu/art/collection/objects/612/roberto-bompiani-a-roman-feast-italian-late-19th-century/ No copyright- United States (https://rightsstatements.org/vocab/NoC-US/1.0/).
+    
+    Kottabos Illustrations and 3Dmodels (game version 5.6+):
+
+    Hellenistic tomb paintings at Sidonian Burial Caves (Detail of two animals). Photographed by Ian Scott. https://commons.wikimedia.org/wiki/Category:Sidonian_Burial_Caves#/media/File:Hellenistic_tomb_paintings_at_Sidonian_Burial_Caves_(9).jpg (CC-BY-SA 2.0)
+    Textures from 3D Textures. https://3dtextures.me/about/ (all CC0).
+    Kottabos Element of a Dancing Satyr (470-450 BC). Italy, Etruscan, 5th century. Bronze. Overall: 15 cm (5 7/8 in.). Purchase from the J. H. Wade Fund 1974.16 https://sketchfab.com/3d-models/197416-kottabos-element-of-a-dancing-satyr-34d0cda5076c4c52a8ce2eecd2d192c6 (CC0).
+    Lekane with Lid. Museo Archeologico di Aidone, Aidone, Sicily, Italy. Catalogue Number: 61-704 / EN10575. Citation: The data for this project were originally collected as a joint effort between the University of Catania and CVAST at the University of South Florida (USF), with the collaboration of the Fondazione Bruno Kessler (FBK). Dr. Mariarita Sgarlata and Dr. Herbert Maschner, Principal Investigators. We gratefully acknowledge the participation of the administrators of the Villa Romana del Casale and the Museo Archeologico di Aidone. The data have been transferred to Global Digital Heritage (GDH) for processing and analysis. Funding for this project, both at USF and at GDH, has been provided by the Hitz Foundation, Herbert Maschner, Principal Investigator. https://sketchfab.com/3d-models/lekane-with-lid-2abcffaade774dfa984b1950da586ce8 (CC-BY-NC).
+    Lion keychain 3D Print (Used in the Kottabos game in the Taverna table leg). Created by AMJ3D. https://cults3d.com/en/3d-model/art/lion-keychain-3d-print (CC-BY)
+    Drinkschaal (kylix/Sianaschaal); symposium scène. Aardewerk, Malibu schilder, Athene (Griekenland), 575-550 v. Chr. [inv. APM13802]. scanned by: 4Dresearchlab in 2019. https://sketchfab.com/3d-models/drinkschaal-kylixsianaschaal-symposium-scene-19f91ca0e7944e3ebd22ecd8d9c9c4b6 (CC-BY)
+    Oxybapha. Hakeem Thomas. 2021. CC-BY-NC
 
     Singing Game Illustration: Braun, Louis, et al. 1893. "Nro. 531." in Braun, Louis, von Diez, Wilhelm, Frölich, Ernst, Gehrts, Johannes, and Carl von Haeberlin. Zur geschichte der kostume. 125 bogen, enthaltend 500 kostumbilder aus verschiedenen jahrhunderten nach zeichnungen. Munich: Braun & Schneider. Contributed to the Internet Archive by the State Library of Pennsylvania, made possible by a grant from the Institute of Museum and Library Services as administered by the Pennsylvania Department of Education through the Office of Commonwealth Libraries. Public Domain. https://archive.org/details/zurgeschichteder00brau/page/n119/mode/2up
 
@@ -191,6 +248,10 @@ Kyrenia Ancient Trade Ship - Turbosquid Royalty Free License
 Tree pack 1 - Turbosquid Royalty Free License
 Cartoon trees - Turbosquid Royalty Free License
 Low Poly Palms by Rusoski - CC Attribution - Sketchfab  https://sketchfab.com/Rusoski 
+Kottabos Element of a Dancing Satyr (470-450 BC) - CC0
+Lekane with Lid. Museo Archeologico di Aidone, Aidone, Sicily, Italy. Catalogue Number: 61-704 / EN10575. Citation: The data for this project were originally collected as a joint effort between the University of Catania and CVAST at the University of South Florida (USF), with the collaboration of the Fondazione Bruno Kessler (FBK). Dr. Mariarita Sgarlata and Dr. Herbert Maschner, Principal Investigators. We gratefully acknowledge the participation of the administrators of the Villa Romana del Casale and the Museo Archeologico di Aidone. The data have been transferred to Global Digital Heritage (GDH) for processing and analysis. Funding for this project, both at USF and at GDH, has been provided by the Hitz Foundation, Herbert Maschner, Principal Investigator - CC-BY-NC
+Lion keychain 3D Print (Used in the Kottabos game in the Taverna table leg). Created by AMJ3D - CC-BY
+Drinkschaal (kylix/Sianaschaal); symposium scène. Aardewerk, Malibu schilder, Athene (Griekenland), 575-550 v. Chr. [inv. APM13802]. scanned by: 4Dresearchlab in 2019 - CC-BY.
 
 
 3rd Party Libraries:

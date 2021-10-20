@@ -4,333 +4,449 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UrGameController : MonoBehaviour
+public class UrGameController : TavernaGameControllerParent
 {
-	public List<UrGameTile> boardPositions;
-	public List<UrGameTile> eBoardPositions;
-	public List<UrCounter> counters;
-	public List<UrCounter> eCounters;
-	public DiceRoller dice;
-	public Text dvText;
-	private int diceValue = 0;
-	public int countersOffBoard = 7;
-	public int countersOnBoard = 0;
-	public int enemyCountersOnBoard;
-	public Camera cam;
-	public bool selectingObject = false;
-	public bool isPlayerTurn;
-	public bool selectingBoardPosition = false;
-	public UrCounter selectedCounter;
-	public GameObject rollDiceButton;
-	public Animator aiAnim;
-	private Animator playerArms;
-	public int playerScore = 0;
-	public int enemyScore = 0;
-	public Text playerScoreText;
-	public Text enemyScoreText;
+	[Header("Ur Variables")]
+	public Vector2Int rewardAmts;
+
+	[Header("Player")]
+	public string playerTag;
+	public List<UrPiece> playerPieces;
+	public List<UrGameTile> playerBoardPositions;
+	public GameObject playerPathLine;
+
+	[Header("Enemy")]
+	public string enemyTag;
+	public List<UrGameTile> enemyBoardPositions;
+	public GameObject enemyPathLine;
+
+	[Header("UI")]
+	public Camera mainCam;
+	[Range(0f, 1f)]
+	public float bragToInsultRatio = 0.66f;
+	public Button rollDiceButton;
+	public Text alertText;
+	public float alertShowTime;
+	public float alertFadeSpeed;
+
+	[Header("Audio")]
+	public AudioSource sfxAud;
+	public AudioClip[] rosetteSounds;
+	public AudioClip[] captureSounds;
+	public AudioClip[] lostTurnSounds;
+	public AudioClip[] offBoardSounds;
+
+	private bool isGameOver = false;
+	private int currentRoll;
+	private bool isPlayerTurn = true;
+	private bool allowPlayerMove = false;
+
+	private UrDiceRoller dice;
+	[HideInInspector] public UrAIController enemyAI;
+
+	private Color baseAlertColor;
+	private Outline alertOutline;
+	private Color baseOutlineColor;
+	private Coroutine fadeCoroutine;
+
+	private List<string> introFlavor;
+	private List<string> winFlavor;
+	private List<string> loseFlavor;
+	private List<string> rosetteFlavor;
+	private List<string> captureFlavor;
+	private List<string> flipFlavor;
+	private List<string> moveOffFlavor;
+	private List<string> moveOnFlavor;
 
 	public void Awake() {
-		playerArms = dice.playerAnimator;
-	}
+		//Assign variables
+		enemyAI = GetComponent<UrAIController>();
+		dice = GetComponent<UrDiceRoller>();
 
-	public void Update() {
-		if(Input.GetKeyDown("p")) {
-			EnemyTurn();
+		//Show the UI
+		mgScreen.gameObject.SetActive(true);
+
+		if (Globals.Database != null) {
+			introFlavor = Globals.Database.urGameIntro;
+			winFlavor = Globals.Database.urGameWin;
+			loseFlavor = Globals.Database.urGameLost;
+			rosetteFlavor = Globals.Database.urGameRosette;
+			captureFlavor = Globals.Database.urGameCapture;
+			flipFlavor = Globals.Database.urGameFlip;
+			moveOffFlavor = Globals.Database.urGameMoveOff;
+			moveOnFlavor = Globals.Database.urGameMoveOn;
 		}
-		if(!isPlaying(playerArms, "RollDiceLoop")) { 
-			if (selectingObject) {
-				if (Input.GetMouseButtonDown(0) && diceValue > 0) {
-					foreach (UrCounter c in counters) {
-						c.GetComponent<CapsuleCollider>().enabled = true;
-					}
-					Ray ray;
-					RaycastHit hit;
-					ray = cam.ScreenPointToRay(Input.mousePosition);
+		else {
+			introFlavor = new List<string> { "Ur intro flavor 1", "Ur intro flavor 2", "Ur intro flavor 3" };
+			winFlavor = new List<string> { "Ur win flavor 1", "Ur win flavor 2", "Ur win flavor 3" };
+			loseFlavor = new List<string> { "Ur lose flavor 1", "Ur lose flavor 2", "Ur lose flavor 3" };
+			rosetteFlavor = new List<string> { "Ur rosette flavor 1", "Ur rosette flavor 2", "Ur rosette flavor 3" };
+			captureFlavor = new List<string> { "Ur capture flavor 1", "Ur capture flavor 2", "Ur capture flavor 3" };
+			flipFlavor = new List<string> { "Ur flip flavor 1", "Ur flip flavor 2", "Ur flip flavor 3" };
+			moveOffFlavor = new List<string> { "Ur move off flavor 1", "Ur move off flavor 2", "Ur move off flavor 3" };
+			moveOnFlavor = new List<string> { "Ur move on flavor 1", "Ur move on flavor 3", "Ur move on flavor 3" };
+		}
 
-					if (Physics.Raycast(ray, out hit, 50)) {
-						if (hit.collider.GetComponent<UrCounter>() != null && hit.collider.tag == "PlayerTile") {
-							//if(hit.)
-							CounterSelected(hit.collider.GetComponent<UrCounter>());
-						}
-					}
-				}
+		string text = introText + "\n\n" + instructions + "\n\n" + introFlavor.RandomElement();
+		mgScreen.DisplayText("The Game of Ur: An Introduction", "Taverna game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaStart);
 
-			}
-			//Does this need to be in update or can it be called less frequently?
-			if (selectingBoardPosition) {
-				Debug.Log("Selecting Board Position");
-				if (Input.GetMouseButtonDown(0)) {
-					//foreach (Counter c in counters) {
-					//	c.GetComponent<CapsuleCollider>().enabled = false;
-					//}
-					Ray ray;
-					RaycastHit hit;
-					ray = cam.ScreenPointToRay(Input.mousePosition);
-
-					if (Physics.Raycast(ray, out hit, 50)) {
-						if (hit.collider.tag == "GameBoard") {
-							if (!selectedCounter.onBoard) {
-								countersOffBoard--;
-								countersOnBoard++;
-							}
-							Debug.Log("Gameboard Hit");
-							CounterSelected(selectedCounter);
-							if (boardPositions.IndexOf(hit.collider.transform.parent.GetComponent<UrGameTile>()) == 19) { PointScored(true); selectedCounter.PlaceOnBoard(hit.collider.transform.parent.GetComponent<UrGameTile>(), true, false, true); /*selectedCounter.enabled = false;*/ }
-							else {
-								if (boardPositions.IndexOf(hit.collider.transform.parent.GetComponent<UrGameTile>()) >= 13) { selectedCounter.PlaceOnBoard(hit.collider.transform.parent.GetComponent<UrGameTile>(), true, false, false); if (IsEnemySpaceOccupied(hit.collider.transform.parent.GetComponent<UrGameTile>())){ IsEnemySpaceOccupiedCounter(hit.collider.transform.parent.GetComponent<UrGameTile>()).transform.position = IsEnemySpaceOccupiedCounter(hit.collider.transform.parent.GetComponent<UrGameTile>()).initPosit; IsEnemySpaceOccupiedCounter(hit.collider.transform.parent.GetComponent<UrGameTile>()).currentTile = null; enemyCountersOnBoard--; } }
-								else { selectedCounter.PlaceOnBoard(hit.collider.transform.parent.GetComponent<UrGameTile>(), false, false, false); }
-							}
-							selectingBoardPosition = false;
-							diceValue = 0;
-							//EnemyTurn();
-
-						}
-					}
-				}
-				//if(Input.GetMouseButtonDown(1)) {
-				//	selectingBoardPosition = false;
-				//	selectingObject = true;
-				//	CounterSelected(selectedCounter);
-				}
-			}
-		
+		//Set up the baseline for the alert colors
+		baseAlertColor = alertText.color;
+		alertOutline = alertText.GetComponent<Outline>();
+		baseOutlineColor = alertOutline.effectColor;
+		alertText.text = "";
 	}
+
+	public override void PauseMinigame() {
+		base.PauseMinigame();
+		mgScreen.DisplayText("The Game of Ur: Instructions and History", "Taverna game", instructions + "\n\n" + history, gameIcon, MiniGameInfoScreen.MiniGame.TavernaPause);
+	}
+
+	public override void RestartMinigame() {
+		TavernaController.ReloadTavernaGame("Ur");
+	}
+
+	/// <summary>
+	/// Turns off all board tile highlights
+	/// </summary>
+	public void UnhighlightBoard() {
+		foreach (UrGameTile tile in playerBoardPositions) {
+			tile.ShowHighlight(false);
+		}
+
+		foreach (UrGameTile tile in enemyBoardPositions) {
+			tile.ShowHighlight(false);
+		}
+	}
+
+	public void UnhighlightPieces() {
+		foreach (UrPlayerPiece piece in playerPieces) {
+			if (piece != null) {
+				piece.ShowHighlight(false);
+			}
+
+		}
+		foreach (UrPiece piece in enemyAI.enemyPieces) {
+			if (piece != null) {
+				piece.ShowHighlight(false);
+			}
+
+		}
+	}
+
+	/// <summary>
+	/// Rolls the dice and returns the result
+	/// </summary>
+	/// <returns></returns>
+	public int GetDiceRoll() {
+		rollDiceButton.interactable = false;
+		currentRoll = dice.RollDice(isPlayerTurn);
+
+		return currentRoll;
+	}
+
+	/// <summary>
+	/// Rolls the dice - used for the button
+	/// </summary>
 	public void RollDice() {
-		dice.StartDiceRoll();
+		//Prevents button from being pressed if there's a bark onscreen
+		if (Time.timeScale != 0) {
+			rollDiceButton.interactable = false;
+			currentRoll = dice.RollDice(isPlayerTurn);
+			if (isPlayerTurn) {
+				allowPlayerMove = true;
+			}
+		}
 	}
 
-	public void CounterSelected(UrCounter c) {
-		if (c.onBoard) {
-			selectedCounter = c;
-			int bIndex = boardPositions.IndexOf(c.currentTile);
-			//for (int i = 0; i < diceValue; i++) {
-			//need to figure this out - what if bIndex + diceValue is out of range?
-			if (bIndex + diceValue < boardPositions.Count) {
-				if (!IsSpaceOccupied(boardPositions[bIndex + diceValue])) 
-				{
-					boardPositions[bIndex + diceValue].ShowAvailable();
-					selectingBoardPosition = !selectingBoardPosition;
+	public void SwitchTurn(bool playerTurn) {
+		isPlayerTurn = playerTurn;
+		allowPlayerMove = false;
+		rollDiceButton.interactable = isPlayerTurn;
+
+		playerPathLine.SetActive(isPlayerTurn);
+		enemyPathLine.SetActive(!isPlayerTurn);
+
+		UnhighlightBoard();
+		UnhighlightPieces();
+
+		//The thought with changing the scale slightly is for overlaps when it comes to capturing
+		//Sometimes, the player would always show through, but sometimes they'd show half-and-half
+		//I want whichever piece that's doing the capturing to show on top, so I figured
+		//let's make the pieces being captured (ie whoever's turn it's not) a tiny bit smaller so they don't overlap
+		//It sounds dumb, but it does actually work, and you can't see the scale change
+		//The other option was fiddling with camera layers or something and this game does enough of that already!
+		if (!isPlayerTurn) {
+			foreach (var p in enemyAI.enemyPieces) {
+				p.transform.localScale = Vector3.one;
+			}
+			foreach (var p in playerPieces) {
+				p.transform.localScale = Vector3.one * 0.98f;
+			}
+			enemyAI.EnemyTurn();
+		}
+		else {
+			foreach (var p in playerPieces) {
+				p.transform.localScale = Vector3.one;
+			}
+			foreach (var p in enemyAI.enemyPieces) {
+				p.transform.localScale = Vector3.one * 0.98f;
+			}
+		}
+
+	}
+
+	public IEnumerator WaitToSwitchTurn(bool playerTurn, float waitTime) {
+		yield return new WaitForSeconds(waitTime);
+		SwitchTurn(playerTurn);
+	}
+
+	public bool CanPlayerMove(bool isPlayer, bool highlightPieces = true) {
+		return CanPlayerMove(isPlayer, currentRoll, highlightPieces);
+	}
+
+	/// <summary>
+	/// Checks if the specified player can move any of their pieces
+	/// </summary>
+	/// <param name="isPlayer">Whether to check the player or not</param>
+	/// <param name="highlightPieces">Whether to highlight any mobile pieces</param>
+	/// <returns></returns>
+	public bool CanPlayerMove(bool isPlayer, int roll, bool highlightPieces = true) {
+		int movable = 0;
+		List<UrGameTile> checkPath = new List<UrGameTile>();
+		List<UrPiece> checkPieces = new List<UrPiece>();
+
+		if (isPlayer) {
+			checkPath = playerBoardPositions;
+			checkPieces = playerPieces;
+		}
+		else {
+			checkPath = enemyBoardPositions;
+			checkPieces = enemyAI.enemyPieces;
+		}
+
+		foreach (UrPiece p in checkPieces) {
+			if (p.PopulateValidMovesList(checkPath, isPlayer, roll).Count > 0) {
+				if (highlightPieces) {
+					p.ShowHighlight(true);
 				}
-				else 
-				{
-					Debug.Log("This tile cannot move.");
+
+				movable++;
+			}
+		}
+
+		return movable > 0;
+	}
+
+	public void ShowAlertText(string alert) {
+		StartCoroutine(DoShowAlertText(alertText, alertOutline, alert));
+	}
+
+	private IEnumerator DoShowAlertText(Text t, Outline o, string alert) {
+		//For some reason, just calling StopCoroutine(FadeText(t, o)) doesn't work, so we have to do it this way
+		if (fadeCoroutine != null) {
+			StopCoroutine(fadeCoroutine);
+			fadeCoroutine = null;
+		}
+		yield return null;
+		t.color = baseAlertColor;
+		o.effectColor = baseOutlineColor;
+		alertText.text = alert;
+		yield return null;
+		fadeCoroutine = StartCoroutine(FadeText(t, o));
+	}
+
+	private IEnumerator FadeText(Text t, Outline o) {
+		yield return new WaitForSeconds(alertShowTime);
+		Color clearColor = new Color(baseAlertColor.r, baseAlertColor.g, baseAlertColor.b, 0f);
+		Color clearOutline = new Color(baseOutlineColor.r, baseOutlineColor.g, baseOutlineColor.b, 0f);
+
+		//I had a lot of trouble with this for some reason - Lerp didn't want to cooperate
+		//I've seen people do something like Color.Lerp(t.color, endColor, t) with t as the for loop iterater,
+		//but for some reason that wasn't giving the right results here
+		for (float i = 0; i <= 1; i += Time.deltaTime * alertFadeSpeed) {
+			t.color = Color.Lerp(baseAlertColor, clearColor, i);
+			o.effectColor = Color.Lerp(baseOutlineColor, clearOutline, i);
+			yield return null;
+		}
+
+		alertText.text = "";
+		alertText.color = baseAlertColor;
+		o.effectColor = baseOutlineColor;
+	}
+
+	public void TriggerBark(bool isPlayer, List<string> triggerType, bool autoTrigger = false) {
+		float rand = Random.Range(0f, 1f);
+
+		//If we want this to disregard the random element, just manually set it to 0 so it's always below barkChance
+		if (autoTrigger) {
+			rand = 0f;
+		}
+
+		//If you've actually triggered one, you can either do the corresponding brag or an insult
+		if (rand <= barkChance) {
+			if (Random.Range(0f, 1f) <= bragToInsultRatio || autoTrigger) {
+				//If the player did the cool thing, the player brags
+				if (isPlayer) {
+					playerBarks.DisplayFromList(triggerType);
 				}
-			}
-			else 
-			{
-				Debug.Log("This tile cannot move.");
-			}
-
-			//bIndex++;
-			//}
-
-			//selectingObject = !selectingObject;
-		}
-		else {
-			selectedCounter = c;
-			if (diceValue == 1 && !IsSpaceOccupied(boardPositions[0])) {
-				boardPositions[0].ShowAvailable();
-				selectingBoardPosition = !selectingBoardPosition;
-			}
-			else if(diceValue == 5 && !IsSpaceOccupied(boardPositions[4]) && !IsSpaceOccupied(boardPositions[16])) { boardPositions[4].ShowAvailable(); selectingBoardPosition = !selectingBoardPosition; }
-		}
-	 
-	}
-
-	public bool IsSpaceOccupied(UrGameTile gt) {
-		foreach(UrCounter c in counters) {
-			if(boardPositions.IndexOf(c.currentTile) == boardPositions.IndexOf(gt)) { Debug.Log("space is occupied");  return true; }
-		}
-		Debug.Log("space is free");
-		return false;
-	}
-
-	public UrCounter IsSpaceOccupiedCounter(UrGameTile gt) {
-		foreach (UrCounter c in counters) {
-			if (boardPositions.IndexOf(c.currentTile) == boardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return c; }
-		}
-		Debug.Log("space is free");
-		return null;
-	}
-
-	public bool IsEnemySpaceOccupied(UrGameTile gt) {
-		foreach (UrCounter c in eCounters) {
-			if (eBoardPositions.IndexOf(c.currentTile) == eBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return true; }
-		}
-		Debug.Log("space is free");
-		return false;
-	}
-
-	public UrCounter IsEnemySpaceOccupiedCounter(UrGameTile gt) {
-		foreach (UrCounter c in eCounters) {
-			if (eBoardPositions.IndexOf(c.currentTile) == eBoardPositions.IndexOf(gt)) { Debug.Log("space is occupied"); return c; }
-		}
-		Debug.Log("space is free");
-		return null;
-	}
-
-	public bool CanPlayerMove(int val) {
-		foreach(UrCounter c in counters) {
-			if(c.currentTile != null && (boardPositions.IndexOf(c.currentTile)+ val) < 19) { return true; }
-		}
-		return false;
-	}
-	public bool CanEnemyMove(int val, UrCounter c) {
-
-		if (c.currentTile != null && (eBoardPositions.IndexOf(c.currentTile) + val) < 19) { return true; }
-		else {
-			return false;
-		}
-	}
-
-	public void SetDiceValue(int val) {
-		diceValue = dice.DiceResult(val);
-		rollDiceButton.SetActive(false);
-		Debug.Log(diceValue);
-		dvText.text = "" + diceValue;
-		if(diceValue == 0) { EnemyTurn(); }
-		if (diceValue == 4 && !CanPlayerMove(diceValue)) { EnemyTurn(); }
-		if (countersOnBoard > 0) {
-			selectingObject = true;
-		}
-		else {
-
-
-			if (diceValue == 1 && countersOffBoard > 0 && countersOnBoard == 0) {
-				counters[countersOffBoard - 1].PlaceOnBoard(boardPositions[0], false, false, false);
-				countersOffBoard--;
-				countersOnBoard++;
-				aiAnim.SetTrigger("Angry");
-				//EnemyTurn();
-			}
-			else if (diceValue == 5 && countersOffBoard > 0 && countersOnBoard == 0) {
-				counters[countersOffBoard - 1].PlaceOnBoard(boardPositions[4], false, false, false);
-				countersOffBoard--;
-				countersOnBoard++;
-				aiAnim.SetTrigger("Angry");
-				//EnemyTurn();
+				//Otherwise, the enemy brags
+				else {
+					enemyBarks.DisplayFromList(triggerType);
+				}
 			}
 			else {
-				EnemyTurn();
+				//If you're going to do the insult instead, it's the opposite
+				if (isPlayer) {
+					enemyBarks.DisplayInsult();
+				}
+				else {
+					playerBarks.DisplayInsult();
+				}
 			}
 		}
-		
 	}
 
-	bool isPlaying(Animator anim, string stateName) {
-		if (anim.GetCurrentAnimatorStateInfo(0).IsName(stateName))
-			return true;
-		else
-			return false;
-	}
-
-	public void PointScored(bool player) {
-		if (player) {
-			playerScore++;
-			playerScoreText.text = "" + playerScore;
+	public void PointScored(bool isPlayer, UrPiece c) {
+		if (isPlayer) {
+			playerPieces.Remove(c);
+			c.GetComponent<MeshRenderer>().enabled = false;
+			Destroy(c.gameObject, 1f);
+			if (playerPieces.Count == 0) {
+				WinGame();
+			}
 		}
 		else {
-			enemyScore++;
-			enemyScoreText.text = "" + enemyScore;
-		}
-		if(playerScore == 7) {
-			Debug.Log("You win.");
-		}
-		if (enemyScore == 7) {
-			Debug.Log("You lose.");
+			enemyAI.enemyPieces.Remove(c);
+			c.GetComponent<MeshRenderer>().enabled = false;
+			Destroy(c.gameObject, 1f);
+			if (enemyAI.enemyPieces.Count == 0) {
+				LoseGame();
+			}
 		}
 	}
 
+	public enum SoundTrigger {Rosette, Capture, LostTurn, OffBoard };
+	public void PlaySoundFX(SoundTrigger type, bool isPlayer) 
+	{
+		AudioClip[] sounds = null;
 
-	public void EnemyTurn() {
-		int[] i = { 0, 1, 4, 5 };
-		int sel = Random.Range(0, 4);
-		int ediceValue = i[sel];
-		dvText.text = "" + ediceValue;
-		if(ediceValue == 1 && enemyCountersOnBoard == 0) {
-			eCounters[0].PlaceOnBoard(eBoardPositions[0], false, true, false); enemyCountersOnBoard++;
+		switch (type) {
+			case (SoundTrigger.Rosette):
+				sounds = rosetteSounds;
+				break;
+			case (SoundTrigger.Capture):
+				sounds = captureSounds;
+				break;
+			case (SoundTrigger.LostTurn):
+				sounds = lostTurnSounds;
+				break;
+			case (SoundTrigger.OffBoard):
+				sounds = offBoardSounds;
+				break;
 		}
-		else if(ediceValue == 5 && enemyCountersOnBoard == 0) {
-				eCounters[0].PlaceOnBoard(eBoardPositions[4], false, true, false); enemyCountersOnBoard++;
-			}
-		else if (ediceValue == 1 && enemyCountersOnBoard > 0 && !IsEnemySpaceOccupied(eBoardPositions[0])) {
-			eCounters[enemyCountersOnBoard].PlaceOnBoard(eBoardPositions[0], false, true, false); enemyCountersOnBoard++;
+
+		if (isPlayer) {
+			sfxAud.clip = sounds[0];
 		}
-		else if (ediceValue == 5 && enemyCountersOnBoard > 0 && !IsEnemySpaceOccupied(eBoardPositions[4])) {
-			eCounters[enemyCountersOnBoard].PlaceOnBoard(eBoardPositions[4], false, true, false); enemyCountersOnBoard++;
+		else {
+			sfxAud.clip = sounds[1];
 		}
-		else if(enemyCountersOnBoard > 0) {
-			if(ediceValue == 1) {
-				foreach(UrCounter c in eCounters) {
-					if (c.onBoard && CanEnemyMove(ediceValue, c)) {
-						Debug.Log("i get here");
-						int index = eBoardPositions.IndexOf(c.currentTile);
-						if (!IsEnemySpaceOccupied(eBoardPositions[index + 1]) && ((index + 1) < 13)) {
-							c.PlaceOnBoard(eBoardPositions[index + 1], false, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 1])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 1]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 1]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 1]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 1]).currentTile = null; break;
-							}
-						}
-						else if (!IsEnemySpaceOccupied(eBoardPositions[index + 1]) && ((index + 1) >= 13)) {
-							if(index + 1 == 19) { PointScored(false); }
-							c.PlaceOnBoard(eBoardPositions[index + 1], true, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 1])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 1]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 1]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 1]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 1]).currentTile = null; break;
-							}
 
-						}
-						
-					}
-					
-				}
-			}
-			else if (ediceValue == 4) {
-				foreach (UrCounter c in eCounters) {
-					if (c.onBoard && CanEnemyMove(ediceValue, c)) {
-						Debug.Log("i get here");
-						int index = eBoardPositions.IndexOf(c.currentTile);
-						if (!IsEnemySpaceOccupied(eBoardPositions[index + 4]) && ((index + 4) < 13)) {
-							c.PlaceOnBoard(eBoardPositions[index + 4], false, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 4])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 4]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 4]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 4]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 4]).currentTile = null; break;
-							}
-						}
-						else if (!IsEnemySpaceOccupied(eBoardPositions[index + 4]) && ((index + 4) >= 13)) {
-							if (index + 4 == 19) { PointScored(false); }
-							c.PlaceOnBoard(eBoardPositions[index + 4], true, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 4])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 4]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 4]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 4]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 4]).currentTile = null; break;
-							}
+		sfxAud.Play();
+	}
 
-						}
+	private void WinGame() 
+	{
+		isGameOver = true;
+		rollDiceButton.interactable = false;
+		allowPlayerMove = false;
 
-					}
-				}
-			}
-			else if (ediceValue == 5) {
-				foreach (UrCounter c in eCounters) {
-					if (c.onBoard && CanEnemyMove(ediceValue, c)) {
-						Debug.Log("i get here");
-						int index = eBoardPositions.IndexOf(c.currentTile);
-						if (!IsEnemySpaceOccupied(eBoardPositions[index + 5]) && ((index + 5) < 13)) {
-							c.PlaceOnBoard(eBoardPositions[index + 5], false, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 5])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 5]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 5]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 5]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 5]).currentTile = null; break;
-							}
-						}
-						else if (!IsEnemySpaceOccupied(eBoardPositions[index + 5]) && ((index + 5) >= 13)) {
-							if (index + 5 == 19) { PointScored(false); }
-							c.PlaceOnBoard(eBoardPositions[index + 5], true, true, false);
-							if (IsSpaceOccupied(boardPositions[index + 5])) {
-								Debug.Log("haha rekt"); IsSpaceOccupiedCounter(boardPositions[index + 5]).onBoard = false; IsSpaceOccupiedCounter(boardPositions[index + 5]).transform.position = IsSpaceOccupiedCounter(boardPositions[index + 5]).initPosit; IsSpaceOccupiedCounter(boardPositions[index + 5]).currentTile = null; break;
-							}
+		mgScreen.gameObject.SetActive(true);
 
-						}
+		//Calculate how much of a reward you get based on how many pieces your opponent still has
+		//Because right now the game is set to 3 pieces each, we can say opponent 1 = min, 2 = middle, 3 = max
+		int reward;
 
-					}
-				}
-			}
+		if (enemyAI.enemyPieces.Count == 1) {
+			reward = rewardAmts.x;
 		}
-		rollDiceButton.SetActive(true);
+		else if (enemyAI.enemyPieces.Count == 2) {
+			reward = Mathf.CeilToInt((rewardAmts.x + rewardAmts.y) / 2.0f);
+		}
+		else {
+			reward = rewardAmts.y;
+		}
+
+		if (Globals.Game.Session != null) {
+			Globals.Game.Session.playerShipVariables.ship.AddToFoodAndWater(reward);
+		}
+
+		string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!" + "\n\n" + winFlavor.RandomElement();
+		mgScreen.DisplayText("The Game of Ur: Victory!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+	}
+
+	private void LoseGame() 
+	{
+		isGameOver = false;
+		rollDiceButton.interactable = false;
+		allowPlayerMove = false;
+
+		string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseText.RandomElement();
+		mgScreen.DisplayText("The Game of Ur: Defeat!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
+	}
+
+	public int CurrentRoll {
+		get {
+			return currentRoll;
+		}
+	}
+
+	public bool IsPlayerTurn {
+		get {
+			return isPlayerTurn;
+		}
+	}
+
+	public bool AllowPlayerMove {
+		get {
+			return allowPlayerMove;
+		}
+	}
+
+	public bool IsGameOver {
+		get {
+			return isGameOver;
+		}
+	}
+
+	public List<string> RosetteFlavor {
+		get {
+			return rosetteFlavor;
+		}
+	}
+
+	public List<string> CaptureFlavor {
+		get {
+			return captureFlavor;
+		}
+	}
+
+	public List<string> FlipFlavor {
+		get {
+			return flipFlavor;
+		}
+	}
+
+	public List<string> MoveOffFlavor {
+		get {
+			return moveOffFlavor;
+		}
+	}
+
+	public List<string> MoveOnFlavor {
+		get {
+			return moveOnFlavor;
+		}
 	}
 }

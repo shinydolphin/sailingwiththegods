@@ -11,7 +11,7 @@ public class UrArmIKHandler : MonoBehaviour
 	public bool leftHand = true;
 	public Transform rightHandObj = null;
 	public Transform lookObj = null;
-	public UrCounter counterOnTheMove;
+	public UrPlayerPiece counterOnTheMove;
 	private bool useIk = false;
 	private float ikValue = 0.0f;
 
@@ -74,15 +74,15 @@ public class UrArmIKHandler : MonoBehaviour
 		}
 	}
 
-	void PickUpPiece() {
-		counterOnTheMove.TileMT();
-		useIk = true;
+	//void PickUpPiece() {
+	//	counterOnTheMove.TileMT();
+	//	useIk = true;
 
-	}
-	void PutDownPiece() {
-		counterOnTheMove.TileMT();
-		useIk = false;
-	}
+	//}
+	//void PutDownPiece() {
+	//	counterOnTheMove.TileMT();
+	//	useIk = false;
+	//}
 
 
 }
