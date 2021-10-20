@@ -11,6 +11,8 @@ public class YarnTavern : MonoBehaviour
 {
 	private DialogScreen ds;
 	private Navigation _Nav;
+	private List<Resource> abundantGoods;
+	private List<Resource> scarceGoods;
 
 	void Start() 
 	{
@@ -43,23 +45,57 @@ public class YarnTavern : MonoBehaviour
 	public void GetNumberOfKnownSettlements() {
 		ds.Storage.SetValue("$settlement_number", Globals.Game.Session.playerShipVariables.ship.playerJournal.knownSettlements.Count);
 	}
+
+	[YarnCommand("setcitygoods")]
+	public void SetCity() {
+		abundantGoods = new List<Resource>(CityDetailsViewModel.AbundantResource(CityFromName(ds.Storage.GetValue("$known_city").AsString)));
+		scarceGoods = new List<Resource>(CityDetailsViewModel.ScarceResource(CityFromName(ds.Storage.GetValue("$known_city").AsString)));
+	}
+
+	[YarnCommand("gettradegoods")]
+	public void GetTradeGoods() 
+	{
+		ds.Storage.SetValue("$trade_goods_finished", false);
+
+		string cityName = ds.Storage.GetValue("$known_city").AsString;
+		bool haveLots = Random.Range(1, 3) % 2 == 0;
+		Debug.Log($"HaveLots {haveLots}");
+		Settlement city = CityFromName(cityName);
+
+		ds.Storage.SetValue("trade_resource", "null");
+
+		if ((haveLots && abundantGoods.Count > 0) || (!haveLots && scarceGoods.Count == 0)) {
+			Resource r = abundantGoods.RandomElement();
+			abundantGoods.Remove(r);
+			Debug.Log($"Getting an abundant good: HaveLots {haveLots} and {abundantGoods.Count} left (and {scarceGoods.Count} scarce left)");
+			ds.Storage.SetValue("$trade_resource", r.name);
+			ds.Storage.SetValue("$have_lots", true);
+		}
+		else if ((!haveLots && scarceGoods.Count > 0) || (haveLots && abundantGoods.Count == 0) ) {
+			Resource r = scarceGoods.RandomElement();
+			scarceGoods.Remove(r);
+			Debug.Log($"Getting a scarce good: HaveLots {haveLots} and {scarceGoods.Count} left (and {abundantGoods.Count} abuntant left)");
+			ds.Storage.SetValue("$trade_resource", r.name);
+			ds.Storage.SetValue("$have_lots", false);
+		}
+
+		if (abundantGoods.Count == 0 && scarceGoods.Count == 0) {
+			Debug.Log("Out of both types of goods");
+			ds.Storage.SetValue("$trade_goods_finished", true);
+		}
+	}
 	#endregion
 
 	#region Yarn Functions - Random (Taverna)
 	[YarnCommand("randomfooddialog")]
 	public void GenerateRandomFoodDialog() {
 		// Begin pulling random food item.
-		List<FoodText> foodList = Globals.Database.foodDialogText;
+		List<string> foodList = Globals.Database.foodDialogText;
 
 		int i = Random.Range(1, foodList.Count);
 
-		if (foodList[i].FoodCost == 0) {
-			foodList[i].FoodCost = (int)ds.Storage.GetValue("$dracma_cost").AsNumber;
-		}
-
-		ds.Storage.SetValue("$food_dialog_item", foodList[i].Item);
-		ds.Storage.SetValue("$food_dialog_quote", foodList[i].GetQuote);
-		ds.Storage.SetValue("$drachma_cost", foodList[i].FoodCost);
+		//ds.Storage.SetValue("$food_dialog_item", foodList[i].Item);
+		ds.Storage.SetValue("$food_dialog_quote", foodList[i]);
 	}
 
 	[YarnCommand("randomwine")]
@@ -68,14 +104,9 @@ public class YarnTavern : MonoBehaviour
 		List<FoodText> wineList = Globals.Database.wineInfoText;
 
 		int i = Random.Range(1, wineList.Count);
-
-		if (wineList[i].FoodCost == 0) {
-			wineList[i].FoodCost = (int)ds.Storage.GetValue("$dracma_cost").AsNumber;
-		}
-
-		ds.Storage.SetValue("$drachma_cost", wineList[i].FoodCost);
+		
 		ds.Storage.SetValue("$random_wine", wineList[i].Item);
-		ds.Storage.SetValue("$wine_quote", wineList[i].GetQuote);
+		ds.Storage.SetValue("$wine_quote", wineList[i].Quote);
 	}
 
 
@@ -86,55 +117,40 @@ public class YarnTavern : MonoBehaviour
 		List<FoodText> foodList =  Globals.Database.foodItemText;
 
 		int i = Random.Range(1, foodList.Count);
-
-		if (foodList[i].FoodCost == 0) {
-			foodList[i].FoodCost = (int)ds.Storage.GetValue("$generated_cost").AsNumber;
-			//Debug.Log("Cost of this item: " + foodList[i].FoodCost + " while i is " + i + " Item should be " + foodList[i].Item);
-		}
-
-		ds.Storage.SetValue("$drachma_cost", foodList[i].FoodCost);
+		
 		ds.Storage.SetValue("$random_food", foodList[i].Item);
-		ds.Storage.SetValue("$food_quote", foodList[i].GetQuote);
+		ds.Storage.SetValue("$food_quote", foodList[i].Quote);
 	}
 
 	[YarnCommand("randomQA")]
 	public void GenerateRandomQAText(string input) 
 	{
 		// Get the city we know of
-		string e = ds.Storage.GetValue("$known_city").AsString;
-		List<DialogText> matchingType = new List<DialogText>();
+		string cityName = ds.Storage.GetValue("$known_city").AsString;
+		List<DialogPair> matchingType = new List<DialogPair>();
 
-		// Obtain the known settlements we can talk about! (NOTE: will change to display known settlements and we'll search our info based on selection)
-		Settlement[] settlementList = Globals.Database.settlement_masterList;
-		Settlement targetSettlement = settlementList[0]; // Simple Assignment to ease compile errors.
-
-		// Finding the currentSettlement
-		foreach (Settlement a in settlementList) 
-		{
-			if (a.name == e)
-				targetSettlement = a;
-		}
+		Settlement targetSettlement = CityFromName(cityName);
 
 		switch (input) 
 		{
 			case "network":
-				e = Globals.Database.networkDialogText.Exists(x => x.CityType == e) ? e : "ALLOTHERS";
-				matchingType = Globals.Database.networkDialogText.FindAll(x => x.CityType == e);
+				cityName = Globals.Database.networkDialogText.Exists(x => x.CityName == cityName) ? cityName : "ALLOTHERS";
+				matchingType = Globals.Database.networkDialogText.FindAll(x => x.CityName == cityName);
 				break;
 			case "pirate":
-				e = Globals.Database.pirateDialogText.Exists(x => x.CityType == e) ? e : "ALLOTHERS";
-				matchingType = Globals.Database.pirateDialogText.FindAll(x => x.CityType == e);
+				cityName = Globals.Database.pirateDialogText.Exists(x => x.CityName == cityName) ? cityName : "ALLOTHERS";
+				matchingType = Globals.Database.pirateDialogText.FindAll(x => x.CityName == cityName);
 				break;
 			case "myth":
-				if (!e.Equals(ds.Storage.GetValue("$current_myth_city").AsString)) 
+				if (!cityName.Equals(ds.Storage.GetValue("$current_myth_city").AsString)) 
 				{
 					ds.Storage.SetValue("$current_myth_count", 0);
-					ds.Storage.SetValue("$current_myth_city", e);
+					ds.Storage.SetValue("$current_myth_city", cityName);
 				}
 				else
 					ds.Storage.SetValue("$current_myth_count", ds.Storage.GetValue("$current_myth_count").AsNumber + 1);
-				e = Globals.Database.mythDialogText.Exists(x => x.CityType == e) ? e : "ALLOTHERS";
-				matchingType = Globals.Database.mythDialogText.FindAll(x => x.CityType == e);
+				cityName = Globals.Database.mythDialogText.Exists(x => x.CityName == cityName) ? cityName : "ALLOTHERS";
+				matchingType = Globals.Database.mythDialogText.FindAll(x => x.CityName == cityName);
 				break;
 			default:
 				Debug.Log("Error, probaby because of a misspelling");
@@ -143,31 +159,31 @@ public class YarnTavern : MonoBehaviour
 
 		int i = Random.Range(0, matchingType.Count);
 
-		ds.Storage.SetValue("$question", matchingType[i].TextQA[0]);
+		ds.Storage.SetValue("$question", matchingType[i].Question);
 		ds.Storage.SetValue("$check_myth", matchingType.Count > ds.Storage.GetValue("$current_myth_count").AsNumber);
 
-		if (e != "ALLOTHERS") 
+		if (cityName != "ALLOTHERS") 
 		{
-			if(e.Equals(ds.Storage.GetValue("$current_myth_city").AsString)) 
+			if(cityName.Equals(ds.Storage.GetValue("$current_myth_city").AsString)) 
 			{
 				if(ds.Storage.GetValue("$check_myth").AsBool) 
 				{
 					// Clean this up for readability.
-					ds.Storage.SetValue("$response", matchingType[(int)ds.Storage.GetValue("$current_myth_count").AsNumber].TextQA[1]);
-					Globals.Game.Session.AddToCaptainsLog("Myth of " + e + ":\n" + ds.Storage.GetValue("$response").AsString);
+					ds.Storage.SetValue("$response", matchingType[(int)ds.Storage.GetValue("$current_myth_count").AsNumber].Answer);
+					Globals.Game.Session.AddToCaptainsLog("Myth of " + cityName + ":\n" + ds.Storage.GetValue("$response").AsString);
 				}
 				else
 					ds.Storage.SetValue("$response", "There is nothing more for me to say!");
 			}
 			else
-				ds.Storage.SetValue("$response", matchingType[i].TextQA[1]);
+				ds.Storage.SetValue("$response", matchingType[i].Answer);
 		}
 		else
 			ds.Storage.SetValue("$response", targetSettlement.description);
 
 		// For wanting to learn more. May consider changing conditional to check if input == myth instead
-		if (input == "myth" && matchingType[i].TextQA.Length > 2)
-			ds.Storage.SetValue("$response2", matchingType[i].TextQA[2]);
+		//if (input == "myth" && matchingType[i].TextQA.Length > 2)
+		//	ds.Storage.SetValue("$response2", matchingType[i].TextQA[2]);
 
 		//Special condition for home town?
 	}
@@ -177,22 +193,11 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("randomguide")]
 	public void GenerateGuideDialogue() 
 	{
-		List<DialogText> guideText = Globals.Database.guideDialogText;
+		List<string> guideText = Globals.Database.guideDialogText;
 
 		int i = Random.Range(1, guideText.Count);
 
-		if(guideText[i].TextQA[0].Equals("")) 
-		{
-			guideText[i].TextQA = guideText[1].TextQA;
-			
-		}
-		if (guideText[i].TextQA[1].Equals("")) {
-			guideText[i].TextQA = guideText[1].TextQA;
-		}
-
-		ds.Storage.SetValue("$flavor_text1", guideText[i].CityType); // Wrongfully added in CityType.
-		ds.Storage.SetValue("$flavor_text2", guideText[i].TextQA[0]);
-		ds.Storage.SetValue("$flavor_text3", guideText[i].TextQA[1]);
+		ds.Storage.SetValue("$flavor_text1", guideText[i]); // Wrongfully added in CityType.
 	}
 
 	[YarnCommand("hirenavigator")]
@@ -206,5 +211,19 @@ public class YarnTavern : MonoBehaviour
 	{
 		ds.yarnOnComplete = onComplete;
 		Globals.UI.Show<TavernView, TavernViewModel>(new TavernViewModel(ds));
+	}
+
+	private Settlement CityFromName(string name) 
+	{
+		// Obtain the known settlements we can talk about! (NOTE: will change to display known settlements and we'll search our info based on selection)
+		Settlement[] settlementList = Globals.Database.settlement_masterList;
+		Settlement targetSettlement = settlementList[0]; // Simple Assignment to ease compile errors.
+
+		// Finding the currentSettlement
+		foreach (Settlement a in settlementList) {
+			if (a.name == name)
+				targetSettlement = a;
+		}
+		return targetSettlement;
 	}
 }

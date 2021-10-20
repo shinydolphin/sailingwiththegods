@@ -32,7 +32,10 @@ public class Game
 	public bool isGameOver { get; set; } = false;
 	public bool menuControlsLock { get; set; } = false;
 	public bool gameIsFinished { get; set; } = false;
-	
+
+	public void Update() {
+		Session?.Update();
+	}
 
 	#region UI Triggered functions
 

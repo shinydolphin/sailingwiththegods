@@ -76,6 +76,7 @@ public class script_player_controls : MonoBehaviour
 	[HideInInspector] public List<string> zonesList = new List<string>();
 
 	private bool checkedStarvingThirsty = false;
+	private bool allowBirdsong = true;
 
 	[Header("Playtesting Bools")]
 	//make sure these are false in Unity's "Inspector" tab before making builds 
@@ -139,7 +140,7 @@ public class script_player_controls : MonoBehaviour
 		//initialize players ghost route
 		UpdatePlayerGhostRouteLineRenderer(Game.IS_NEW_GAME);
 
-		// setup teleport debug tool options (see inspector)
+		// setup teleport debug tool options (see inspector)s
 		teleportToSettlementOptions = Database.settlement_masterList.Select(s => s.name).ToList();
 	}
 
@@ -224,8 +225,15 @@ public class script_player_controls : MonoBehaviour
 		UpdateShipSpeed();
 
 		//check for bird song
-		if (rayCheck_playBirdSong) SFX_birdsong.enabled = true;
-		else SFX_birdsong.enabled = false;
+		if (rayCheck_playBirdSong && allowBirdsong) 
+		{
+			SFX_birdsong.enabled = true;
+		}
+		else 
+		{
+			SFX_birdsong.enabled = false;
+		}
+			
 
 		// don't run the rest of the update if a game session has not been started
 		if (Session == null) return;
@@ -233,8 +241,8 @@ public class script_player_controls : MonoBehaviour
 		// debug tool to see where you are in lat long (depends on session)
 		longXLatY = CoordinateUtil.ConvertWebMercatorToWGS1984(CoordinateUtil.Convert_UnityWorld_WebMercator(Session.playerShip.transform.position));
 
-		// TODO: Pull all this logic into the game state system (Game.cs) instead of all these booleans
-
+		// TODO:  Make a game state system instead of all these booleans
+		
 		//TODO: need to update all references to controlsLocked to the MGV.controlsLocked
 		//controlsLocked = MGV.controlsLocked;
 		//If NOT Game Over then go with the regular logic
@@ -310,6 +318,9 @@ public class script_player_controls : MonoBehaviour
 
 	}
 
+	public void ToggleBirdsong(bool toggle) {
+		allowBirdsong = toggle;
+	}
 
 	public void CheckForPlayerNavigationCursor() {
 
@@ -491,8 +502,7 @@ public class script_player_controls : MonoBehaviour
 	public void TravelToSelectedTarget(Vector3 destination) {
 		//Let's slowly rotate the ship towards the direction it's traveling and then allow the ship to move
 		if (!shipTravelStartRotationFinished) {
-
-
+			
 			destination = new Vector3(destination.x, shipTransform.position.y, destination.z);
 			Vector3 temprot = Vector3.RotateTowards(shipTransform.forward, Vector3.Normalize(destination - shipTransform.position), .1f, 0.0F);
 			Vector3 targetDirection = Vector3.Normalize(destination - shipTransform.position);

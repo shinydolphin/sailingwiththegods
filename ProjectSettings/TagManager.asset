@@ -30,19 +30,17 @@ TagManager:
   - EtruscanPirateRegionZone
   - IllyrianRegionZone
   - GameBoard
-  - PlayerTile
-  - PetteiaW
-  - Petteia
   - Activator
   - Canvas
   - LeftActivator
   - UpActivator
   - DownActivator
   - RightActivator
-  - PetteiaB
   - Target
   - TrajectSystem
   - Wine
+  - EnemyPiece
+  - PlayerPiece
   layers:
   - Default
   - TransparentFX
@@ -69,7 +67,7 @@ TagManager:
   - Background
   - GameSquare
   - KottaboasLighting
-  - 
+  - Dice
   - 
   - 
   - 

@@ -19,17 +19,34 @@ public class Database
 	public List<DialogText> portDialogText { get; private set; } = new List<DialogText>();
 
 	//Taverna
-	public List<DialogText> networkDialogText { get; private set; } = new List<DialogText>();
-	public List<DialogText> pirateDialogText { get; private set; } = new List<DialogText>();
-	public List<DialogText> mythDialogText { get; private set; } = new List<DialogText>();
-	public List<DialogText> guideDialogText { get; private set; } = new List<DialogText>();
-	public List<DialogText> tradingDialogText { get; private set; } = new List<DialogText>(); // Perhaps
-	public List<FoodText> foodItemText { get; private set; } = new List<FoodText>();
-	public List<FoodText> wineInfoText { get; private set; } = new List<FoodText>();
-	public List<FoodText> foodDialogText { get; private set; } = new List<FoodText>();
+	public List<DialogPair> networkDialogText = new List<DialogPair>();
+	public List<DialogPair> pirateDialogText = new List<DialogPair>();
+	public List<DialogPair> mythDialogText = new List<DialogPair>();
+	public List<string> guideDialogText = new List<string>();
+	public List<DialogPair> tradingDialogText = new List<DialogPair>(); // Perhaps
+	public List<FoodText> foodItemText = new List<FoodText>();
+	public List<FoodText> wineInfoText = new List<FoodText>();
+	public List<string> foodDialogText = new List<string>();
 
 	public List<string> tavernaGameInsults;
 	public List<string> tavernaGameBragging;
+
+	public List<string> petteiaGameFlavor;
+	public List<string> petteiaGameBragging;
+	public List<string> petteiaGameInsults;
+	public List<string> petteiaGameWin;
+	public List<string> petteiaGameLost;
+	public List<string> petteiaGameBlocked;
+
+	public List<string> urGameRosette;
+	public List<string> urGameCapture;
+	public List<string> urGameFlip;
+	public List<string> urGameMoveOff;
+	public List<string> urGameMoveOn;
+	public List<string> urGameLost;
+	public List<string> urGameWin;
+	public List<string> urGameInsults;
+	public List<string> urGameIntro;
 
 	//STORMS
 	public List<Ritual> stormRituals = new List<Ritual>();
@@ -72,18 +89,11 @@ public class Database
 
 		CSVLoader.LoadTavernaGameBarks(out tavernaGameInsults, out tavernaGameBragging);
 
-		// Mylo's Addition
-		networkDialogText = CSVLoader.LoadNetworkDialog();
-		pirateDialogText = CSVLoader.LoadPirateDialog();
-		mythDialogText = CSVLoader.LoadMythDialog();
-		guideDialogText = CSVLoader.LoadHireGuideDialog();
-		// trading goods here
-		foodItemText = CSVLoader.LoadFoodItemsList();
-		foodDialogText = CSVLoader.LoadFoodDialogList();
-		wineInfoText = CSVLoader.LoadWineInfoList();
-
-
-		// end Mylo's Addition
+		CSVLoader.LoadTavernaDialog(out networkDialogText, out pirateDialogText, out mythDialogText, out guideDialogText, out foodDialogText, out foodItemText, out wineInfoText);
+		CSVLoader.LoadPetteiaText(out petteiaGameFlavor, out petteiaGameInsults, out petteiaGameBragging, out petteiaGameWin,
+			out petteiaGameLost, out petteiaGameBlocked);
+		CSVLoader.LoadUrText(out urGameIntro, out urGameRosette, out urGameCapture, out urGameFlip, out urGameMoveOff, out urGameMoveOn,
+			out urGameLost, out urGameWin, out urGameInsults);
 
 		region_masterList = CSVLoader.LoadRegionList();
 		settlement_masterList = CSVLoader.LoadSettlementList();     // depends on resource list, region list, and crew list

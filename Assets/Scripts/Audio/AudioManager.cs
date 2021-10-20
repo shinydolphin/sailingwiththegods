@@ -6,11 +6,10 @@ using UnityEngine.Audio;
 
 public class AudioManager : MonoBehaviour
 {
-	[SerializeField] private Sound[] sounds;
-	[SerializeField] private static AudioManager instance;
-	[SerializeField] private AudioMixerGroup mixer;
+	[SerializeField] private Sound[] sounds = null;
+	//[SerializeField] private static AudioManager instance = null;
+	[SerializeField] private AudioMixerGroup mixer = null;
 
-	// Start is called before the first frame update
 	void Awake() {
 		///////////////////////////////////////////////////////////////////////////
 		///To make sure that the game doesn't create two audio managers by mistake.

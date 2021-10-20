@@ -296,7 +296,7 @@ GameObject:
   - component: {fileID: 331492733}
   m_Layer: 0
   m_Name: Petteia Player Piece
-  m_TagString: PetteiaW
+  m_TagString: PlayerPiece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -353,7 +353,7 @@ MonoBehaviour:
   pieceStartPos: {x: 0, y: 0}
   cam: {fileID: 0}
   pController: {fileID: 0}
-  real: {fileID: 0}
+  real: {fileID: 8008979059028001866}
   highlight: {fileID: 4149380171605957465}
   dummyParent: {fileID: 0}
   dummy: {fileID: 7666413527833223381, guid: f4269311302f83e4d891a2a4544f1a76, type: 3}

@@ -9,7 +9,7 @@ public class PetteiaArmIKHandler : MonoBehaviour
 	public bool ikActive = false;
 	public Transform rightHandObj = null;
 	public Transform lookObj = null;
-	public UrCounter counterOnTheMove;
+	public UrPlayerPiece counterOnTheMove;
 	private bool useIk = false;
 	private float ikValue = 0.0f;
 

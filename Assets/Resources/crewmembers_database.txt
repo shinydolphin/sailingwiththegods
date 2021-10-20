@@ -6,7 +6,7 @@ crewID@crewname@crew origin city ID@clout@crew job@background story@killable@par
 5@Asterion@317@10@0@son of Cometes, from the river Apidanus; he lived at Peiresiae@1@1@0@0
 6@Augeias@37@30@7@King of Elis who kept famously filthy stables - never mucked out! Herakles had to clean them as one of his labors.@1@1@0@0
 7@Butes@26@22@1@warlike son of Teleon, and the only Argonaut who yielded to the charms of the Sirens, jumping off the ship and swimming to see them. Aphrodite saved him, taking him safely to Lilybaeum in Sicily to be her lover. He becomes the father of Eryx (city Erice) @1@1@0@0
-8@Canthus@255@24@1@Hero from Euboia, fated to die in Libya:he was the son or grandson of Abas, the founder of the Abantians who migrated to Euboia, where Abas ruled.@0@1@0@0
+8@Canthus@255@24@1@Hero from Euboea, fated to die in Libya:he was the son or grandson of Abas, the founder of the Abantians who migrated to Euboea, where Abas ruled.@0@1@0@0
 9@Erginus@76@15@0@semi-divine son of Poseidon from Miletus@1@1@0@0
 10@Eurydamas@193@15@0@son of Ctimenus, lived at Dolopian Ctimene near the Xynian Lake.@1@1@0@0
 11@Hylas@207@12@6@Boy beloved of Herakles, the son of a king the hero killed; he will eventually be snatched by the water nymphs in Mysia. Herakles, desperate to find him, will abandon the quest at that point. Annual rituals at Mysia replayed the hero's search for the boy.@0@1@0@0
@@ -96,10 +96,10 @@ crewID@crewname@crew origin city ID@clout@crew job@background story@killable@par
 95@Thalassios@40@5@0@Thalassios of Eresos is part of a great proxenic network, and his name - 'Seafaring guy' - is a marker of his great skills@1@0@0@0
 96@Paramythios@44@97@0@Paramythios of Halikarnassos can talk as fast as he rows: his city is the home of Herodotus, the father of history and famous for his storytelling prowess@1@0@0@0
 97@Sambatis@44@66@0@Sambatis of Halikarnassos can entertain us with Carian tales while we row: his home city was the meeting place for Greek colonists and Carian locals@1@0@0@0
-98@Beirakos@498@71@0@Beirakos comes from  Histiaia in Euboia, rich in vines and strategically positioned overlooking the Euboian gulf: he drinks and rows with equal facility (Iliad 2.537)@1@0@0@0
+98@Beirakos@498@71@0@Beirakos comes from  Histiaia in Euboea, rich in vines and strategically positioned overlooking the Euboean gulf: he drinks and rows with equal facility (Iliad 2.537)@1@0@0@0
 99@Demetrios@116@12@1@Demetrios of Ilion can pull an oar but prefers to wield a sword: he is forever comparing himself to the great heroes of the Trojan war@1@0@0@0
 100@Zenophilos@504@73@0@Zenophilos is a sailor and a wealthy man: he comes from Karthaia, one of four cities on the island of Kea, where fine walls and silver coins reflect real economic power@1@0@0@0
-101@Kratylos@505@54@0@Kratylos comes from Karystos in Euboia, an ancient town known to Homer (Iliad 2.539) which also appears in Linear B tablets, suggesting its role in Mycenaean networks of communication and exchange @1@0@0@0
+101@Kratylos@505@54@0@Kratylos comes from Karystos in Euboea, an ancient town known to Homer (Iliad 2.539) which also appears in Linear B tablets, suggesting its role in Mycenaean networks of communication and exchange @1@0@0@0
 102@Megathumos@52@74@0@Megathumos is a good rower and a great companion: his name means 'Great Heart.' He comes from Kaunos, an ancient Carian town  with two fine harbors@1@0@0@0
 103@Niketes@52@74@0@Niketes comes from Kaunos and loves to chatter about his city's foundations - it is named for the unfortunate son of the Carian king Miletus, whose sister Byblis fell in love with him.  He fled to escape this unnatural bond, and she became mad with grief;@1@0@0@0
 104@Hippichos@509@96@0@Hippochos wears a coin on a string around his neck as a tribute to his home town of Kleitor, the first city in Arcadia to mint coins (500-460 BC) @1@0@0@0

@@ -23,7 +23,10 @@ public class PetteiaPlayerPiece : MonoBehaviour
 
 	void Start()
     {
-		real.enabled = true;
+		if (real != null) {
+			real.enabled = true;
+		}
+
 
 		mask = LayerMask.GetMask("GameSquare");
 
@@ -110,7 +113,7 @@ public class PetteiaPlayerPiece : MonoBehaviour
 				//Only advances the turn if the piece was moved
 				if (!(pieceStartPos.x == potentialPos.x && pieceStartPos.y == potentialPos.y)) 
 				{
-					pController.MovePiece(pieceStartPos, potentialPos, "PetteiaW");
+					pController.MovePiece(pieceStartPos, potentialPos, pController.playerTag);
 					pieceStartPos = potentialPos;
 					pController.SwitchTurn();
 					pController.PlayMoveSound();

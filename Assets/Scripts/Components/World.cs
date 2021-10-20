@@ -51,6 +51,8 @@ public class World : MonoBehaviour
 
 	[Header("Ununorganized Scene Refs")]
 	public List<CrewMember> currentlyAvailableCrewMembersAtPort; // updated every time ship docks at port
+	public MenuSwitcherSounds audioManager;
+
 	[Header("GUI Scene Refs")]
 	public GameObject selection_ring;
 
@@ -138,13 +140,17 @@ public class World : MonoBehaviour
 		SetInGameWaterZonesToCurrentRoseData();
 	}
 
+	private void Update() {
+		Globals.Game.Update();
+	}
+
 
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
 	//  THE REMAINDER OF THE SCRIPT IS ALL GLOBALLY ACCESSIBLE FUNCTIONS
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
-	
+
 
 	//====================================================================================================
 	//      GAMEOBJECT BUILDING TO POPULATE WORLD FUNCTIONS

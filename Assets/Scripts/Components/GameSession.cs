@@ -116,13 +116,7 @@ public class GameSession
 	}
 
 	public void RotateCameraTowards(Vector3 target) {
-
-		// rotate the camera's parent to look at the target (which eliminates the need for RotateAround below)
-		// also rotate the 
-		//FPVCamera.transform.parent.parent.parent.DOLookAt(target, 1f);
-
 		CameraLookTarget = target;
-
 	}
 
 	public Vector3? CameraLookTarget;
@@ -144,7 +138,7 @@ public class GameSession
 
 	}
 
-	private void Update() {
+	public void Update() {
 		UpdateCameraRotation();
 		//DebugHotkeys();
 	}
