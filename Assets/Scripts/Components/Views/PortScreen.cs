@@ -9,6 +9,9 @@ using UnityEngine.UI;
 
 public class PortScreen : ViewBehaviour<PortViewModel>
 {
+	UISystem UI => Globals.UI;
+	MiniGames MiniGames => Globals.MiniGames;
+
 	[SerializeField] CrewManagementListView Hire = null;
 	[SerializeField] CrewManagementListView Fire = null;
 
@@ -45,7 +48,7 @@ public class PortScreen : ViewBehaviour<PortViewModel>
 		Town.Interactable = model.allowTownAccess;
 
 		Info?.Bind(ValueModel.New(new ButtonViewModel {
-			OnClick = () => Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
+			OnClick = () => UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
 				Icon = model.PortCoin,
 				Title = model.PortName,
 				Subtitle = model.PortPopulationRank,
@@ -55,17 +58,17 @@ public class PortScreen : ViewBehaviour<PortViewModel>
 
 		Loans?.Bind(ValueModel.New(new ButtonViewModel {
 			Label = "Loans",
-			OnClick = () => Globals.UI.Show<LoanView, LoanViewModel>(new LoanViewModel())
+			OnClick = () => UI.Show<LoanView, LoanViewModel>(new LoanViewModel())
 		}));
 
 		Tavern?.Bind(ValueModel.New(new ButtonViewModel {
 			Label = "Tavern",
-			OnClick = () => Globals.MiniGames.EnterScene("TavernaMenu")
+			OnClick = () => MiniGames.EnterScene("TavernaMenu")
 		}));
 
 		Repairs?.Bind(ValueModel.New(new ButtonViewModel {
 			Label = "Shipyard",
-			OnClick = () => Globals.UI.Show<RepairsView, RepairsViewModel>(new RepairsViewModel())
+			OnClick = () => UI.Show<RepairsView, RepairsViewModel>(new RepairsViewModel())
 		}));
 
 		PortIcon?.Bind(new BoundModel<Sprite>(model, nameof(model.PortIcon)));

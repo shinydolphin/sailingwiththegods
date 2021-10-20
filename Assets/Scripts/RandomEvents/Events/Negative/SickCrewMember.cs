@@ -51,6 +51,6 @@ public class SickCrewMember : RandomEvents.NegativeEvent
 		}
 
 		finalMessage += " You continue the journey with the crew--thankful that it wasn't any worse. A plague on a ship asea is quite dangerous.";
-		Globals.Notifications.ShowANotificationMessage(finalMessage);
+		Notifications.ShowANotificationMessage(finalMessage);
 	}
 }

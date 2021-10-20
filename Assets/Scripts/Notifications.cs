@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 public class Notifications
 {
-	Game MainState => Globals.Game;
+	Game Game => Globals.Game;
+	UISystem UI => Globals.UI;
 
 	// notifications
 	public bool NotificationQueued { get; private set; }
@@ -21,7 +22,7 @@ public class Notifications
 		//Check to see if we need to show any generic notifications ?
 		if (NotificationQueued) {
 			ShowNotification(QueuedNotificationMessage);
-			MainState.menuControlsLock = true;
+			Game.menuControlsLock = true;
 			ConsumeNotification();
 		}
 	}
@@ -30,7 +31,7 @@ public class Notifications
 
 		// KD: I don't think the complexity of stacked notifications is needed. pretty sure it'd be okay to queue them up (stack them so you close one by one)
 		// also changed to the new popup which i think looks better
-		Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
+		UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
 			Title = "Attention!",
 			Message = message,
 			OnClose = () => OnNotificationClose()
@@ -39,8 +40,8 @@ public class Notifications
 	}
 
 	public void OnNotificationClose() {
-		if (!Globals.UI.IsShown<PortScreen>() && !Globals.UI.IsShown<CityView>()) {
-			MainState.menuControlsLock = false;
+		if (!UI.IsShown<PortScreen>() && !UI.IsShown<CityView>()) {
+			Game.menuControlsLock = false;
 		}
 	}
 

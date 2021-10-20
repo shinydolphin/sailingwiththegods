@@ -26,6 +26,6 @@ public class ZeusBounty : RandomEvents.PositiveEvent
 				"obviously it's a gift to Zeus' brother--not to us and not worth the risk! We continue on our journey--despite the grumblings of the crew.";
 		}
 
-		Globals.Notifications.ShowANotificationMessage(finalMessage);
+		Notifications.ShowANotificationMessage(finalMessage);
 	}
 }

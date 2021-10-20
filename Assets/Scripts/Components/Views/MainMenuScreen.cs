@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class MainMenuScreen : ViewBehaviour<GameViewModel>
 {
+	UISystem UI => Globals.UI;
+
 	[SerializeField] Button ResumeButton = null;
 	[SerializeField] Button HelpButton = null;
 	[SerializeField] Button SaveButton = null;
@@ -15,7 +17,7 @@ public class MainMenuScreen : ViewBehaviour<GameViewModel>
 	[SerializeField] Button HelpExitButton = null;
 
 	private void Start() {
-		Subscribe(ResumeButton.onClick, () => Globals.UI.Hide<MainMenuScreen>());
+		Subscribe(ResumeButton.onClick, () => UI.Hide<MainMenuScreen>());
 		Subscribe(HelpButton.onClick, GUI_showHelpMenu);
 		Subscribe(HelpExitButton.onClick, GUI_closeHelpMenu);
 		Subscribe(SaveButton.onClick, () => DoAndClose(Model.GUI_saveGame));
@@ -24,7 +26,7 @@ public class MainMenuScreen : ViewBehaviour<GameViewModel>
 
 	void DoAndClose(Action action) {
 		action();
-		Globals.UI.Hide<MainMenuScreen>();
+		UI.Hide<MainMenuScreen>();
 	}
 
 	//-----------------------------------------------------

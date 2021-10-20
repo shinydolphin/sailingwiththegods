@@ -4,6 +4,7 @@ using System.Linq;
 
 public class World : MonoBehaviour
 {
+	Game Game => Globals.Game;
 	Notifications Notifications => Globals.Notifications;
 	Database Database => Globals.Database;
 
@@ -64,39 +65,39 @@ public class World : MonoBehaviour
 	//	DEBUG VARIABLES
 	//###################################
 	[ReadOnly] public int DEBUG_currentQuestLeg = 0;
-	[HideInInspector] public bool DEBUG_MODE_ON = false;
+	public bool DEBUG_MODE_ON { get; private set; } = false;
 
 	// TODO: unorganized variables
-	[HideInInspector] public GameObject mainCamera;
-	[HideInInspector] public GameObject playerTrajectory;
-	[HideInInspector] public LineRenderer playerGhostRoute;
-	[HideInInspector] public WindRose[,] windrose_January = new WindRose[10, 8];
-	[HideInInspector] public GameObject windZoneParent;
-	[HideInInspector] public GameObject waterSurface;
-	[HideInInspector] public CurrentRose[,] currentRose_January;
-	[HideInInspector] public GameObject currentZoneParent;
+	public GameObject mainCamera { get; private set; }
+	public GameObject playerTrajectory { get; private set; }
+	public LineRenderer playerGhostRoute { get; private set; }
+	public WindRose[,] windrose_January { get; private set; } = new WindRose[10, 8];
+	public GameObject windZoneParent { get; private set; }
+	public GameObject waterSurface { get; private set; }
+	public CurrentRose[,] currentRose_January { get; private set; }
+	public GameObject currentZoneParent { get; private set; }
 
-	[HideInInspector] public GameObject settlement_masterList_parent;
+	public GameObject settlement_masterList_parent { get; private set; }
 
 	// environment
-	[HideInInspector] public Light mainLightSource;
+	public Light mainLightSource { get; private set; }
 
 	// title and start screens
-	[HideInInspector] public bool startGameButton_isPressed = false;
-	[HideInInspector] public GameObject camera_titleScreen;
+	public bool startGameButton_isPressed { get; private set; } = false;
+	public GameObject camera_titleScreen { get; private set; }
 
 
 	//###################################
 	//	GUI VARIABLES
 	//###################################
-	[HideInInspector] public bool[] newGameCrewSelectList = new bool[40];
-	[HideInInspector] public List<CrewMember> newGameAvailableCrew = new List<CrewMember>();
+	public bool[] newGameCrewSelectList { get; set; } = new bool[40];
+	public List<CrewMember> newGameAvailableCrew { get; set; } = new List<CrewMember>();
 
 
 	//###################################
 	//	RANDOM EVENT VARIABLES
 	//###################################
-	[HideInInspector] public List<int> activeSettlementInfluenceSphereList = new List<int>();
+	public List<int> activeSettlementInfluenceSphereList { get; private set; } = new List<int>();
 
 
 
@@ -129,7 +130,7 @@ public class World : MonoBehaviour
 		Globals.Register(new Game());
 		Globals.Register(new Database());
 
-		Globals.Database.Init();
+		Database.Init();
 
 		// wind and current init
 		BuildWindZoneGameObjects();
@@ -141,7 +142,7 @@ public class World : MonoBehaviour
 	}
 
 	private void Update() {
-		Globals.Game.Update();
+		Game.Update();
 	}
 
 

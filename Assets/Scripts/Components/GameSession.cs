@@ -9,8 +9,10 @@ using UnityEngine;
 public class GameSession
 {
 	World World => Globals.World;
+	QuestSystem Quests => Globals.Quests;
 	Database Database => Globals.Database;
 	Notifications Notifications => Globals.Notifications;
+	UISystem UI => Globals.UI;
 
 	// TODO: These should be removed eventually in favor of using Globals.World.Crew.Jason, so that World isn't so overloaded with util functions
 	public CrewMember Jason => Crew.Jason;
@@ -20,14 +22,14 @@ public class GameSession
 	public IEnumerable<CrewMember> AllNonCrew => Crew.AllNonCrew;
 
 	// settlements
-	[HideInInspector] public GameObject currentSettlementGameObject;
-	[HideInInspector] public Settlement currentSettlement;
-	[HideInInspector] public int currentPortTax = 0;        // this is derived from the currentSettlement. could be a getter on settlement object
+	public GameObject currentSettlementGameObject { get; set; }
+	public Settlement currentSettlement { get; set; }
+	public int currentPortTax { get; set; } = 0;        // this is derived from the currentSettlement. could be a getter on settlement object
 
 
 	// ship
-	[HideInInspector] public GameObject playerShip;
-	[HideInInspector] public script_player_controls playerShipVariables;
+	public GameObject playerShip { get; private set; }
+	public script_player_controls playerShipVariables { get; private set; }
 
 	// captain's log
 	private string currentCaptainsLog = "";
@@ -44,10 +46,10 @@ public class GameSession
 	}
 
 	// game state
-	[HideInInspector] public bool controlsLocked = false;
-	[HideInInspector] public bool justLeftPort = false;
-	[HideInInspector] public bool isPerformingRandomEvent = false;
-	[HideInInspector] public bool isPassingTime = false;
+	public bool controlsLocked { get; set; } = false;
+	public bool justLeftPort { get; set; } = false;
+	public bool isPerformingRandomEvent { get; set; } = false;
+	public bool isPassingTime { get; set; } = false;
 
 	// TODO: Should really make all this game state stuff an actual state machine at some point
 	public bool IsCutsceneMode = false;
@@ -64,11 +66,11 @@ public class GameSession
 	//###################################
 	//	GUI VARIABLES
 	//###################################
-	[HideInInspector] public bool showSettlementGUI = false;
-	[HideInInspector] public bool showSettlementTradeButton = false;
-	[HideInInspector] public bool showPortDockingNotification = false;
-	[HideInInspector] public bool gameDifficulty_Beginner = false;
-	[HideInInspector] public bool showNonPortDockButton = false;
+	public bool showSettlementGUI { get; set; } = false;
+	public bool showSettlementTradeButton { get; set; } = false;
+	public bool showPortDockingNotification { get; set; } = false;
+	public bool gameDifficulty_Beginner { get; set; } = false;
+	public bool showNonPortDockButton { get; set; } = false;
 
 
 	public GameSession() {
@@ -78,7 +80,6 @@ public class GameSession
 		// must be after csv are loaded
 		Network = new Network();
 		Trade = new Trade();
-		Icons = new Icons(Database.masterResourceList);
 		Crew = new Crew(Database.masterCrewList, Database.masterPirateTypeList, playerShipVariables.ship);
 
 		World.CreateSettlementsFromList();
@@ -134,6 +135,7 @@ public class GameSession
 	}
 
 	void DebugHotkeys() {
+		// uncomment to use debug hotkeys
 #if UNITY_EDITOR
 		//if(Input.GetKeyUp(KeyCode.E)) {
 		//	var storm = new StormAtSea();
@@ -149,11 +151,11 @@ public class GameSession
 
 	void StartPlayerShipAtOriginCity() {
 		//first set the origin city to the first available as a default
-		GameObject originCity = World.settlement_masterList_parent.transform.GetChild(0).gameObject;
+		//GameObject originCity = World.settlement_masterList_parent.transform.GetChild(0).gameObject;
 		foreach (Transform child in World.settlement_masterList_parent.transform) {
 			//if the settlement we want exists, then use it as the default instead
 			if (child.name == "Samothrace") {
-				originCity = child.gameObject;
+				//originCity = child.gameObject;
 				break;
 			}
 		}
@@ -172,10 +174,10 @@ public class GameSession
 		playerShipVariables.ship.crewCapacity = 30;
 		playerShipVariables.ship.cargo_capicity_kg = 1200;
 
-		Globals.UI.Hide<RepairsView>();
+		UI.Hide<RepairsView>();
 
 		// this will automatically add the story crew that was previously being added manually in a hack
-		Globals.Quests.CheckUpgradeShipTriggers();
+		Quests.CheckUpgradeShipTriggers();
 
 		// show the new ship model
 		SetShipModel(playerShipVariables.ship.upgradeLevel);

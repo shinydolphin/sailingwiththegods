@@ -13,9 +13,6 @@ public class Network
 	GameSession Session => Globals.Game.Session;
 	Database Database => Globals.Database;
 
-	public Network() {
-	}
-
 	public bool CheckForNetworkMatchBetweenTwoSettlements(int cityA, int cityB) {
 		Settlement cityAObj = Database.GetSettlementFromID(cityA);
 		Settlement cityBObj = Database.GetSettlementFromID(cityB);

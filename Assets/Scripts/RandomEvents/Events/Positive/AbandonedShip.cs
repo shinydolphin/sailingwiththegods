@@ -30,6 +30,6 @@ public class AbandonedShip : RandomEvents.PositiveEvent
 
 		//now add the final bit to the event
 		finalMessage += "We watch the ship sink as we sail away--ever mindful that if we aren't careful, the same could happen to us!";
-		Globals.Notifications.ShowANotificationMessage(finalMessage);
+		Notifications.ShowANotificationMessage(finalMessage);
 	}
 }

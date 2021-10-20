@@ -18,7 +18,7 @@ public class PortViewModel : CityViewModel
 	}
 
 	public void GoToTown() {
-		Globals.UI.Hide<PortScreen>();
-		Globals.UI.Show<TownScreen, TradeViewModel>(Globals.World.MasterGUISystem.Trade);
+		UI.Hide<PortScreen>();
+		UI.Show<TownScreen, TradeViewModel>(World.MasterGUISystem.Trade);
 	}
 }

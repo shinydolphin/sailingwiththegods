@@ -14,6 +14,6 @@ public class StormAtSea : RandomEvents.NegativeEvent
 
 
 	public override void Execute() {
-		Globals.MiniGames.Enter("Storm Game");
+		MiniGames.Enter("Storm Game");
 	}
 }

@@ -9,6 +9,8 @@ using UnityEngine.SceneManagement;
 
 public class MiniGames : MonoBehaviour
 {
+	World World => Globals.World;
+
 	Scene? Scene;
 
 	private void Awake() {
@@ -66,10 +68,10 @@ public class MiniGames : MonoBehaviour
 		CutsceneMode.Enter();
 		IsMiniGameActive = true;
 
-		Globals.World.camera_Mapview.SetActive(false);
+		World.camera_Mapview.SetActive(false);
 
 		if(disableCamera) {
-			Globals.World.FPVCamera.SetActive(false);
+			World.FPVCamera.SetActive(false);
 		}
 	}
 
@@ -90,17 +92,17 @@ public class MiniGames : MonoBehaviour
 			IsMiniGameSceneActive = false;
 		}
 
-		Globals.World.camera_Mapview.SetActive(true);
-		Globals.World.FPVCamera.SetActive(true);
+		World.camera_Mapview.SetActive(true);
+		World.FPVCamera.SetActive(true);
 
 	}
 
 	// scene minigames usually live at the origin, so this disables things that get in the way of the additively loaded minigames
 	void SetMainSceneObjectsEnabled(bool enabled) {
-		Globals.World.crewBeacon.IsTemporarilyHidden = !enabled;
-		Globals.World.navigatorBeacon.IsTemporarilyHidden = !enabled;
+		World.crewBeacon.IsTemporarilyHidden = !enabled;
+		World.navigatorBeacon.IsTemporarilyHidden = !enabled;
 		//Globals.World.terrain.GetComponent<Terrain>().drawHeightmap = enabled;
-		Globals.World.terrain.SetActive(enabled);
+		World.terrain.SetActive(enabled);
 		GameObject mainLight = GameObject.FindGameObjectWithTag("main_light_source");
 		if (mainLight != null) {
 			mainLight.GetComponent<Light>().enabled = enabled;

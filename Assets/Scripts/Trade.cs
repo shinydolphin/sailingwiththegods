@@ -6,9 +6,6 @@ public class Trade
 	Database Database => Globals.Database;
 	GameSession Session => Globals.Game.Session;
 
-	public Trade() {
-	}
-
 	// given the amount of this cargo in the current settlment, returns the price of it at this settlement based on scarcity
 	public int GetPriceOfResource(string resource, Settlement port) {
 		var amount = port.GetCargoByName(resource).initial_amount_kg;
@@ -55,7 +52,6 @@ public class Trade
 	public float GetTotalPriceOfGoods() {
 		//We need to get the total price of all cargo on the ship
 		float totalPriceOfGoods = 0f;
-		//Debug.Log($"Checking prices in {Session.currentSettlement}");
 
 		//Loop through each resource in the settlement's cargo and figure out the price of that resource 
 		//The reason this starts at 2 is so it ignores the value of your food and water
@@ -64,15 +60,7 @@ public class Trade
 			//with this price, let's check the ships cargo at the same index position and calculate its worth and add it to the total
 			float totalResourcePrice = (currentResourcePrice * Session.playerShipVariables.ship.cargo[setIndex].amount_kg);
 			totalPriceOfGoods += totalResourcePrice;
-			//Debug.Log (MGV.currentSettlement.cargo[setIndex].name + totalPriceOfGoods)
-
-			////if (Session.playerShipVariables.ship.cargo[setIndex].amount_kg > 0) {
-			////	Debug.Log($"You have {Session.playerShipVariables.ship.cargo[setIndex].amount_kg}kg of {Session.currentSettlement.cargo[setIndex].name}, which sells for {currentResourcePrice} each for a total of {totalResourcePrice}.");
-			////}
-			
 		}
-
-		//Debug.Log($"Altogether, your cargo is worth {totalPriceOfGoods}");
 
 		return totalPriceOfGoods;
 	}
