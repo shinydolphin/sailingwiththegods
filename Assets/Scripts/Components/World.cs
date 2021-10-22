@@ -25,9 +25,6 @@ public class World : MonoBehaviour
 	[Header("World Scene Refs")]
 	public GameObject terrain;
 
-	[Header("GUI Scene Refs")]
-	public script_GUI MasterGUISystem;
-
 	[Header("Skybox Scene Refs")]
 	public GameObject skybox_celestialGrid;
 	public GameObject skybox_MAIN_CELESTIAL_SPHERE;
@@ -52,7 +49,6 @@ public class World : MonoBehaviour
 
 	[Header("Ununorganized Scene Refs")]
 	public List<CrewMember> currentlyAvailableCrewMembersAtPort; // updated every time ship docks at port
-	public MenuSwitcherSounds audioManager;
 
 	[Header("GUI Scene Refs")]
 	public GameObject selection_ring;
@@ -100,6 +96,17 @@ public class World : MonoBehaviour
 	public List<int> activeSettlementInfluenceSphereList { get; private set; } = new List<int>();
 
 
+	[Header("Regional Zones")]
+	//any time a new regional zone is added to this list or to the IDE, 
+	//the regional_zones array will need to be hard-code edited in this script's start method
+	//AND the game object within the IDE needs to be inactive to start off with 
+	[SerializeField] GameObject Aetolian_Region_Zone = null;
+	[SerializeField] GameObject Cretan_Region_Zone = null;
+	[SerializeField] GameObject Etruscan_Pirate_Region_Zone = null;
+	[SerializeField] GameObject Illyrian_Region_Zone = null;
+
+	GameObject[] regional_zones;
+
 
 
 
@@ -139,6 +146,9 @@ public class World : MonoBehaviour
 		currentRose_January = CSVLoader.LoadWaterZonesFromFile(currentZoneColumns, currentZoneRows);
 		SetInGameWindZonesToWindRoseData();
 		SetInGameWaterZonesToCurrentRoseData();
+
+		regional_zones = new GameObject[] { Aetolian_Region_Zone, Cretan_Region_Zone, Etruscan_Pirate_Region_Zone, Illyrian_Region_Zone };
+		Make_Zones_Invisible_On_Play_Start();
 	}
 
 	private void Update() {
@@ -336,5 +346,17 @@ public class World : MonoBehaviour
 		}
 
 	}
+
+	#region Making Regional Zones Invisible in Game
+
+	public void Make_Zones_Invisible_On_Play_Start() {
+		foreach (GameObject zone in regional_zones) {
+			zone.SetActive(true);
+			foreach (var zonePiece in zone.GetComponentsInChildren<MeshRenderer>()) {
+				zonePiece.enabled = false;
+			}
+		}
+	}
+	#endregion
 
 }///////// END OF FILE

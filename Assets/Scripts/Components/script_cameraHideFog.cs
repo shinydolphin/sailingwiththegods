@@ -3,7 +3,8 @@ using System.Collections;
 
 public class script_cameraHideFog : MonoBehaviour
 {
-	public static bool FogActive => !Globals.MiniGames.IsMiniGameSceneActive;
+	// fog is active when mini games system is not
+	public static bool FogActive => Globals.MiniGames == null || !Globals.MiniGames.IsMiniGameSceneActive;
 
 	[SerializeField] bool enableFog = true;
 	public bool revertFogState = false;

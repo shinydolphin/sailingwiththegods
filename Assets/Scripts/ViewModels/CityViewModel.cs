@@ -120,6 +120,9 @@ public class CityViewModel : Model
 	protected Game MainState => Globals.Game;
 	protected UISystem UI => Globals.UI;
 
+	// TODO: Remove this soon. the number of references is under 5 now
+	protected script_GUI masterGUISystem => GameObject.FindObjectOfType<script_GUI>();
+
 	public Settlement City { get; private set; }
 
 	public string PortName => City.name;
@@ -171,7 +174,7 @@ public class CityViewModel : Model
 			Session.showSettlementGUI = false;
 			MainState.runningMainGameGUI = true;
 
-			World.MasterGUISystem.ClearViewModels();
+			masterGUISystem.ClearViewModels();
 
 			UI.Hide<PortScreen>();
 			UI.Hide<TownScreen>();
