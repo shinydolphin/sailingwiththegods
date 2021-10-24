@@ -9,10 +9,9 @@ public class Bootstrap : MonoBehaviour
 	[SerializeField] string _baseScene = null;
 	[SerializeField] string[] _additiveScenes = null;
 
-	[SerializeField] Canvas _loadingScreen;
+	[SerializeField] Canvas _loadingScreen = null;
 
-    IEnumerator Start()
-    {
+	IEnumerator Start() {
 		DontDestroyOnLoad(gameObject);
 
 		// base scene has to be loaded and activated first or unity won't load additive scenes over it
@@ -22,10 +21,9 @@ public class Bootstrap : MonoBehaviour
 		Debug.Log("Base scene " + _baseScene + " loaded and activated.");
 
 		var sceneLoads = new List<AsyncOperation>();
-		foreach (var scene in _additiveScenes)
-        {
+		foreach (var scene in _additiveScenes) {
 			sceneLoads.Add(LoadWithoutActivation(scene));
-        }
+		}
 
 		Debug.Log("Waiting on scene loads: " + sceneLoads.Count);
 
@@ -37,10 +35,10 @@ public class Bootstrap : MonoBehaviour
 		Debug.Log("All additive scenes preloaded...");
 
 		// activate all at once
-		foreach(var load in sceneLoads) {
+		foreach (var load in sceneLoads) {
 			load.allowSceneActivation = true;
 		}
-		while(sceneLoads.Any(loads => !loads.isDone)) {
+		while (sceneLoads.Any(loads => !loads.isDone)) {
 			yield return new WaitForEndOfFrame();
 		}
 

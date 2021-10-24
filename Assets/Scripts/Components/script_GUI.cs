@@ -240,8 +240,8 @@ public class script_GUI : MonoBehaviour
 		Session.showSettlementTradeButton = false;
 		Session.controlsLocked = true;
 
-		trade = new TradeViewModel(heraldIcon, noHeraldIcon, i.Equals(Intention.Water), i.Equals(Intention.All), heraldMod);
-		port = new PortViewModel(i.Equals(Intention.All));
+		trade = new TradeViewModel(Session, heraldIcon, noHeraldIcon, i.Equals(Intention.Water), i.Equals(Intention.All), heraldMod);
+		port = new PortViewModel(Session, Notifications, i.Equals(Intention.All));
 
 		//-------------------------------------------------
 		//NEW GUI FUNCTIONS FOR SETTING UP TAB CONTENT

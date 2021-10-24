@@ -78,7 +78,7 @@ public class GameSession
 		playerShipVariables = playerShip.GetComponent<script_player_controls>();
 
 		// must be after csv are loaded
-		Network = new Network();
+		Network = new Network(this, Database);
 		Trade = new Trade();
 		Crew = new Crew(Database.masterCrewList, Database.masterPirateTypeList, playerShipVariables.ship);
 

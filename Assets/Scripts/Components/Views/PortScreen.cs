@@ -58,7 +58,7 @@ public class PortScreen : ViewBehaviour<PortViewModel>
 
 		Loans?.Bind(ValueModel.New(new ButtonViewModel {
 			Label = "Loans",
-			OnClick = () => UI.Show<LoanView, LoanViewModel>(new LoanViewModel())
+			OnClick = () => UI.Show<LoanView, LoanViewModel>(new LoanViewModel(model.Session))
 		}));
 
 		Tavern?.Bind(ValueModel.New(new ButtonViewModel {
@@ -68,7 +68,7 @@ public class PortScreen : ViewBehaviour<PortViewModel>
 
 		Repairs?.Bind(ValueModel.New(new ButtonViewModel {
 			Label = "Shipyard",
-			OnClick = () => UI.Show<RepairsView, RepairsViewModel>(new RepairsViewModel())
+			OnClick = () => UI.Show<RepairsView, RepairsViewModel>(new RepairsViewModel(model.Session))
 		}));
 
 		PortIcon?.Bind(new BoundModel<Sprite>(model, nameof(model.PortIcon)));

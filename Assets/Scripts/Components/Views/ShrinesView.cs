@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public class ShrinesViewModel : Model
 {
-	GameSession Session => Globals.Game.Session;
+	GameSession Session { get; set; }
 
 	int BaseCost {
 		get {
@@ -28,14 +28,15 @@ public class ShrinesViewModel : Model
 
 	public ICollectionModel<ShrineOptionModel> Options { get; private set; }
 
-	public ShrinesViewModel() {
+	public ShrinesViewModel(GameSession session) {
+		Session = session;
 		Options = ValueModel.Wrap(new ObservableCollection<ShrineOptionModel>(new[]
 		{
-			new ShrineOptionModel("Votive", BaseCost / 200, 1, "+1 Clout"),
-			new ShrineOptionModel("Feast", BaseCost / 10, 10, "+10 Clout"),
-			new ShrineOptionModel("Statue", BaseCost / 3, 30, "+30 Clout"),
-			new ShrineOptionModel("Shrine", BaseCost / 3 * 50, 50, "+50 Clout"),
-			new ShrineOptionModel("Temple", BaseCost / 3 * 50 * 20, 100, "+100 Clout")
+			new ShrineOptionModel(Session, "Votive", BaseCost / 200, 1, "+1 Clout"),
+			new ShrineOptionModel(Session, "Feast", BaseCost / 10, 10, "+10 Clout"),
+			new ShrineOptionModel(Session, "Statue", BaseCost / 3, 30, "+30 Clout"),
+			new ShrineOptionModel(Session, "Shrine", BaseCost / 3 * 50, 50, "+50 Clout"),
+			new ShrineOptionModel(Session, "Temple", BaseCost / 3 * 50 * 20, 100, "+100 Clout")
 		}));
 	}
 }

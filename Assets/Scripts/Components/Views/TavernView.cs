@@ -28,7 +28,7 @@ public class TavernCityViewModel : CityViewModel
 		get { return ds; }
 	}
 
-	public TavernCityViewModel(Settlement city, DialogScreen d) : base(city, null) 
+	public TavernCityViewModel(GameSession session, Settlement city, DialogScreen d) : base(session, city, null) 
 	{
 		ds = d;
 	}
@@ -80,16 +80,14 @@ public class TavernCityViewModel : CityViewModel
 
 public class TavernViewModel : Model
 {
-	World World => Globals.World;
-	GameSession Session => Globals.Game.Session;
 	Database Database => Globals.Database;
 
 	public ICollectionModel<CityViewModel> Cities { get; private set; }
 
-	public TavernViewModel(DialogScreen d) {
-		Cities = ValueModel.Wrap(Session.playerShipVariables.ship.playerJournal.knownSettlements)
+	public TavernViewModel(GameSession session, DialogScreen d) {
+		Cities = ValueModel.Wrap(session.playerShipVariables.ship.playerJournal.knownSettlements)
 			//.Where(id => id != Session.currentSettlement.settlementID)
-			.Select(id => new TavernCityViewModel(Database.GetSettlementFromID(id), d) as CityViewModel);
+			.Select(id => new TavernCityViewModel(session, Database.GetSettlementFromID(id), d) as CityViewModel);
 	}
 }
 

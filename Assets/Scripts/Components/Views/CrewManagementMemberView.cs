@@ -11,7 +11,8 @@ using UnityEngine.UI;
 public class CrewManagementMemberViewModel : Model
 {
 	Database Database => Globals.Database;
-	GameSession Session => Globals.Game.Session;
+
+	GameSession Session { get; set; }
 
 	public CrewMember Member { get; private set; }
 	
@@ -39,17 +40,18 @@ public class CrewManagementMemberViewModel : Model
 	public Action<CrewManagementMemberViewModel> OnClick { get => _OnClick; set { _OnClick = value; Notify(); } }
 
 
-	public CrewManagementMemberViewModel(CrewMember member, Action<CrewManagementMemberViewModel> onClick, Action<CityViewModel> onClickCity) {
+	public CrewManagementMemberViewModel(GameSession session, CrewMember member, Action<CrewManagementMemberViewModel> onClick, Action<CityViewModel> onClickCity) {
 		Member = member;
 		OnClick = onClick;
 		Portrait = member.PortraitSprite();
+		Session = session;
 		
 		// don't bother building the network list if we're being created for a view that doesn't need it
 		// sort by port name so you can easily look up a port in the list
 		if(onClickCity != null) {
 			CitiesInNetwork = ValueModel.Wrap(new ObservableCollection<CityViewModel>(
 				Session.Network.GetCrewMemberNetwork(Member)
-					.Select(s => new CityViewModel(s, onClickCity))
+					.Select(s => new CityViewModel(session, s, onClickCity))
 					.OrderBy(c => c.PortName)
 			));
 		}

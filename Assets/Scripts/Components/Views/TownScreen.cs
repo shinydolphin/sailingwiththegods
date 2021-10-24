@@ -46,7 +46,7 @@ public class TownScreen : ViewBehaviour<TradeViewModel>
 
 		Monuments?.Bind(ValueModel.New(new ButtonViewModel {
 			Label = "Monuments",
-			OnClick = () => UI.Show<ShrinesView, ShrinesViewModel>(new ShrinesViewModel())
+			OnClick = () => UI.Show<ShrinesView, ShrinesViewModel>(new ShrinesViewModel(model.Session))
 		}));
 		Monuments.Interactable = model.monuments;
 

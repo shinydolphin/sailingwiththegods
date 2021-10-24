@@ -8,8 +8,9 @@ using UnityEngine.UI;
 
 public class RepairsViewModel : Model
 {
-	GameSession Session => Globals.Game.Session;
 	Notifications Notifications => Globals.Notifications;
+
+	GameSession Session { get; set; }
 
 	public int costToRepair { get; private set; }
 	public int costToBuyUpgrade => 10000;			// TODO: Drive with something.
@@ -17,7 +18,8 @@ public class RepairsViewModel : Model
 	public BoundModel<float> shipHealth { get; private set; }
 	public BoundModel<int> shipLevel { get; private set; }
 
-	public RepairsViewModel() {
+	public RepairsViewModel(GameSession session) {
+		Session = session;
 
 		//We need to do a clout check as well as a network checks
 		int baseModifier = Mathf.CeilToInt(2 - Session.GetOverallCloutModifier(Session.currentSettlement.settlementID));

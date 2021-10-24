@@ -20,6 +20,9 @@ public class Game
 	UISystem UI => Globals.UI;
 	QuestSystem Quests => Globals.Quests;
 
+	// TODO: Make this private and require it be passed around to avoid scattering Globals.Game.Session calls everywhere, which doesn't guarantee you have a session.
+	// it would be better if the session is passed around to people who need it, and if you don't have it it's probably because you're not allowed to have it
+	// everything else in Globals is actually global and is valid at any time	
 	public GameSession Session { get; private set; }
 
 	// TODO: Is this a bug? These never change.
@@ -142,7 +145,7 @@ public class Game
 			SetupBeginnerGameDifficulty();
 
 			//Turn on the ship HUD
-			UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
+			UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel(Session));
 
 			Session.controlsLocked = false;
 			//Flag the main GUI scripts to turn on
@@ -217,7 +220,7 @@ public class Game
 		//title_crew_select.SetActive(false);
 
 		//Turn on the ship HUD
-		UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
+		UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel(Session));
 	}
 
 	bool LoadSavedGameInternal() {

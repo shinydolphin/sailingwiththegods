@@ -210,7 +210,7 @@ public class YarnTavern : MonoBehaviour
 	public void GenerateKnownSettlementUI(string [] parameters, System.Action onComplete) 
 	{
 		ds.yarnOnComplete = onComplete;
-		Globals.UI.Show<TavernView, TavernViewModel>(new TavernViewModel(ds));
+		Globals.UI.Show<TavernView, TavernViewModel>(new TavernViewModel(Globals.Game.Session, ds));
 	}
 
 	private Settlement CityFromName(string name) 

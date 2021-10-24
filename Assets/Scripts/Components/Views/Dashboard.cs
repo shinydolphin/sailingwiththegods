@@ -49,7 +49,7 @@ public class Dashboard : ViewBehaviour<DashboardViewModel>
 
 		MainMenuButton.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => UI.Show<MainMenuScreen, GameViewModel>(new GameViewModel()) }));
 		CloutButton.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => UI.Show<CrewDetailsScreen, CrewManagementMemberViewModel>(
-			new CrewManagementMemberViewModel(model.Jason, model.OnCrewClicked, model.OnCrewCityClicked)
+			new CrewManagementMemberViewModel(model.Session, model.Jason, model.OnCrewClicked, model.OnCrewCityClicked)
 		)}));
 
 		// TODO: make 5000 max clout a const somewhere

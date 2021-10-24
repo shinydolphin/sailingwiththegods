@@ -47,7 +47,7 @@ public class script_settlement_functions : MonoBehaviour, IPointerEnterHandler, 
 
 	void TryShowTooltip() {
 		if (!UI.IsShown<CityView>() && !Session.IsCutsceneMode) {
-			var ui = UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(thisSettlement, null));
+			var ui = UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(Session, thisSettlement, null));
 			ui.transform.position = UI.WorldToUI(World.FPVCamera.GetComponent<Camera>(), transform.position);
 		}
 	}

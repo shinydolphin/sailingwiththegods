@@ -12,8 +12,8 @@ public class PortViewModel : CityViewModel
 
 	public bool allowTownAccess;
 
-	public PortViewModel(bool townAccess = true) : base(Globals.Game.Session.currentSettlement, null){
-		CrewManagement = new CrewManagementViewModel(City);
+	public PortViewModel(GameSession session, Notifications notifications, bool townAccess = true) : base(session, Globals.Game.Session.currentSettlement, null){
+		CrewManagement = new CrewManagementViewModel(session, notifications, City);
 		allowTownAccess = townAccess;
 	}
 
