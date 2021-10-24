@@ -194,5 +194,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bootstrap
       objectReference: {fileID: 0}
+    - target: {fileID: 7393342226895666855, guid: fbe66d8058811ae46b70c357f0656a44,
+        type: 3}
+      propertyPath: m_text
+      value: Traveling back to 200 BCE . . .
+      objectReference: {fileID: 0}
+    - target: {fileID: 7393342226895666855, guid: fbe66d8058811ae46b70c357f0656a44,
+        type: 3}
+      propertyPath: m_textInfo.characterCount
+      value: 31
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fbe66d8058811ae46b70c357f0656a44, type: 3}
