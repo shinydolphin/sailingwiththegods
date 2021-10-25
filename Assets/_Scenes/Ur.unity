@@ -285,7 +285,7 @@ MonoBehaviour:
     Once pieces reach the back of the bridge and begin the last
     path to the end of the board, they are flipped over to show they are close to
     finishing.'
-  history: The Royal Game of Ur - also known as Twenty Squares - has a history that
+  history: "The Royal Game of Ur - also known as Twenty Squares - has a history that
     stretches over five millennia! Its earliest boards date back to 2500 BC, and
     over 100 examples have been found in archaeological sites in Iraq, Iran, Israel,
     Syria, Jordan, Lebanon, Turkey, Cyprus, Egypt, and Crete. Sir Leonard Woolley
@@ -302,7 +302,20 @@ MonoBehaviour:
     known as Iddin-Bel. You can see Itti-Marduk-balatu's tablet at the British Museum,
     BM33333B.  It is inscribed on the back with omens from the flights of birds,
     including the swallow (summatu) and the raven (ugagu). A second tablet, several
-    centuries earlier, has some of the same material, and may have come from Uruk.
+    centuries earlier, has some of the same material, and may have come from Uruk.\n\nBendlin,
+    Andreas (Erfurt) and Hurschmann, Rolf (Hamburg), \u201CBoard games\u201D, in
+    Brill\u2019s New Pauly, Antiquity volumes edited by: Hubet Cancik and Helmuth
+    Schneider, English Edition by: Christine F. Salazar, Classical Tradition volumes
+    edited by: Manfred Landfester, English Edition by: Francis G. Gentry. First published
+    online: 2006. First print edition: 9789004122598, 20110510\r\nBritish Museum.
+    Collection webpage for Royal Game of Ur, game-board. The British Museum collection
+    #120834.  Available at: https://www.britishmuseum.org/collection/object/W_1928-1009-378
+    Accessed on [10/2021].\r\n\r\nFinkel, Irving L.  2007. \u201COn the Rules for
+    the Royal Games of Ur,\u201D in Irving L. Finkel (ed.) Ancient Board Games in
+    Perspective. Papers from the 1990 British Museum Colloquium, with additional
+    contributions London: British Museum Press, p 22-32.\r\n\r\nKurke, Leslie. 1999.
+    \u201CAncient Greek Board Games and How to Play Them.\u201D Classical Philology
+    94.3: 247-267."
   winText: Your opponent grimaces for a second, but seems happy to have met his match.
     "Well done, then! As promised, a bit of food and water for your ship and crew.
     Perhaps next time we meet I'll defeat you!"
