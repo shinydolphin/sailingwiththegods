@@ -12992,11 +12992,6 @@ PrefabInstance:
       propertyPath: port_dialog
       value: 
       objectReference: {fileID: 688996875}
-    - target: {fileID: 6923551785582966986, guid: 2f5f4f70e730bf646bd3fff108e614e8,
-        type: 3}
-      propertyPath: useDebugDialog
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6923551785582966987, guid: 2f5f4f70e730bf646bd3fff108e614e8,
         type: 3}
       propertyPath: m_LocalPosition.x
