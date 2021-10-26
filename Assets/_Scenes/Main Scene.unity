@@ -48281,6 +48281,18 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 1
   m_IsOn: 0
+--- !u!114 &1921937386 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1446390382397619008, guid: 7675c14122f18e2438dac94c4c2bcf02,
+    type: 3}
+  m_PrefabInstance: {fileID: 1446390381854587699}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e186cf6cf44ca4d499ff12ba53ca91c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1923566591
 GameObject:
   m_ObjectHideFlags: 0
@@ -53273,6 +53285,16 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 195346831048514406, guid: 585b20b052d2d944995ceb2669320f48,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1921937386}
+    - target: {fileID: 195346831048514406, guid: 585b20b052d2d944995ceb2669320f48,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: DeactiveText
+      objectReference: {fileID: 0}
     - target: {fileID: 196151082385226367, guid: 585b20b052d2d944995ceb2669320f48,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -53772,6 +53794,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1132243673126856374, guid: 585b20b052d2d944995ceb2669320f48,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1921937386}
+    - target: {fileID: 1132243673126856374, guid: 585b20b052d2d944995ceb2669320f48,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ActiveText
       objectReference: {fileID: 0}
     - target: {fileID: 1209208028174121477, guid: 585b20b052d2d944995ceb2669320f48,
         type: 3}
