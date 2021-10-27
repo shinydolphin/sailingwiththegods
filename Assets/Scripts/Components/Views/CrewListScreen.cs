@@ -9,6 +9,9 @@ using UnityEngine.UI;
 
 public class CrewListScreen : ViewBehaviour<ICollectionModel<CrewManagementMemberViewModel>>
 {
+	UISystem UI => Globals.UI;
+	QuestSystem Quests => Globals.Quests;
+
 	[SerializeField] CrewManagementListView List = null;
 	[SerializeField] ButtonView Close = null;
 
@@ -17,8 +20,8 @@ public class CrewListScreen : ViewBehaviour<ICollectionModel<CrewManagementMembe
 
 		// HACK: collectionwrappermodel has limited ordering features for now, so the *9999 simulates a orderby.thenby, and use a 1/(value) to simulate a desc sort
 		List?.Bind(model
-			.OrderBy(c => 1f / (c.CitiesInNetwork.Count(city => city.City.settlementID == Globals.Quests.CurrDestinationId) * 9999 + Globals.Game.Session.Network.GetCrewMemberNetwork(c.Member).Count()))
+			.OrderBy(c => 1f / (c.CitiesInNetwork.Count(city => city.City.settlementID == Quests.CurrDestinationId) * 9999 + c.CitiesInNetwork.Count()))
 		);
-		Close?.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => Globals.UI.Hide(this) }));
+		Close?.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => UI.Hide(this) }));
 	}
 }

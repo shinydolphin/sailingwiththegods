@@ -118,7 +118,7 @@ public class TavernaController : MonoBehaviour
 	public void LeaveTavernaScene(bool keepTavernaAudio = false) {
 		if (Globals.Game.Session != null && !keepTavernaAudio) 
 		{
-			Globals.World.audioManager.PlaySound(portAudio);
+			Globals.audioManager.PlaySound(portAudio);
 			Globals.Game.Session.playerShipVariables.ToggleBirdsong(true);
 		}
 		Globals.MiniGames.Exit();

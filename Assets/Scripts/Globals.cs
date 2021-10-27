@@ -13,6 +13,9 @@ public static class Globals
 	public static QuestSystem Quests => Get<QuestSystem>();
 	public static MiniGames MiniGames => Get<MiniGames>();
 
+	// TODO: Needs a review. Should turn this into a reusable audio system soon
+	public static MenuSwitcherSounds audioManager => Get<MenuSwitcherSounds>();
+
 
 	public static void Register<T>(T obj)
 	{

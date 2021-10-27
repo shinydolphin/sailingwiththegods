@@ -6,7 +6,10 @@ public class script_GUI : MonoBehaviour
 {
 	Notifications Notifications => Globals.Notifications;
 	Database Database => Globals.Database;
+	QuestSystem Quests => Globals.Quests;
+	MiniGames MiniGames => Globals.MiniGames;
 	Game Game => Globals.Game;
+	UISystem UI => Globals.UI;
 
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
@@ -84,7 +87,7 @@ public class script_GUI : MonoBehaviour
 			// IF WE ARE AT THE TITLE SCREEN
 			if (MainState.isTitleScreen) {
 
-				Globals.UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
+				UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
 				MainState.isTitleScreen = false;			// TODO: Make this based on an event rather than this hacky one-time execution style.
 			}
 
@@ -148,8 +151,8 @@ public class script_GUI : MonoBehaviour
 	//So we get an empty DialogScreen loading in and locking the game, because it has no buttons to close it
 	//Doing it this way *does* leave a split second of black screen during the transition, but it's the best I can figure out right now
 	public void CloseTavernDialog() {
-		Globals.UI.Hide<DialogScreen>();
-		Globals.MiniGames.EnterScene("TavernaMenu");
+		UI.Hide<DialogScreen>();
+		MiniGames.EnterScene("TavernaMenu");
 	}
 
 	//=====================================================================================================================================	
@@ -228,7 +231,7 @@ public class script_GUI : MonoBehaviour
 		Session.showPortDockingNotification = false;
 		//port_info_main.SetActive(false);
 		//Check if current Settlement is part of the main quest line
-		Globals.Quests.CheckCityTriggers(Session.currentSettlement.settlementID);
+		Quests.CheckCityTriggers(Session.currentSettlement.settlementID);
 		//Add this settlement to the player's knowledge base
 		//Debug.Log("Adding known city from script_GUI: " + Session.currentSettlement.name);
 		Session.playerShipVariables.ship.playerJournal.AddNewSettlementToLog(Session.currentSettlement.settlementID);
@@ -237,19 +240,19 @@ public class script_GUI : MonoBehaviour
 		Session.showSettlementTradeButton = false;
 		Session.controlsLocked = true;
 
-		trade = new TradeViewModel(heraldIcon, noHeraldIcon, i.Equals(Intention.Water), i.Equals(Intention.All), heraldMod);
-		port = new PortViewModel(i.Equals(Intention.All));
+		trade = new TradeViewModel(Session, heraldIcon, noHeraldIcon, i.Equals(Intention.Water), i.Equals(Intention.All), heraldMod);
+		port = new PortViewModel(Session, Notifications, i.Equals(Intention.All));
 
 		//-------------------------------------------------
 		//NEW GUI FUNCTIONS FOR SETTING UP TAB CONTENT
 		//Show Port Menu
-		Globals.UI.Hide<Dashboard>();
+		UI.Hide<Dashboard>();
 
 		if (i.Equals(Intention.Water) || i.Equals(Intention.Trading)) {
-			Globals.UI.Show<TownScreen, TradeViewModel>(trade);
+			UI.Show<TownScreen, TradeViewModel>(trade);
 		}
 		else {
-			Globals.UI.Show<PortScreen, PortViewModel>(port);
+			UI.Show<PortScreen, PortViewModel>(port);
 		}
 
 		//Add a new route to the player journey log as a port entry

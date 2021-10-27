@@ -9,6 +9,9 @@ using UnityEngine.UI;
 
 public class Dashboard : ViewBehaviour<DashboardViewModel>
 {
+	UISystem UI => Globals.UI;
+	Database Database => Globals.Database;
+
 	[SerializeField] ButtonView CaptainsLogButton = null;
 	[SerializeField] ButtonView MainMenuButton = null;
 	[SerializeField] ButtonView CargoButton = null;
@@ -34,25 +37,25 @@ public class Dashboard : ViewBehaviour<DashboardViewModel>
 		base.Bind(model);
 
 		CaptainsLogButton.Bind(ValueModel.New(new ButtonViewModel {
-			OnClick = () => Globals.UI.Show(CaptainsLogScreen,
+			OnClick = () => UI.Show(CaptainsLogScreen,
 			new MessageBoxViewModel {
 				Message = Model.CaptainsLog,
-				Cancel = new ButtonViewModel { Label = "Close", OnClick = () => Globals.UI.Hide(CaptainsLogScreen) }
+				Cancel = new ButtonViewModel { Label = "Close", OnClick = () => UI.Hide(CaptainsLogScreen) }
 			})
 		}));
 
-		CargoButton.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => Globals.UI.Show(CargoList, Model.CargoList) }));
+		CargoButton.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => UI.Show(CargoList, Model.CargoList) }));
 		CrewButton.Bind(ValueModel.New(new ButtonViewModel { OnClick = CrewButtonClick }));
 
-		MainMenuButton.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => Globals.UI.Show<MainMenuScreen, GameViewModel>(new GameViewModel()) }));
-		CloutButton.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => Globals.UI.Show<CrewDetailsScreen, CrewManagementMemberViewModel>(
-			new CrewManagementMemberViewModel(model.Jason, model.OnCrewClicked, model.OnCrewCityClicked)
+		MainMenuButton.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => UI.Show<MainMenuScreen, GameViewModel>(new GameViewModel()) }));
+		CloutButton.Bind(ValueModel.New(new ButtonViewModel { OnClick = () => UI.Show<CrewDetailsScreen, CrewManagementMemberViewModel>(
+			new CrewManagementMemberViewModel(model.Session, model.Jason, model.OnCrewClicked, model.OnCrewCityClicked)
 		)}));
 
 		// TODO: make 5000 max clout a const somewhere
 		CloutSlider.Bind(Model.Clout.Select(c => c / 5000f));
 		CloutTitle.Bind(ValueModel.Wrap(Model.Clout)
-			.Select(c => Globals.Database.GetCloutTitleEquivalency((int)c)));
+			.Select(c => Database.GetCloutTitleEquivalency((int)c)));
 
 		FoodInventory.Bind(Model.FoodInventory);
 		WaterInventory.Bind(Model.WaterInventory);
@@ -67,7 +70,7 @@ public class Dashboard : ViewBehaviour<DashboardViewModel>
 	}
 
 	private void CrewButtonClick() {
-		Globals.UI.Show(CrewList, Model.CrewList);
+		UI.Show(CrewList, Model.CrewList);
 		CrewListScroll.value = 0;
 	}
 }

@@ -3,15 +3,17 @@ using UnityEngine.UI;
 
 public class ShrineOptionModel : Model
 {
-	GameSession Session => Globals.Game.Session;
 	Notifications Notifications => Globals.Notifications;
+
+	GameSession Session { get; set; }
 
 	public string Name;
 	public int Cost;
 	public int CloutGain;
 	public string BenefitHint;
 
-	public ShrineOptionModel(string name, int cost, int cloutGain, string benefitHint) {
+	public ShrineOptionModel(GameSession session, string name, int cost, int cloutGain, string benefitHint) {
+		Session = session;
 		Name = name;
 		Cost = cost;
 		CloutGain = cloutGain;

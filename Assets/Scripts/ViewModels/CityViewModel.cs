@@ -27,13 +27,13 @@ public class CityDetailsViewModel : CityViewModel
 				})
 				.ToArray();
 
-	public CityDetailsViewModel(Settlement city, Action<CityViewModel> onClick) : base(city, onClick) {
+	public CityDetailsViewModel(GameSession session, Settlement city, Action<CityViewModel> onClick) : base(session, city, onClick) {
 
 		Crew = ValueModel.Wrap(new ObservableCollection<CrewManagementMemberViewModel>(
 			Session.Network.CrewMembersWithNetwork(city, true)
 				.OrderBy(c => Session.Network.GetCrewMemberNetwork(c).Count())
 				.Take(5)
-				.Select(crew => new CrewManagementMemberViewModel(crew, OnCrewClicked, OnCrewCityClicked))
+				.Select(crew => new CrewManagementMemberViewModel(Session, crew, OnCrewClicked, OnCrewCityClicked))
 		));
 
 		Buy = ValueModel.Wrap(new ObservableCollection<CargoInventoryViewModel>(
@@ -52,13 +52,12 @@ public class CityDetailsViewModel : CityViewModel
 
 	}
 
-	public static List<Resource> AbundantResource(Settlement city) 
-	{
+	public static List<Resource> AbundantResource(Settlement city) {
 		PriceInfo[] PriceInfos = city.cargo.Select(resource => new PriceInfo {
-					Resource = resource,
-					Price = Globals.Game.Session.Trade.GetPriceOfResource(resource.name, city),
-					AvgPrice = Globals.Game.Session.Trade.GetAvgPriceOfResource(resource.name)
-				}).ToArray();
+			Resource = resource,
+			Price = Globals.Game.Session.Trade.GetPriceOfResource(resource.name, city),
+			AvgPrice = Globals.Game.Session.Trade.GetAvgPriceOfResource(resource.name)
+		}).ToArray();
 
 		IEnumerable<PriceInfo> mostAbundant = PriceInfos.OrderBy(o => o.Price - o.AvgPrice).Take(5);
 		List<Resource> mostAbundantResources = new List<Resource>();
@@ -86,8 +85,8 @@ public class CityDetailsViewModel : CityViewModel
 	void OnCrewClicked(CrewManagementMemberViewModel crew) {
 
 		// hide a previous details view if one was already showing so they don't stack on top of eachother and confuse the user
-		Globals.UI.Hide<CrewDetailsScreen>();
-		Globals.UI.Show<CrewDetailsScreen, CrewManagementMemberViewModel>(crew);
+		UI.Hide<CrewDetailsScreen>();
+		UI.Show<CrewDetailsScreen, CrewManagementMemberViewModel>(crew);
 
 	}
 
@@ -95,16 +94,16 @@ public class CityDetailsViewModel : CityViewModel
 	public void OnCrewCityClicked(CityViewModel city) {
 		Debug.Log("City clicked: " + city.PortName);
 
-		if (Globals.UI.IsShown<CityView>()) {
-			Globals.UI.Hide<CityView>();
+		if (UI.IsShown<CityView>()) {
+			UI.Hide<CityView>();
 		}
 
-		var beacon = Globals.World.crewBeacon;
+		var beacon = World.crewBeacon;
 		if (city.City != beacon.Target) {
 			beacon.Target = city.City;
-			Globals.Game.Session.ActivateNavigatorBeacon(Globals.World.crewBeacon, city.City.theGameObject.transform.position);
-			Globals.Game.Session.RotateCameraTowards(city.City.theGameObject.transform.position);
-			Globals.UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(city.City, null));
+			Session.ActivateNavigatorBeacon(World.crewBeacon, city.City.theGameObject.transform.position);
+			Session.RotateCameraTowards(city.City.theGameObject.transform.position);
+			UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(Session, city.City, null));
 		}
 		else {
 			beacon.IsBeaconActive = false;
@@ -115,9 +114,14 @@ public class CityDetailsViewModel : CityViewModel
 public class CityViewModel : Model
 {
 	protected World World => Globals.World;
-	protected GameSession Session => Globals.Game.Session;
 	protected Notifications Notifications => Globals.Notifications;
 	protected Game MainState => Globals.Game;
+	protected UISystem UI => Globals.UI;
+
+	public GameSession Session { get; private set; }
+
+	// TODO: Remove this soon. the number of references is under 5 now
+	protected script_GUI masterGUISystem => GameObject.FindObjectOfType<script_GUI>();
 
 	public Settlement City { get; private set; }
 
@@ -145,17 +149,16 @@ public class CityViewModel : Model
 
 	}
 
-	public CityViewModel(Settlement city, Action<CityViewModel> onClick) {
+	public CityViewModel(GameSession session, Settlement city, Action<CityViewModel> onClick) {
 		City = city;
 		OnClick = onClick;
+		Session = session;
 	}
 
 	// REFERENCED IN BUTTON CLICK UNITYEVENT
 	public void GUI_Button_TryToLeavePort() {
 		//If you aren't low on supplies or you've already been warned
-		if (!Globals.Game.Session.playerShipVariables.CheckIfShipLeftPortStarvingOrThirsty()) {
-			//if (Session.Trade.CheckIfPlayerCanAffordToPayPortTaxes()) {
-			//MGV.controlsLocked = false;
+		if (!Session.playerShipVariables.CheckIfShipLeftPortStarvingOrThirsty()) {
 			//Start Our time passage
 			Session.playerShipVariables.PassTime(.25f, true);
 			Session.justLeftPort = true;
@@ -172,16 +175,11 @@ public class CityViewModel : Model
 			Session.showSettlementGUI = false;
 			MainState.runningMainGameGUI = true;
 
-			World.MasterGUISystem.ClearViewModels();
+			masterGUISystem.ClearViewModels();
 
-			Globals.UI.Hide<PortScreen>();
-			Globals.UI.Hide<TownScreen>();
-			Globals.UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
-
-			//}
-			//else {//Debug.Log ("Not Enough Drachma to Leave the Port!");
-			//	Notifications.ShowANotificationMessage("Not Enough Drachma to pay the port tax and leave!");
-			//}
+			UI.Hide<PortScreen>();
+			UI.Hide<TownScreen>();
+			UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel(Session));
 		}
 
 	}

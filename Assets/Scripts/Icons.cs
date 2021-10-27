@@ -35,11 +35,13 @@ public class Icons
 
 public static class IconExtensions
 {
-	public static Sprite IconSprite(this MetaResource self) => Globals.Game.Session.Icons.GetCargoIcon(self);
-	public static Sprite IconSprite(this Resource self) => Globals.Game.Session.Icons.GetCargoIcon(self);
+	static Database Database => Globals.Database;
 
-	public static Sprite PortraitSprite(this CrewMember self) => Globals.Game.Session.Icons.GetCrewPortrait(self);
+	public static Sprite IconSprite(this MetaResource self) => Database.Icons.GetCargoIcon(self);
+	public static Sprite IconSprite(this Resource self) => Database.Icons.GetCargoIcon(self);
 
-	public static Sprite PortIcon(this Settlement self) => Globals.Game.Session.Icons.GetPortIcon(self);
-	public static Sprite PortCoinIcon(this Settlement self) => Globals.Game.Session.Icons.GetPortCoinIcon(self);
+	public static Sprite PortraitSprite(this CrewMember self) => Database.Icons.GetCrewPortrait(self);
+
+	public static Sprite PortIcon(this Settlement self) => Database.Icons.GetPortIcon(self);
+	public static Sprite PortCoinIcon(this Settlement self) => Database.Icons.GetPortCoinIcon(self);
 }

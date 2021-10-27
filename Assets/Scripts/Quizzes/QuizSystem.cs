@@ -10,6 +10,11 @@ namespace Quizzes
 {
 	abstract class Quiz
 	{
+		protected Game Game => Globals.Game;
+		protected UISystem UI => Globals.UI;
+		protected QuestSystem Quests => Globals.Quests;
+		protected GameSession Session => Globals.Game.Session;
+
 		private Action CompleteCallback;
 
 		public abstract string Name { get; }
@@ -26,14 +31,14 @@ namespace Quizzes
 		}
 
 		protected void HideAnyScreens() {
-			Globals.UI.Hide<QuizScreen>();
-			Globals.UI.Hide<QuestScreen>();
+			UI.Hide<QuizScreen>();
+			UI.Hide<QuestScreen>();
 		}
 
 		protected void Question(string message, ButtonViewModel[] options) {
 			HideAnyScreens();
 
-			Globals.UI.Show<QuizScreen, QuizScreenModel>(new QuizScreenModel(
+			UI.Show<QuizScreen, QuizScreenModel>(new QuizScreenModel(
 				title: Title,
 				message: message,
 				caption: Caption,
@@ -45,7 +50,7 @@ namespace Quizzes
 		protected void Message(string message, Action callback) {
 			HideAnyScreens();
 
-			Globals.UI.Show<QuestScreen, QuizScreenModel>(new QuizScreenModel(
+			UI.Show<QuestScreen, QuizScreenModel>(new QuizScreenModel(
 				title: Title,
 				message: message,
 				caption: Caption,
@@ -60,7 +65,7 @@ namespace Quizzes
 			Debug.Log("Failed Quiz: " + Name);
 
 			HideAnyScreens();
-			Globals.Game.isGameOver = true;
+			Game.isGameOver = true;
 		}
 
 		protected void Complete() {

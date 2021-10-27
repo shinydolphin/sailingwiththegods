@@ -9,7 +9,9 @@ using UnityEngine;
 public class DashboardViewModel : Model
 {
 	World World => Globals.World;
-	GameSession Session => Globals.Game.Session;
+	UISystem UI => Globals.UI;
+
+	public GameSession Session { get; set; }
 
 	public string CaptainsLog => Session.CaptainsLog;
 	public readonly CargoInventoryViewModel WaterInventory;
@@ -24,7 +26,8 @@ public class DashboardViewModel : Model
 
 	public BoundModel<string> Objective { get; private set; }
 
-	public DashboardViewModel() {
+	public DashboardViewModel(GameSession sesion) {
+		Session = sesion;
 
 		Clout = new BoundModel<float>(Session.playerShipVariables.ship, nameof(Session.playerShipVariables.ship.playerClout));
 
@@ -37,7 +40,7 @@ public class DashboardViewModel : Model
 		CargoList = ValueModel.Wrap(new ObservableCollection<CargoInventoryViewModel>(Session.playerShipVariables.ship.cargo.Select(c => new CargoInventoryViewModel(c))));
 
 		CrewList = ValueModel.Wrap(Session.playerShipVariables.ship.crewRoster)
-			.Select(c => new CrewManagementMemberViewModel(c, OnCrewClicked, OnCrewCityClicked));
+			.Select(c => new CrewManagementMemberViewModel(Session, c, OnCrewClicked, OnCrewCityClicked));
 
 		SailsAreUnfurled = new BoundModel<bool>(Session.playerShipVariables.ship, nameof(Session.playerShipVariables.ship.sailsAreUnfurled));
 
@@ -47,8 +50,8 @@ public class DashboardViewModel : Model
 	public void OnCrewCityClicked(CityViewModel city) {
 		Debug.Log("City clicked: " + city.PortName);
 
-		if(Globals.UI.IsShown<CityView>()) {
-			Globals.UI.Hide<CityView>();
+		if(UI.IsShown<CityView>()) {
+			UI.Hide<CityView>();
 		}
 
 		var beacon = World.crewBeacon;
@@ -56,7 +59,7 @@ public class DashboardViewModel : Model
 			beacon.Target = city.City;
 			Session.ActivateNavigatorBeacon(World.crewBeacon, city.City.theGameObject.transform.position);
 			Session.RotateCameraTowards(city.City.theGameObject.transform.position);
-			Globals.UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(city.City, null));
+			UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(Session, city.City, null));
 		}
 		else {
 			beacon.IsBeaconActive = false;
@@ -65,11 +68,11 @@ public class DashboardViewModel : Model
 
 	public void OnCrewClicked(CrewManagementMemberViewModel crew) {
 
-		if (Globals.UI.IsShown<CityView>()) {
-			Globals.UI.Hide<CityView>();
+		if (UI.IsShown<CityView>()) {
+			UI.Hide<CityView>();
 		}
 
-		Globals.UI.Show<CrewDetailsScreen, CrewManagementMemberViewModel>(crew);
+		UI.Show<CrewDetailsScreen, CrewManagementMemberViewModel>(crew);
 	}
 
 	public void GUI_furlOrUnfurlSails() {

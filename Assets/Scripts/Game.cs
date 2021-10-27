@@ -17,7 +17,12 @@ public class Game
 	Notifications Notifications => Globals.Notifications;
 	Database Database => Globals.Database;
 	World World => Globals.World;
+	UISystem UI => Globals.UI;
+	QuestSystem Quests => Globals.Quests;
 
+	// TODO: Make this private and require it be passed around to avoid scattering Globals.Game.Session calls everywhere, which doesn't guarantee you have a session.
+	// it would be better if the session is passed around to people who need it, and if you don't have it it's probably because you're not allowed to have it
+	// everything else in Globals is actually global and is valid at any time	
 	public GameSession Session { get; private set; }
 
 	// TODO: Is this a bug? These never change.
@@ -45,7 +50,7 @@ public class Game
 		isTitleScreen = false;
 		isStartScreen = true;
 
-		Globals.UI.Hide<TitleScreen>();
+		UI.Hide<TitleScreen>();
 
 		FillNewGameCrewRosterAvailability();
 
@@ -88,8 +93,8 @@ public class Game
 
 		//Take player back to title screen
 		//Debug.Log ("GOING TO TITLE SCREEN");
-		Globals.UI.HideAll();
-		Globals.UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
+		UI.HideAll();
+		UI.Show<TitleScreen, GameViewModel>(new GameViewModel());
 		session.controlsLocked = true;
 		isTitleScreen = true;
 		RenderSettings.fog = false;
@@ -114,7 +119,7 @@ public class Game
 			isTitleScreen = false;
 			isStartScreen = false;
 
-			Globals.UI.Hide<TitleScreen>();
+			UI.Hide<TitleScreen>();
 
 			World.camera_titleScreen.SetActive(false);
 
@@ -140,7 +145,7 @@ public class Game
 			SetupBeginnerGameDifficulty();
 
 			//Turn on the ship HUD
-			Globals.UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
+			UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel(Session));
 
 			Session.controlsLocked = false;
 			//Flag the main GUI scripts to turn on
@@ -209,13 +214,13 @@ public class Game
 		Session.controlsLocked = false;
 
 		//Initiate the main questline
-		Globals.Quests.InitiateMainQuestLineForPlayer();
+		Quests.InitiateMainQuestLineForPlayer();
 
 		// TODO: Crew select disabled for now
 		//title_crew_select.SetActive(false);
 
 		//Turn on the ship HUD
-		Globals.UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel());
+		UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel(Session));
 	}
 
 	bool LoadSavedGameInternal() {
@@ -224,9 +229,9 @@ public class Game
 		PlayerJourneyLog loadedJourney = new PlayerJourneyLog();
 		Ship ship = session.playerShipVariables.ship;
 
-		string[] splitFile = new string[] { "\r\n", "\r", "\n" };
-		char[] lineDelimiter = new char[] { ',' };
-		char[] recordDelimiter = new char[] { '_' };
+		string[] splitFile = new [] { "\r\n", "\r", "\n" };
+		char[] lineDelimiter = new [] { ',' };
+		char[] recordDelimiter = new [] { '_' };
 
 		//Look for a save game file and tell the player if none is found.
 		string saveText;
@@ -294,7 +299,6 @@ public class Game
 			loadedJourney.cargoLog.Add(CSVcargo);
 
 			//Next add the other attributes string
-			// KDTODO: This needs to update whenever we add a new field right now. Needs a rewrite.
 			string CSVotherAtt = "";
 			for (int i = 23; i < 42; i++) {
 				CSVotherAtt += "," + records[i];
@@ -340,7 +344,7 @@ public class Game
 		ship.mainQuest.currentQuestSegment = int.Parse(playerVars[28]);
 
 		// Update objective
-		ship.objective = Globals.Quests.CurrSegment?.objective;
+		ship.objective = Quests.CurrSegment?.objective;
 
 		//Update Ship Health
 		ship.health = float.Parse(playerVars[29]);
@@ -390,18 +394,14 @@ public class Game
 		//Add the Known Settlements
 
 		string[] parsedKnowns = playerVars[38].Split(recordDelimiter, StringSplitOptions.None);
-		//Debug.Log ("PARSED KNOWNS: " + playerVars[38]);
 		ship.playerJournal.knownSettlements.Clear();    // TODO: completely move to JSON. For now the JSON values are replaced with the CSV values.
 		foreach (string settlementID in parsedKnowns) {
-			//Debug.Log ("PARSED KNOWNS: " + settlementID);
 			ship.playerJournal.knownSettlements.Add(int.Parse(settlementID));
 		}
 		//Add Captains Log
 		string restoreCommasAndNewLines = playerVars[39].Replace('^', ',');
 		session.ResetCaptainsLog(restoreCommasAndNewLines.Replace('*', '\n'));
-		//Debug.Log (currentCaptainsLog);
 
-		// KDTODO: This needs to be done every time we add a new field right now. Needs a rewrite.
 		ship.upgradeLevel = int.Parse(playerVars[40]);
 		ship.crewCapacity = int.Parse(playerVars[41]);
 		ship.cargo_capicity_kg = int.Parse(playerVars[42]);
@@ -474,7 +474,6 @@ public class Game
 
 			// Loop until stream content ends.
 			while (contentLength != 0) {
-				//Debug.Log("Progress: " + ((fs.Position / fs.Length) * 100f));
 				// Write content from file stream to FTP upload stream.
 				stream.Write(buffer, 0, contentLength);
 				contentLength = fs.Read(buffer, 0, bufferLength);
@@ -504,8 +503,6 @@ public class Game
 		for (int row = 0; row < fileByLine.Length; row++) {
 			int index = fileByLine[row].LastIndexOf(",");
 			newFile += fileByLine[row].Substring(0, index) + "\n";
-			//Debug.Log (fileByLine [row]); 
-			//Debug.Log (fileByLine [row].Substring (0, index));
 		}
 
 		return newFile;

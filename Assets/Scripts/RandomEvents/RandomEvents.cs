@@ -94,6 +94,8 @@ public static class RandomEvents
 		protected World World => Globals.World;
 		protected GameSession Session => Globals.Game.Session;
 		protected Database Database => Globals.Database;
+		protected Notifications Notifications => Globals.Notifications;
+		protected MiniGames MiniGames => Globals.MiniGames;
 
 		protected Ship ship { get; private set; }
 		protected ShipSpeedModifiers shipSpeedModifiers { get; private set; }

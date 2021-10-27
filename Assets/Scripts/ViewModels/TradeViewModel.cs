@@ -36,7 +36,7 @@ public class TradeViewModel : CityViewModel
 	private int heraldUses;
 	private CargoItemTradeViewModel heraldTarget;
 
-	public TradeViewModel(Sprite herald = null, Sprite noHerald = null, bool justWater = false, bool portAccess = true, float heraldMod = 1.0f) : base(Globals.Game.Session.currentSettlement, null) 
+	public TradeViewModel(GameSession session, Sprite herald = null, Sprite noHerald = null, bool justWater = false, bool portAccess = true, float heraldMod = 1.0f) : base(session, session.currentSettlement, null) 
 	{
 		noHeraldIcon = noHerald;
 		heraldEffect = heraldMod;
@@ -96,8 +96,8 @@ public class TradeViewModel : CityViewModel
 	}
 
 	public void BackToPort() {
-		Globals.UI.Hide<TownScreen>();
-		Globals.UI.Show<PortScreen, PortViewModel>(Globals.World.MasterGUISystem.Port);
+		UI.Hide<TownScreen>();
+		UI.Show<PortScreen, PortViewModel>(masterGUISystem.Port);
 	}
 
 	public void SmallTxn() {

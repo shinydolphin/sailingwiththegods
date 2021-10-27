@@ -8,9 +8,9 @@ using UnityEngine.UI;
 
 public class RepairsViewModel : Model
 {
-	World World => Globals.World;
-	GameSession Session => Globals.Game.Session;
 	Notifications Notifications => Globals.Notifications;
+
+	GameSession Session { get; set; }
 
 	public int costToRepair { get; private set; }
 	public int costToBuyUpgrade => 10000;			// TODO: Drive with something.
@@ -18,7 +18,8 @@ public class RepairsViewModel : Model
 	public BoundModel<float> shipHealth { get; private set; }
 	public BoundModel<int> shipLevel { get; private set; }
 
-	public RepairsViewModel() {
+	public RepairsViewModel(GameSession session) {
+		Session = session;
 
 		//We need to do a clout check as well as a network checks
 		int baseModifier = Mathf.CeilToInt(2 - Session.GetOverallCloutModifier(Session.currentSettlement.settlementID));
@@ -74,6 +75,8 @@ public class RepairsViewModel : Model
 
 public class RepairsView : ViewBehaviour<RepairsViewModel>
 {
+	GameSession Session => Globals.Game.Session;
+
 	[SerializeField] StringView ShipHealth = null;
 	[SerializeField] StringView CostOneHp = null;
 	[SerializeField] StringView CostAllHp = null;
@@ -85,7 +88,7 @@ public class RepairsView : ViewBehaviour<RepairsViewModel>
 		base.Bind(model);
 
 		ShipHealth.Bind(ValueModel.Wrap(model.shipHealth)
-			.Select(h => Mathf.CeilToInt(Globals.Game.Session.playerShipVariables.ship.health))
+			.Select(h => Mathf.CeilToInt(Session.playerShipVariables.ship.health))
 			.AsString()
 		);
 
@@ -125,7 +128,7 @@ public class RepairsView : ViewBehaviour<RepairsViewModel>
 				.AsString());
 
 			CostAllHp.Bind(ValueModel.New(Model.costToRepair)
-				.Select(cost => (Mathf.CeilToInt(100 - Mathf.CeilToInt(Globals.Game.Session.playerShipVariables.ship.health)) * cost))
+				.Select(cost => (Mathf.CeilToInt(100 - Mathf.CeilToInt(Session.playerShipVariables.ship.health)) * cost))
 				.AsString());
 
 			RepairOneButton.GetComponent<Button>().interactable = true;

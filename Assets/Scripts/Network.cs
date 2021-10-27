@@ -10,10 +10,12 @@ public class Network
 
 	Ship Ship => Session.playerShipVariables.ship;
 
-	GameSession Session => Globals.Game.Session;
-	Database Database => Globals.Database;
+	GameSession Session {get; set;}
+	Database Database { get; set; }
 
-	public Network() {
+	public Network(GameSession session, Database database) {
+		Session = session;
+		Database = database;
 	}
 
 	public bool CheckForNetworkMatchBetweenTwoSettlements(int cityA, int cityB) {

@@ -10,9 +10,15 @@ using UnityEngine.UI;
 public class LoanViewModel : Model
 {
 	World World => Globals.World;
-	GameSession Session => Globals.Game.Session;
 	Database Database => Globals.Database;
 	Notifications Notifications => Globals.Notifications;
+
+	GameSession Session { get; set; }
+
+	public LoanViewModel(GameSession session)
+    {
+		Session = session;
+    }
 
 	public Loan Loan => Session.playerShipVariables.ship.currentLoan;
 	public Loan NewLoan {

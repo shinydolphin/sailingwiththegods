@@ -36,7 +36,7 @@ namespace Quizzes
 		}
 
 		private void Win() {
-			Message(Globals.Quests.NextSegment.descriptionOfQuest, Complete);
+			Message(Quests.NextSegment.descriptionOfQuest, Complete);
 		}
 	}
 }

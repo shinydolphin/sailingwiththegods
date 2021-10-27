@@ -8,8 +8,8 @@ using UnityEngine;
 
 public class CrewManagementViewModel : Model
 {
-	GameSession Session => Globals.Game.Session;
-	Notifications Notifications => Globals.Notifications;
+	GameSession Session { get; set; }
+	Notifications Notifications { get; set; }
 
 	public readonly ICollectionModel<CrewManagementMemberViewModel> AvailableCrew;
 	public readonly ICollectionModel<CrewManagementMemberViewModel> MyCrew;
@@ -20,8 +20,11 @@ public class CrewManagementViewModel : Model
 
 	Settlement Settlement { get; set; }
 
-	public CrewManagementViewModel(Settlement settlement) {
+	public CrewManagementViewModel(GameSession session, Notifications notifications, Settlement settlement) {
+		Session = session;
+		Notifications = notifications;
 		Settlement = settlement;
+		Notifications = notifications;
 
 		Money = new BoundModel<int>(Session.playerShipVariables.ship, nameof(Session.playerShipVariables.ship.currency));
 		CrewCapacity = new BoundModel<int>(Session.playerShipVariables.ship, nameof(Session.playerShipVariables.ship.crewCapacity));
@@ -31,10 +34,10 @@ public class CrewManagementViewModel : Model
 
 		AvailableCrew = ValueModel.Wrap(settlement.availableCrew)
 			.Where(crew => !Session.playerShipVariables.ship.crewRoster.Contains(crew))
-			.Select(crew => new CrewManagementMemberViewModel(crew, OnCrewClicked, null));
+			.Select(crew => new CrewManagementMemberViewModel(Session, crew, OnCrewClicked, null));
 
 		MyCrew = ValueModel.Wrap(Session.playerShipVariables.ship.crewRoster)
-			.Select(crew => new CrewManagementMemberViewModel(crew, OnCrewClicked, null));
+			.Select(crew => new CrewManagementMemberViewModel(Session, crew, OnCrewClicked, null));
 	}
 
 	//=================================================================================================================

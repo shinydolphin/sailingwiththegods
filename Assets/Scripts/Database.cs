@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Database
 {
+	public Icons Icons { get; private set; }
+
 	// settlements
 	public Region[] region_masterList { get; private set; }
 	public Settlement[] settlement_masterList { get; private set; }
@@ -97,6 +99,8 @@ public class Database
 
 		region_masterList = CSVLoader.LoadRegionList();
 		settlement_masterList = CSVLoader.LoadSettlementList();     // depends on resource list, region list, and crew list
+
+		Icons = new Icons(masterResourceList);
 	}
 
 	public string GetJobClassEquivalency(CrewType jobCode) {

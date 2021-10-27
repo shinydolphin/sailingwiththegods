@@ -23,6 +23,9 @@ public class script_player_controls : MonoBehaviour
 	GameSession Session => Globals.Game.Session;
 	Game MainState => Globals.Game;
 	Database Database => Globals.Database;
+	UISystem UI => Globals.UI;
+	QuestSystem Quests => Globals.Quests;
+	MiniGames MiniGames => Globals.MiniGames;
 
 	[HideInInspector] public PlayerJourneyLog journey;
 	[HideInInspector] public Vector3 lastPlayerShipPosition;
@@ -180,29 +183,29 @@ public class script_player_controls : MonoBehaviour
 		if (hotkeysOn) {
 			//TODO: Remove - this is just here as an initial test of minigames
 			if (Input.GetKeyUp(KeyCode.B)) {
-				Globals.MiniGames.Enter("Pirate Game");
+				MiniGames.Enter("Pirate Game");
 			}
 			if (Input.GetKeyUp(KeyCode.L)) {
-				Globals.UI.Show<DialogScreen>().StartDialog("Start_Taverna", "taverna");
+				UI.Show<DialogScreen>().StartDialog("Start_Taverna", "taverna");
 			}
 			if (Input.GetKeyUp(KeyCode.N)) {
-				Globals.MiniGames.Enter("Storm Game");
+				MiniGames.Enter("Storm Game");
 			}
             if (Input.GetKeyUp(KeyCode.Z))
             {
-                Globals.MiniGames.EnterScene("Petteia");
+                MiniGames.EnterScene("Petteia");
             }
             if (Input.GetKeyUp(KeyCode.R))
             {
-                Globals.MiniGames.EnterScene("SongCompMainMenu");
+                MiniGames.EnterScene("SongCompMainMenu");
             }
             if (Input.GetKeyUp(KeyCode.T))
             {
-				Globals.MiniGames.EnterScene("TavernaMenu");
+				MiniGames.EnterScene("TavernaMenu");
             }
 			if (Input.GetKeyUp(KeyCode.M)) 
 			{
-				Globals.MiniGames.Exit();
+				MiniGames.Exit();
 			}
 		}
 
@@ -291,7 +294,7 @@ public class script_player_controls : MonoBehaviour
 				else {
 					//Check if we're in the menus or not
 					//	-If we aren't in the settlement menu then we know we're traveling
-					if (!MainState.menuControlsLock && !Globals.UI.IsShown<TitleScreen>()) {
+					if (!MainState.menuControlsLock && !UI.IsShown<TitleScreen>()) {
 						//If the ship is dead in the water--don't do anything
 						if (shipSpeed_Actual != 0) {
 							TravelToSelectedTarget(currentDestination);
@@ -388,7 +391,7 @@ public class script_player_controls : MonoBehaviour
 						//lock controls so that the travel function is triggered on the next update cycle
 						Session.controlsLocked = true;
 
-						Globals.UI.Show<TimePassingView, IValueModel<float>>(new BoundModel<float>(ship, nameof(ship.totalNumOfDaysTraveled)));
+						UI.Show<TimePassingView, IValueModel<float>>(new BoundModel<float>(ship, nameof(ship.totalNumOfDaysTraveled)));
 
 						//set the destination: using the players Y value so the ship always stays at a set elevation
 						currentDestination = new Vector3(firstRelevantHit.point.x, transform.position.y, firstRelevantHit.point.z);
@@ -587,7 +590,7 @@ public class script_player_controls : MonoBehaviour
 
 				// only bother to check coord triggers while moving. this prevents them from getting triggered more 
 				// than once since the quest system will drop anchor and prevent this from running again
-				Globals.Quests.CheckCoordTriggers(Session.playerShip.transform.position.XZ());
+				Quests.CheckCoordTriggers(Session.playerShip.transform.position.XZ());
 
 			}
 			else if (!Session.showSettlementGUI || notEnoughSpeedToMove) { //check to see if we're in the trade menu otherwise we will indefintely write duplicate routes until we leave the trade menu
@@ -606,7 +609,7 @@ public class script_player_controls : MonoBehaviour
 				Session.controlsLocked = false;
 				shipTravelStartRotationFinished = false;
 
-				Globals.UI.Hide<TimePassingView>();
+				UI.Hide<TimePassingView>();
 
 				//reset coastline detection flag
 				rayCheck_stopShip = false;
@@ -667,7 +670,7 @@ public class script_player_controls : MonoBehaviour
 				//change the current settlement to this location (normally this is done by opening the docking menu--but in this case there is no docking menu)
 				Session.currentSettlement = trigger.transform.parent.GetComponent<script_settlement_functions>().thisSettlement;
 				//Check if current Settlement is part of the main quest line
-				Globals.Quests.CheckCityTriggers(Session.currentSettlement.settlementID);
+				Quests.CheckCityTriggers(Session.currentSettlement.settlementID);
 				Session.showNonPortDockButton = true;
 			}
 		}
@@ -1745,7 +1748,7 @@ public class script_player_controls : MonoBehaviour
 
 	public void PassTime(float amountToWait, bool isPort) {
 		Session.isPassingTime = true;
-		Globals.UI.Show<TimePassingView, IValueModel<float>>(new BoundModel<float>(ship, nameof(ship.totalNumOfDaysTraveled)));
+		UI.Show<TimePassingView, IValueModel<float>>(new BoundModel<float>(ship, nameof(ship.totalNumOfDaysTraveled)));
 		StartCoroutine(WaitForTimePassing(.25f, false));
 	}
 
@@ -1772,7 +1775,7 @@ public class script_player_controls : MonoBehaviour
 		Session.isPassingTime = false;
 		Session.controlsLocked = false;
 
-		Globals.UI.Hide<TimePassingView>();
+		UI.Hide<TimePassingView>();
 
 		if (!isPort) {//If this isn't a port--then add a journey log at the end
 					  //Add a new route to the player journey log

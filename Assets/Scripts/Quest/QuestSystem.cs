@@ -100,7 +100,7 @@ public class QuestSystem : MonoBehaviour
 
 			//Now add the city name of the next journey quest to the players known settlements
 			// this is only valid for city destinations, obviously
-			Debug.Log("Adding known city from next quest destination: " + Globals.Game.Session.currentSettlement.name);
+			Debug.Log("Adding known city from next quest destination: " + Session.currentSettlement.name);
 			playerShipVariables.ship.playerJournal.AddNewSettlementToLog(cityTrigger2.DestinationId);
 			Debug.Log("next seg: " + cityTrigger2.DestinationId);
 		}
@@ -115,7 +115,7 @@ public class QuestSystem : MonoBehaviour
 			Debug.Log("mentioning: " + i);
 			//Make sure we don't add any null values--a -1 represents no mentions of any settlements
 			if (i != -1) {
-				Debug.Log("Adding known city from quest: " + Globals.Game.Session.currentSettlement.name);
+				Debug.Log("Adding known city from quest: " + Session.currentSettlement.name);
 				playerShipVariables.ship.playerJournal.AddNewSettlementToLog(i);
 			}
 
@@ -255,7 +255,7 @@ public class QuestSystem : MonoBehaviour
 			Game.GenerateRandomCrewMembers(5).ForEach(c => settlement.availableCrew.Add(c));
 		}
 
-		Globals.Quests.StartQuestSegment(0);
+		StartQuestSegment(0);
 		Debug.Log("Current quest segment " + quest.currentQuestSegment);
 
 		//Flag the main GUI scripts to turn on
