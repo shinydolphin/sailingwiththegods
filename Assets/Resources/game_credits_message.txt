@@ -7,9 +7,14 @@ Dr. Sandra Blakely – Project Director, Emory University, Department of Classic
 Sandra Blakely is an Associate Professor of Classics at Emory University, where her research integrates anthropological, archaeological and Classical approaches to Greek religion and myth.  Her foci include mystery cults, the fragmentary Greek historians Herodoros, Conon and Alexander Polyhistor, and the daimones associated with metallurgy as well as with the Samothracian rites.  In her current book project, The Anthropology of an Island Cult: Maritime Networks and the cult of the Great Gods of Samothrace, she brings Social Network Analysis and Geographic Information Systems to the epigraphic record of the Great Gods of Samothrace, to test the hypothesis that the safety at sea the Samothracian rites promised was a social reality as well as a mythic metaphor.
 
 
-Kevin Dressel – Programmer and Designer, Shiny Dolphin Games LLC
+Kevin Dressel – Technical Architect, Shiny Dolphin Games LLC
 
 Kevin Dressel is the lead Programmer developing Sailing with the Gods: Argonauts and Samothracians in an Ancient Sea. Kevin founded Shiny Dolphin Games LLC in 2016. He is an independent programmer who has previously worked at Zynga on games like CityVille, Ninja Kingdom, and Puzzle Charms.
+
+
+Kylie Gilde – Lead Programmer, Freelance Programmer
+
+Kylie Gilde graduated from Kennesaw State University in 2020 with a degree in game design. She worked in Spring 2020 as a student on the user interfaces for the pirate and storm mini-games. After graduation she has worked as a consultant on the project on user interface design for the game UI, port menu, taverna, and tax collector scenes. You can see more of her work on her website at  https://gamesbykylie.weebly.com/ or download some of her games at https://games-by-kylie.itch.io/.
 
 
 Dr. Joanna C. Mundy – Digital Projects Specialist, Emory Center for Digital Scholarship
@@ -17,24 +22,22 @@ Dr. Joanna C. Mundy – Digital Projects Specialist, Emory Center for Digital Sc
 Joanna Mundy is a Digital Projects Specialist in the Emory Center for Digital Scholarship. She received her PhD from Emory University in Art History, 2018. For her dissertation she explored the built domestic environment in ancient urban houses, domūs and insulae, in the city of Rome in the first to fifth century CE and includes a social network analysis of households in the fourth century city. Her work for Samothracian Networks includes mySQL database design, so that the project database interacts with geospatial and network data. She works with network analysis software, produces network visualizations, and manages the website.
 
 
-Kylie Gilde – User Interface and Game Designer, Kennesaw State University (2020-)
-
-Kylie Gilde graduated from Kennesaw State University in 2020 with a degree in game design. She worked in Spring 2020 as a student on the user interfaces for the pirate and storm mini-games. After graduation she has worked as a consultant on the project on user interface design for the game UI, port menu, taverna, and tax collector scenes. You can see more of her work on her website at  https://gamesbykylie.weebly.com/ or download some of her games at https://games-by-kylie.itch.io/.
-
-
 Sara E. Palmer – Digital Text Specialist, Emory Center for Digital Scholarship
 
 Sara Palmer received an MA in Film and Media Studies from Emory University in 2012. At the Emory Center for Digital Scholarship, she consults with researchers on creating online exhibits, designing databases, generating network visualizations, and performing textual markup and analysis.
 
+
 Evie Wang Edmundson – Freelance Composer and Producer
 
 Evie Wang Edmundson graduated from Agnes Scott College in 2018 with a BA in Music and a minor in Classical Civilization. She created the ambience soundtrack for the taverna as well as mini-game sound effects in Sailing with the Gods.
+
 
 Craig Brasco – Visual Interface Collaborator, Kennesaw State University, Assistant Professor of Art | Graphic Communications
 
 Dr. Philip Kiernan – Outreach and Consultant, Kennesaw State University, Assistant Professor of Art History
 
 Dr. Joy Li – Game Development Collaborator, Kennesaw State University, Assistant Professor of Computer Game Design and Development
+
 
 Student Participants:
 
