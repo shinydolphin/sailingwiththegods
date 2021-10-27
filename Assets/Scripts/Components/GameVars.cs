@@ -71,8 +71,9 @@ public class GameVars : MonoBehaviour
 	public GameObject[] sails = new GameObject[6];
 	public GameObject[] shipLevels;
 
-	[Header("Ununorganized Scene Refs")]
+	[Header("Unorganized Scene Refs")]
 	public List<CrewMember> currentlyAvailableCrewMembersAtPort; // updated every time ship docks at port
+	public MenuSwitcherSounds audioManager;
 
 	[Header("GUI Scene Refs")]
 	public script_GUI MasterGUISystem;
@@ -184,16 +185,42 @@ public class GameVars : MonoBehaviour
 	[HideInInspector] public List<DialogText> portDialogText = new List<DialogText>();
 
 	//Taverna
-	[HideInInspector] public List<DialogText> networkDialogText = new List<DialogText>();
-	[HideInInspector] public List<DialogText> pirateDialogText = new List<DialogText>();
-	[HideInInspector] public List<DialogText> mythDialogText = new List<DialogText>();
-	[HideInInspector] public List<DialogText> guideDialogText = new List<DialogText>(); 
-	[HideInInspector] public List<DialogText> tradingDialogText = new List<DialogText>(); // Perhaps
-	[HideInInspector] public List<FoodText> foodItemText= new List<FoodText>();
-	[HideInInspector] public List<FoodText> wineInfoText = new List<FoodText>();
-	[HideInInspector] public List<FoodText> foodDialogText = new List<FoodText>();
+	//[HideInInspector] public List<DialogText> networkDialogText = new List<DialogText>();
+	//[HideInInspector] public List<DialogText> pirateDialogText = new List<DialogText>();
+	//[HideInInspector] public List<DialogText> mythDialogText = new List<DialogText>();
+	//[HideInInspector] public List<DialogText> guideDialogText = new List<DialogText>(); 
+	//[HideInInspector] public List<FoodText> foodItemText= new List<FoodText>();
+	//[HideInInspector] public List<FoodText> wineInfoText = new List<FoodText>();
+	//[HideInInspector] public List<FoodText> foodDialogText = new List<FoodText>();
+
+	[HideInInspector] public List<DialogPair> networkDialogText;
+	[HideInInspector] public List<DialogPair> pirateDialogText;
+	[HideInInspector] public List<DialogPair> mythDialogText;
+	[HideInInspector] public List<string> guideDialogText;
+	[HideInInspector] public List<string> foodDialogText;
+	[HideInInspector] public List<FoodText> wineInfoText;
+	[HideInInspector] public List<FoodText> foodItemText;
+
+
 	[HideInInspector] public List<string> tavernaGameInsults;
 	[HideInInspector] public List<string> tavernaGameBragging;
+
+	[HideInInspector] public List<string> petteiaGameFlavor;
+	[HideInInspector] public List<string> petteiaGameBragging;
+	[HideInInspector] public List<string> petteiaGameInsults;
+	[HideInInspector] public List<string> petteiaGameWin;
+	[HideInInspector] public List<string> petteiaGameLost;
+	[HideInInspector] public List<string> petteiaGameBlocked;
+
+	[HideInInspector] public List<string> urGameRosette;
+	[HideInInspector] public List<string> urGameCapture;
+	[HideInInspector] public List<string> urGameFlip;
+	[HideInInspector] public List<string> urGameMoveOff;
+	[HideInInspector] public List<string> urGameMoveOn;
+	[HideInInspector] public List<string> urGameLost;
+	[HideInInspector] public List<string> urGameWin;
+	[HideInInspector] public List<string> urGameInsults;
+	[HideInInspector] public List<string> urGameIntro;
 
 
 	// high level game systems
@@ -236,11 +263,6 @@ public class GameVars : MonoBehaviour
 	[ReadOnly] public int DEBUG_currentQuestLeg = 0;
 	[HideInInspector] public bool DEBUG_MODE_ON = false;
 
-
-
-
-
-
 	//======================================================================================================================================================================
 	//======================================================================================================================================================================
 	//  INITIALIZE THE GAME WORLD
@@ -280,16 +302,22 @@ public class GameVars : MonoBehaviour
 		portDialogText = CSVLoader.LoadPortDialog();
 
 		CSVLoader.LoadTavernaGameBarks(out tavernaGameInsults, out tavernaGameBragging);
+		CSVLoader.LoadTavernaDialog(out networkDialogText, out pirateDialogText, out mythDialogText, out guideDialogText, out foodDialogText, 
+			out foodItemText, out wineInfoText);
+		CSVLoader.LoadPetteiaText(out petteiaGameFlavor, out petteiaGameInsults, out petteiaGameBragging, out petteiaGameWin, 
+			out petteiaGameLost, out petteiaGameBlocked);
+		CSVLoader.LoadUrText(out urGameIntro, out urGameRosette, out urGameCapture, out urGameFlip, out urGameMoveOff, out urGameMoveOn,
+			out urGameLost, out urGameWin, out urGameInsults);
 
 		// Mylo's Addition
-		networkDialogText = CSVLoader.LoadNetworkDialog();
-		pirateDialogText = CSVLoader.LoadPirateDialog();
-		mythDialogText = CSVLoader.LoadMythDialog();
-		guideDialogText = CSVLoader.LoadHireGuideDialog();
-		// trading goods here
-		foodItemText = CSVLoader.LoadFoodItemsList();
-		foodDialogText = CSVLoader.LoadFoodDialogList();
-		wineInfoText = CSVLoader.LoadWineInfoList();
+		//networkDialogText = CSVLoader.LoadNetworkDialog();
+		//pirateDialogText = CSVLoader.LoadPirateDialog();
+		//mythDialogText = CSVLoader.LoadMythDialog();
+		//guideDialogText = CSVLoader.LoadHireGuideDialog();
+		//// trading goods here
+		//foodItemText = CSVLoader.LoadFoodItemsList();
+		//foodDialogText = CSVLoader.LoadFoodDialogList();
+		//wineInfoText = CSVLoader.LoadWineInfoList();
 
 
 		// end Mylo's Addition
@@ -1139,6 +1167,11 @@ public class GameVars : MonoBehaviour
 	//    PLAYER MODIFICATION FUNCTIONS
 	//====================================================================================================   
 
+	/// <summary>
+	/// Changes the player's clout score
+	/// </summary>
+	/// <param name="cloutAdjustment">Change in the clout</param>
+	/// <param name="useMod">If you are writing new code, set this to false</param>
 	public void AdjustPlayerClout(int cloutAdjustment, bool useMod = true) {
 		int cloutModifier = useMod? 100 : 1; //We have a modifier to help link the new system in with the old functions.
 		int clout = (int)playerShipVariables.ship.playerClout;

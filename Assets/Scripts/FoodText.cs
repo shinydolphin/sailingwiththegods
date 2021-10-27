@@ -6,41 +6,30 @@ public class FoodText
 {
 	public enum Type {
 		Food,
-		Quote,
 		Wine
 	}
-	private string source, chapter, item, quote, speaker, scenario = "This is EMPTY what are you DOING I am going to LOSE IT";
-	private int foodCost = 0;
+
+	private string item, quote;
 	private Type textType;
 
-
-	public FoodText() { }
-
-	public string GetQuote 
+	public FoodText() 
 	{
-		get { return quote + "\n(" + source + " " + chapter + ")"; }
+		item = "default food";
+		quote = "default food quote";
+		textType = Type.Food;
 	}
 
-	public int FoodCost 
+	public FoodText(string foodItem, string foodQuote, Type t) 
 	{
-		get { return foodCost; }
-		set { foodCost = value; }
+		item = foodItem;
+		quote = foodQuote;
+		textType = t;
 	}
+	
 	public Type TextType 
 	{
 		get { return textType; }
 		set { textType = value; }
-	}
-	public string Source
-	{
-		get { return source; }
-		set { source = value; }
-	}
-
-	public string Chapter 
-	{
-		get { return chapter; }
-		set { chapter = value; }
 	}
 
 	public string Item 
@@ -54,17 +43,4 @@ public class FoodText
 		get { return quote; }
 		set { quote = value; }
 	}
-
-	public string Speaker 
-	{
-		get { return speaker; }
-		set { speaker = value; }
-	}
-
-	public string Scenario 
-	{
-		get { return scenario; }
-		set { scenario = value; }
-	}
-
 }

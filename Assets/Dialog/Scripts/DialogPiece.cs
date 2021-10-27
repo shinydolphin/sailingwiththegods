@@ -14,6 +14,8 @@ public class DialogPiece : MonoBehaviour
 		if (content[0] == '/') {
 			content = content.Remove(0, 1);
 		}
+		content = content.Replace("(leftbrace)", "[");
+		content = content.Replace("(rightbrace)", "]");
 		text.text = content;
 	}
 

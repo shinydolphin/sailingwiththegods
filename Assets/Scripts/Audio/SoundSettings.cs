@@ -7,6 +7,7 @@ using UnityEngine.Audio;
 public class SoundSettings : MonoBehaviour
 {
 	//Game objects
+#pragma warning disable 0649
 	[SerializeField] private GameObject audioSettings;
 	[SerializeField] private SettingsPanel settingsPanel;
 
@@ -15,7 +16,7 @@ public class SoundSettings : MonoBehaviour
 
 	//Audio Mixer Groups
 	[SerializeField] private AudioMixer masterMixer;
-
+#pragma warning restore 0649
 	// Start is called before the first frame update
 	void Awake()
     {

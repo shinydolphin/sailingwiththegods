@@ -19,7 +19,7 @@ public class PetteiaBoardPosition : MonoBehaviour
 
 	void OnTriggerEnter(Collider other) 
 	{
-		if (other.CompareTag("PetteiaB") || other.CompareTag("PetteiaW")) 
+		if (other.CompareTag(pController.enemyTag) || other.CompareTag(pController.playerTag)) 
 		{
 			occupied = true;
 			currentPiece = other.GetComponent<PetteiaPlayerPiece>();
@@ -28,7 +28,7 @@ public class PetteiaBoardPosition : MonoBehaviour
 
 	private void OnTriggerExit(Collider other) 
 	{
-		if (other.CompareTag("PetteiaB") || other.CompareTag("PetteiaW")) 
+		if (other.CompareTag(pController.enemyTag) || other.CompareTag(pController.playerTag)) 
 		{
 			occupied = false;
 			currentPiece = null;

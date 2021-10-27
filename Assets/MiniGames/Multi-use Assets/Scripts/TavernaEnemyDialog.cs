@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+
 public class TavernaEnemyDialog : TavernaMiniGameDialog
 {
 	public Text enemyName;
@@ -23,14 +24,18 @@ public class TavernaEnemyDialog : TavernaMiniGameDialog
 			enemyImage.sprite = Resources.Load<Sprite>(ResourcePath + "/" + crew.ID) ?? Resources.Load<Sprite>(DefaultPortrait);
 		}
 
-		if (Globals.GameVars != null) {
-			insultingTexts = Globals.GameVars.tavernaGameInsults;
-			braggingTexts = Globals.GameVars.tavernaGameBragging;
-		}
-		else {
-			braggingTexts = new List<string> { "Enemy brag 1", "Enemy brag 2" };
-			insultingTexts = new List<string> { "Enemy insult 1", "Enemy insult 2" };
-		}
+		SetTextLists();
 
 	}
+
+	//private void Update() {
+	//	if (Input.GetKeyDown(KeyCode.Space)) {
+	//		if (Random.Range(1, 3) % 2 == 0) {
+	//			DisplayInsult();
+	//		}
+	//		else {
+	//			DisplayBragging();
+	//		}
+	//	}
+	//}
 }

@@ -16,7 +16,7 @@ public class LyricsController : MonoBehaviour
 	private string lyricsColor= "<color=red>";//set the tag for tex coloer flash
 	public Image text_mask;
 	public Scrollbar SB;
-	private int SBC = 0;
+	//private int SBC = 0;
 	private string currentLyricsIndex;
 	private static string[] active_words;
 	private static int word_count = 0;
@@ -47,7 +47,7 @@ public class LyricsController : MonoBehaviour
 		//Debug.Log(Application.persistentDataPath);
 		
 		word_count = 0;
-		SBC = 0;
+		//SBC = 0;
 		lyricsText.text = "";
 		// Create a temporary reference to the current scene.
 		Scene currentScene = SceneManager.GetActiveScene();
