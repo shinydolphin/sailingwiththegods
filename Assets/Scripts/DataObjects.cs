@@ -81,6 +81,9 @@ public class QuestSegment
 
 	public abstract class ArrivalEvent
 	{
+		protected QuestSystem Quests => Globals.Quests;
+		protected UISystem UI => Globals.UI;
+
 		protected QuestSegment Segment { get; private set; }
 		public abstract ArrivalEventType Type { get; }
 		public abstract void Execute(QuestSegment segment);
@@ -92,17 +95,17 @@ public class QuestSegment
 
 		public override void Execute(QuestSegment segment) {
 
-			Globals.UI.Show<QuestScreen, QuizScreenModel>(new QuizScreenModel(
+			UI.Show<QuestScreen, QuizScreenModel>(new QuizScreenModel(
 				title: QuestSystem.QuestMessageIntro,
 				message: Message,
 				caption: segment.caption,
 				icon: segment.image,
 				choices: new ObservableCollection<ButtonViewModel> {
-					new ButtonViewModel { Label = "OK", OnClick = () => Globals.UI.Hide<QuestScreen>() }
+					new ButtonViewModel { Label = "OK", OnClick = () => UI.Hide<QuestScreen>() }
 				}
 			));
 
-			Globals.Quests.CompleteQuestSegment(segment);
+			Quests.CompleteQuestSegment(segment);
 		}
 
 		public readonly string Message;
@@ -119,7 +122,7 @@ public class QuestSegment
 		readonly string QuizName;
 
 		public override void Execute(QuestSegment segment) {
-			Quizzes.QuizSystem.StartQuiz(QuizName, () => Globals.Quests.CompleteQuestSegment(segment));
+			Quizzes.QuizSystem.StartQuiz(QuizName, () => Quests.CompleteQuestSegment(segment));
 		}
 
 		public QuizArrivalEvent(string quizName) {
@@ -133,7 +136,7 @@ public class QuestSegment
 
 		// just immediately start the next quest with no additional popups
 		public override void Execute(QuestSegment segment) {
-			Globals.Quests.CompleteQuestSegment(segment);
+			Quests.CompleteQuestSegment(segment);
 		}
 	}
 
@@ -239,6 +242,8 @@ public class PirateType
 
 public class CrewMember
 {
+	GameSession Session => Globals.Game.Session;
+
 	public int ID;
 	public string name;
 	public int originCity;
@@ -253,13 +258,13 @@ public class CrewMember
 	public bool isJason => name == "Jason";
 
 	SkillModifiers _changeOnHire;
-	public SkillModifiers changeOnHire { get { if(_changeOnHire == null) InitChangeOnHire(); return _changeOnHire; } }
+	public SkillModifiers changeOnHire { get { if(_changeOnHire == null) InitChangeOnHire(Session); return _changeOnHire; } }
 
 	SkillModifiers _changeOnFire;
-	public SkillModifiers changeOnFire { get { if (_changeOnFire == null) InitChangeOnFire(); return _changeOnFire; } }
+	public SkillModifiers changeOnFire { get { if (_changeOnFire == null) InitChangeOnFire(Session); return _changeOnFire; } }
 
 	SkillModifiers _currentContribution;
-	public SkillModifiers currentContribution { get { if (_currentContribution == null) InitCurrentContribution(); return _currentContribution; } }
+	public SkillModifiers currentContribution { get { if (_currentContribution == null) InitCurrentContribution(Session); return _currentContribution; } }
 
 	//0= sailor  1= warrior  2= slave  3= passenger 4= navigator 5= auger
 	//A sailor is the base class--no benefits/detriments
@@ -287,35 +292,29 @@ public class CrewMember
 		_currentContribution = new SkillModifiers();
 	}
 
-	void InitChangeOnHire() {
-		var gameVars = Globals.GameVars;
-
+	void InitChangeOnHire(GameSession session) {
 		_changeOnHire = new SkillModifiers {
-			CitiesInNetwork = gameVars.Network.GetCrewMemberNetwork(this).Count(s => !gameVars.Network.MyCompleteNetwork.Contains(s)),
+			CitiesInNetwork = session.Network.GetCrewMemberNetwork(this).Count(s => !session.Network.MyCompleteNetwork.Contains(s)),
 			BattlePercentChance = typeOfCrew == CrewType.Warrior ? 5 : 0,
 			Navigation = typeOfCrew == CrewType.Sailor ? 1 : 0,
 			PositiveEvent = typeOfCrew == CrewType.Guide ? 10 : 0
 		};
 	}
 
-	void InitChangeOnFire() {
-		var gameVars = Globals.GameVars;
-
+	void InitChangeOnFire(GameSession session) {
 		// the cities in network calculation is too expensive right now. disabled temporarily
 		_changeOnFire = new SkillModifiers {
-			CitiesInNetwork = -gameVars.Network.GetCrewMemberNetwork(this).Count(s => !gameVars.Network.CrewMembersWithNetwork(s).Any(crew => crew != this) && !gameVars.Network.MyImmediateNetwork.Contains(s)),
+			CitiesInNetwork = -session.Network.GetCrewMemberNetwork(this).Count(s => !session.Network.CrewMembersWithNetwork(s).Any(crew => crew != this) && !session.Network.MyImmediateNetwork.Contains(s)),
 			BattlePercentChance = typeOfCrew == CrewType.Warrior ? -5 : 0,
 			Navigation = typeOfCrew == CrewType.Sailor ? -1 : 0,
 			PositiveEvent = typeOfCrew == CrewType.Guide ? -10 : 0
 		};
 	}
 
-	void InitCurrentContribution() {
-		var gameVars = Globals.GameVars;
-
+	void InitCurrentContribution(GameSession session) {
 		// very similar to changeOnFire, but shows it as positives. this is their contribution to your team, not what you'll lose if you fire them (but it's basically the same).
 		_currentContribution = new SkillModifiers {
-			CitiesInNetwork = gameVars.Network.GetCrewMemberNetwork(this).Count(s => !gameVars.Network.CrewMembersWithNetwork(s).Any(crew => crew != this) && !gameVars.Network.MyImmediateNetwork.Contains(s)),
+			CitiesInNetwork = session.Network.GetCrewMemberNetwork(this).Count(s => !session.Network.CrewMembersWithNetwork(s).Any(crew => crew != this) && !session.Network.MyImmediateNetwork.Contains(s)),
 			BattlePercentChance = typeOfCrew == CrewType.Warrior ? 5 : 0,
 			Navigation = typeOfCrew == CrewType.Sailor ? 1 : 0,
 			PositiveEvent = typeOfCrew == CrewType.Guide ? 10 : 0

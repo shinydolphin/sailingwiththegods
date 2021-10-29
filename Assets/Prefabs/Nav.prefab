@@ -47,12 +47,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _TitleScreen: {fileID: 0}
-  AI: {fileID: 1446390382397619014}
-  _Text: {fileID: 0}
-  _imageSlot: {fileID: 0}
-  _menu: {fileID: 0}
-  _Navgater: {fileID: 0}
-  _lineRendererON: 0
+  navAgent: {fileID: 1446390382397619014}
+  fireNavigatorButton: {fileID: 0}
+  directionsText: {fileID: 0}
+  crewPortrait: {fileID: 0}
+  menu: {fileID: 0}
+  navigatorUI: {fileID: 0}
+  lineRendererON: 0
 --- !u!114 &1446390382397619009
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,7 +10,9 @@ public class script_mousehover_popup : MonoBehaviour
 	bool showPopup = false;
 	public string message = "";
 	string resourceName = "";
-	GameVars GameVars;
+
+	World World => Globals.World;
+	Database Database => Globals.Database;
 
 	//popup window dimensions
 	public float left = 0f;
@@ -22,11 +24,10 @@ public class script_mousehover_popup : MonoBehaviour
 
 	void Start() {
 		//Find the matching resource of this gameObject's label, and add the description here
-		GameVars = Globals.GameVars;
 		bgSprite = gameObject.transform.parent.GetChild(0);//bg sprite should always be the first index
 
-		resourceName = GameVars.masterResourceList[resourceID].name;
-		message = GameVars.masterResourceList[resourceID].description;
+		resourceName = Database.masterResourceList[resourceID].name;
+		message = Database.masterResourceList[resourceID].description;
 
 		message = resourceName + " : " + message;
 
@@ -88,7 +89,7 @@ public class script_mousehover_popup : MonoBehaviour
 
 		//Set dimensions and location of GUI.Label
 		Vector3 iconPosition = transform.position;
-		iconPosition = GameVars.FPVCamera.GetComponent<Camera>().WorldToScreenPoint(iconPosition);
+		iconPosition = World.FPVCamera.GetComponent<Camera>().WorldToScreenPoint(iconPosition);
 		//the GUI 0,0 is top left, the screen is bottom left--let's flip the y value--the x stays the same
 		top = Screen.height - iconPosition.y;
 		//let's bump about 20 pixels off to the right

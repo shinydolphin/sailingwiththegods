@@ -4,11 +4,15 @@ using System.IO;
 
 #if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 [ExecuteInEditMode]
 public class FallbackAssets : MonoBehaviour
 {
+	// only used in editor, but needs to exist always for unity serialization, so suppressing the warning
+#pragma warning disable 0414
 	[SerializeField] FallbackLink[] _fallbacks = null;
+#pragma warning restore
 
 	[Serializable]
 	class FallbackLink
@@ -17,6 +21,7 @@ public class FallbackAssets : MonoBehaviour
 		public string FallbackGuid = null;
 	}
 
+#if UNITY_EDITOR
 	void OnEnable() {
 		if(!FallbackSwap.HasProprietaryAssets) {
 			Swap();
@@ -50,6 +55,7 @@ public class FallbackAssets : MonoBehaviour
 			Debug.Log("Propreietary Asset " + entry.ProprietaryGuid + " was missing, so it was replaced with fallback " + fallbackFilename);
 		}
 	}
+#endif
+
 }
 
-#endif

@@ -6,18 +6,21 @@ using System.Threading.Tasks;
 
 public static class CutsceneMode
 {
+	static GameSession Session => Globals.Game.Session;
+	static UISystem UI => Globals.UI;
+
 	static IEnumerable<ViewBehaviour> _restoreViews;
 
 	public static void Enter() {
-		Globals.GameVars.IsCutsceneMode = true;
-		_restoreViews = Globals.UI.GetActiveViews();
-		Globals.UI.HideAll();
+		Session.IsCutsceneMode = true;
+		_restoreViews = UI.GetActiveViews();
+		UI.HideAll();
 	}
 
 	public static void Exit() {
-		Globals.GameVars.IsCutsceneMode = false;
+		Session.IsCutsceneMode = false;
 		foreach(var view in _restoreViews) {
-			Globals.UI.Show(view);
+			UI.Show(view);
 		}
 	}
 }

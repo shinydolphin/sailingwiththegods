@@ -9,6 +9,8 @@ using UnityEngine.UI;
 
 public class TavernCityView : ViewBehaviour<CityViewModel>
 {
+	UISystem UI => Globals.UI;
+
 	[SerializeField] StringView Name = null;
 	[SerializeField] ButtonView Ask = null;
 
@@ -33,7 +35,7 @@ public class TavernCityView : ViewBehaviour<CityViewModel>
 				ds.Storage.SetValue("$known_city_ID", Model.City.settlementID);
 				ds.Storage.SetValue("$known_city_type", Model.City.typeOfSettlement);
 				ds.yarnOnComplete();
-				Globals.UI.Hide<TavernView>();
+				UI.Hide<TavernView>();
 			}
 		})) ;
 

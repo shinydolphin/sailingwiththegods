@@ -1,0 +1,402 @@
+title: Start_Taverna
+tags: 
+colorID: 0
+position: -675,-1564
+---
+<< reset DialogScreen>>
+<< set $first_time to false >> 
+<< settaverninfo DialogScreen >>
+
+<< setpartner DialogScreen Telones>>
+<< setpartnername DialogScreen Oineus >>
+<< setconvotitle DialogScreen Taverna>> 
+//<< setsprite Backgrounds taverna >> 
+<< setsprite Telones neutral >>
+<< setspeaker DialogScreen other>> 
+
+<<getknownsettlementnumber DialogScreen>>
+
+
+
+//<< cityinfo DialogScreen>> 
+
+Khaire, hello, welcome!
+<< setend DialogScreen >> 
+How may I help you?
+
+[[I want to ask a few things about this city.|This_City_Setup]]
+<<if $settlement_number > 1 >>
+[[I want to ask about somewhere in the area. |City_Setup]]
+<<endif>>
+[[ Never mind! |Exit_Taverna]]
+===
+title: Networks_QA
+tags: 
+colorID: 0
+position: -1112,313
+---
+<< randomcost DialogScreen 25 35>> 
+<< randomfood DialogScreen>> 
+
+<< setspeaker DialogScreen Jason>> 
+<< randomQA DialogScreen network>>
+Tell me about the connections and networks surrounding {$known_city}.
+
+<< setspeaker DialogScreen other>> 
+<< setend DialogScreen>> 
+I could tell you, but would be happier with {$random_food} (cost {$generated_cost} dr).
+<< set $first_time to true >> 
+
+<< checkafford DialogScreen $generated_cost >> 
+
+<< if $can_afford>> 
+    [[ Sure, tell me about this city's networks. (Pay {$generated_cost}) |Network_Response]]
+<<endif>> 
+[[ How greedy! (Do not pay) |City_Questions]]
+===
+title: pirates
+tags: 
+colorID: 0
+position: -62,48
+---
+<< randomcost DialogScreen 25 35>>
+<< randomfood DialogScreen>> 
+
+<< setspeaker DialogScreen Jason>> 
+<< randomQA DialogScreen pirate >> 
+What can you tell me of the pirates in these waters?
+
+<< setspeaker DialogScreen other>> 
+<< setend DialogScreen>> 
+It's risky to speak of pirates! I would talk more easily if I had {$random_food} (cost {$generated_cost} dr).
+
+<< checkafford DialogScreen $generated_cost>> 
+<< set $first_time to true >> 
+
+<< if $can_afford>> 
+    [[ Tell me about the pirates in these waters. (Pay {$generated_cost}) |Pirate_Response]]
+<<endif>> 
+[[ I will face these waters myself, then! (Do not pay) |City_Questions]]
+===
+title: myths
+tags: 
+colorID: 0
+position: -70,-235
+---
+<< randomcost DialogScreen 15 20>>
+<< randomfood DialogScreen>> 
+
+<< setspeaker DialogScreen Jason>> 
+<< randomQA DialogScreen myth>>
+
+<< setspeaker DialogScreen other>>
+<< setend DialogScreen>> 
+I know many things, but {$random_food} would loosen my tongue (cost {$generated_cost} dr).
+
+<< checkafford DialogScreen $generated_cost>>
+
+<< set $first_time to true >> 
+
+<< if $can_afford>> 
+    [[ Sure, tell me your tales. (Pay {$generated_cost}) |Myth_Response]]
+<<endif>> 
+[[ How greedy! I will not pay to hear your stories. (Do not pay) |City_Questions]]
+===
+title: trading_goods
+tags: 
+colorID: 0
+position: -1341,-220
+---
+<< setspeaker DialogScreen Jason >>
+Tell me, what of the trade goods in {$known_city}?
+
+<< randomfood DialogScreen >>
+<< randomcost DialogScreen 15 20>>
+
+<< setspeaker DialogScreen other >>
+It seems to have slipped my mind! Perhaps some {$random_food} would help my memory (cost {$generated_cost} drachma)?
+
+<< checkafford DialogScreen $generated_cost>>
+
+<< set $first_time to true >> 
+
+<< if $can_afford>> 
+    [[ Tell me about what they have for sale. (Pay {$generated_cost}) |trading_response]]
+<<endif>> 
+[[ How greedy! I will simply check their agora for myself. (Do not pay) |City_Questions]]
+===
+title: hire_guide
+tags: 
+colorID: 0
+position: -521,454
+---
+<< randomcost DialogScreen 75 100>> 
+<< randomfood DialogScreen>> 
+<< randomguide DialogScreen>> 
+
+<< setspeaker DialogScreen Jason>> 
+I'm eager to sail to {$known_city}, but need to find the way!
+<< setspeaker DialogScreen other>>
+A guide is what you want! {$flavor_text1}
+<< setend DialogScreen>> 
+I know a man I can recommend to you. His rate is {$generated_cost} dr.
+
+<< checkafford DialogScreen $generated_cost>> 
+<< set $first_time to true >> 
+
+
+<< if $can_afford>> 
+    [[ If I must hire a guide to find my way, then so be it! (Pay {$generated_cost}) |Guide_Set]]
+<<endif>> 
+    [[No, no, I will find my way myself! (Do not pay) |City_Questions]]
+===
+title: Network_Response
+tags: 
+colorID: 0
+position: -1338,41
+---
+<< pay DialogScreen $generated_cost >> 
+
+<< setspeaker DialogScreen Jason >>
+There, your meal.
+
+<< setspeaker DialogScreen other>> 
+/{$food_quote}
+
+<< setspeaker DialogScreen Jason >>
+I am glad you liked your food! So tell me: {$question}
+
+<< setspeaker DialogScreen other>> 
+/{$response}
+<< set $first_time to true >> 
+[[City_Questions]]
+===
+title: Pirate_Response
+tags: 
+colorID: 0
+position: -270,309
+---
+<< pay DialogScreen $generated_cost >> 
+
+<< setspeaker DialogScreen Jason >>
+Here's your meal!
+
+<< setspeaker DialogScreen other>> 
+/{$food_quote}
+
+<< setspeaker DialogScreen Jason >>
+Now that you have eaten, I ask again: {$question}
+
+<< setspeaker DialogScreen other>> 
+<< set $first_time to true >> 
+/{$response}
+
+[[City_Questions]]
+===
+title: Myth_Response
+tags: 
+colorID: 0
+position: -78,-597
+---
+<< pay DialogScreen $generated_cost >> 
+
+<< setspeaker DialogScreen Jason >>
+I'll buy you some food. So tell me -
+
+<< setspeaker DialogScreen other>> 
+/{$food_quote}
+
+<< setspeaker DialogScreen Jason >>
+I am glad you liked your food. But tell me: {$question}
+
+<< setspeaker DialogScreen other>> 
+<< setend DialogScreen>> 
+/{$response}
+<< set $first_time to true >> 
+
+[[Tell me more! |Myth_Response_2]]
+[[That is all. Thank you! |City_Questions]]
+===
+title: Exit_Taverna
+tags: 
+colorID: 0
+position: -241,-1209
+---
+<< setspeaker DialogScreen Jason >>
+I must be going now, thank you for your time.
+
+<< setspeaker DialogScreen other>> 
+Good bye!
+===
+title: Myth_Response_2
+tags: 
+colorID: 0
+position: -85,-929
+---
+<< randomQA DialogScreen myth>>
+<< setend DialogScreen>> 
+/{$response}
+<< set $first_time to true >> 
+
+<< if $check_myth>> 
+    [[Tell me more! |Myth_Response_2]]
+    [[That is all. Thank you! |City_Questions]]
+<< else >>
+    [[ Thank you for tales! |City_Questions]]
+<< endif >>
+===
+title: Guide_Set
+tags: 
+colorID: 0
+position: -843,459
+---
+<< setspeaker DialogScreen Jason>> 
+Local knowledge, tired ears: a worthy balance. I will hire a guide! {$flavor_text2}
+
+<< setspeaker DialogScreen other>>
+<< setend DialogScreen >>
+It is true, they are often given to too much chatter: {$flavor_text3}
+<< set $first_time to true >> 
+
+<< hirenavigator DialogScreen >> 
+
+[[City_Questions]]
+===
+title: City_Questions
+tags: 
+colorID: 0
+position: -682,-381
+---
+<< setend DialogScreen>> 
+<< if $first_time is true >>
+    << setspeaker DialogScreen other >>
+    << setend DialogScreen >> 
+    How else could I assist you?
+<< else >> 
+    << setspeaker DialogScreen other >>
+    << setend DialogScreen >> 
+    << setcitygoods DialogScreen >>
+    Certainly! What would you like to know about {$known_city}?
+<< endif >> 
+
+<<checkifcurrent DialogScreen>>
+
+<<if $known_city_type == 1>>
+    [[What are {$known_city}'s connections to other cities? |Networks_QA]]
+<<endif>>
+[[What can you tell me about pirates in the area? |pirates]]
+<<if $known_city_type == 1>>
+    [[What goods are traded in {$known_city}? |trading_goods]]
+<<endif>>
+[[What tales and myths are told here? |myths]]
+
+<<if $asking_current == false>>
+[[I would like to hire a guide to get me there. |hire_guide]]
+<<endif>>
+
+<<if $settlement_number > 1>>
+[[I have questions about a different city. |City_Setup]]
+<<endif>>
+
+[[That is all! I'll take my leave. |Exit_Taverna]]
+===
+title: City_Setup
+tags: 
+colorID: 0
+position: -535,-1020
+---
+<< if $first_time is false >> 
+    << setspeaker DialogScreen Jason >>
+    I want to ask about somewhere in the area.
+    << setspeaker DialogScreen other >>
+    Of course! Which city do you want to ask about?
+<< else >>
+     << setspeaker DialogScreen Jason >>
+    I want to ask about another city.
+    << setspeaker DialogScreen other >>
+    Certainly! Where does your curiosity take you?
+<< endif >>   
+
+<< displayknownsettlements >>
+[[City_Questions]]
+===
+title: This_City_Setup
+tags: 
+colorID: 0
+position: -814,-1015
+---
+<< getcurrentsettlement DialogScreen >>
+
+<< setspeaker DialogScreen Jason >>
+I would like to ask a few questions about this city.
+
+[[City_Questions]]
+===
+title: trading_response
+tags: 
+colorID: 0
+position: -1347,-590
+---
+<< pay DialogScreen $generated_cost >> 
+
+<< setspeaker DialogScreen Jason >>
+Sure, take your meal.
+
+<< setspeaker DialogScreen other>> 
+/{$food_quote}
+
+<< setspeaker DialogScreen Jason >>
+Now that you've eaten, tell me what goods {$known_city} is known for trading.
+
+<< setspeaker DialogScreen other>> 
+
+<< gettradegoods DialogScreen >>
+
+<< if $trade_goods_finished is false >>
+    << setend DialogScreen>> 
+    [[Tell me more! |trading_response_2]]
+<<endif>>
+
+<< if $have_lots is true >>
+    I've heard they have an abundance of {$trade_resource}.
+<< else >>
+    The rumor is that they are running low on {$trade_resource}.
+<< endif >>
+
+<< set $first_time to true >> 
+
+<< if $trade_goods_finished is true >>
+<< setend DialogScreen >>
+That's all I know about their trading.
+<< endif >>
+
+
+[[That is all. Thank you! |City_Questions]]
+===
+title: trading_response_2
+tags: 
+colorID: 0
+position: -1363,-912
+---
+<< gettradegoods DialogScreen >>
+
+<< if $trade_goods_finished is false >>
+    << setend DialogScreen>> 
+    [[Tell me more! |trading_response_2]]
+<<endif>>
+
+<< if $have_lots is true >>
+    I've heard they have an abundance of {$trade_resource}.
+<< else >>
+    The rumor is that they are running low on {$trade_resource}.
+<< endif >>
+
+<< set $first_time to true >> 
+
+<< if $trade_goods_finished is true >>
+<< setend DialogScreen >>
+That's all I know about their trading.
+<< endif >>
+
+[[That is all. Thank you! |City_Questions]]
+===

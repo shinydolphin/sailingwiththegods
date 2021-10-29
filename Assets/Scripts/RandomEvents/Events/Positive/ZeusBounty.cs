@@ -17,7 +17,7 @@ public class ZeusBounty : RandomEvents.PositiveEvent
 		//If there is room on board(There will almost ALWAYS be some room so let's say at least 50kg) then tell the player how much they found
 		//if there is less than 50kg of room, but the ship is low on water, then the crew can have the water
 		if (amountCanHold > 50 || ship.cargo[0].amount_kg <= 100) {
-			int amountToAdd = (int)(Random.Range(1, amountCanHold) * gameVars.GetOverallCloutModifier(gameVars.currentSettlement.settlementID));
+			int amountToAdd = (int)(Random.Range(1, amountCanHold) * Session.GetOverallCloutModifier(Session.currentSettlement.settlementID));
 			finalMessage += "The crew catches " + amountToAdd + " kg of water from the rain. What luck! Praise be to Poseidon! Hopefully this isn't one of his tricks!";
 			ship.cargo[0].amount_kg += amountToAdd;
 		}
@@ -26,6 +26,6 @@ public class ZeusBounty : RandomEvents.PositiveEvent
 				"obviously it's a gift to Zeus' brother--not to us and not worth the risk! We continue on our journey--despite the grumblings of the crew.";
 		}
 
-		gameVars.ShowANotificationMessage(finalMessage);
+		Notifications.ShowANotificationMessage(finalMessage);
 	}
 }

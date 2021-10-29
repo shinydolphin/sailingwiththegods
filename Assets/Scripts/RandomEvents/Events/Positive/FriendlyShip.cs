@@ -39,6 +39,6 @@ public class FriendlyShip : RandomEvents.PositiveEvent
 
 		//Now add what Provisions and water they give you to the message
 		finalMessage += messageWaterModifier + messageProvisionsModifier + " They bid you farewell and wish Poseidon's favor upon you!";
-		gameVars.ShowANotificationMessage(finalMessage);
+		Notifications.ShowANotificationMessage(finalMessage);
 	}
 }

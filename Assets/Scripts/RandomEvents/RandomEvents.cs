@@ -4,6 +4,10 @@ using System.Linq;
 
 public static class RandomEvents
 {
+	static World World => Globals.World;
+	static GameSession Session => Globals.Game.Session;
+	static Notifications Notifications => Globals.Notifications;
+
 	//#########################################################################################################
 	//	RANDOM  EVENT  FUNCTION
 	//=========================
@@ -16,7 +20,7 @@ public static class RandomEvents
 
 	// it makes sense for this to have access to the ship, the ship's movement data and position, and the crew, as well as things like clout
 	// doesn't need access to things like the GUI
-	public static void WillARandomEventHappen(GameVars gameVars, Ship ship, ShipSpeedModifiers shipSpeedModifiers, Transform shipTransform) {
+	public static void WillARandomEventHappen(Ship ship, ShipSpeedModifiers shipSpeedModifiers, Transform shipTransform) {
 
 
 		//Random Events have a chance to occur every half day of travel
@@ -30,14 +34,14 @@ public static class RandomEvents
 		const int midnight = 9;
 
 		//If we are at a half day's travel, then see if a random event occurs
-		if ((Mathf.FloorToInt(tenthPlaceTemp) == noon || Mathf.FloorToInt(tenthPlaceTemp) == midnight /*|| Mathf.FloorToInt(tenthPlaceTemp) ==1 || Mathf.FloorToInt(tenthPlaceTemp) ==3 || Mathf.FloorToInt(tenthPlaceTemp) ==7*/) && !gameVars.isPerformingRandomEvent) {
-			gameVars.isPerformingRandomEvent = true;
+		if ((Mathf.FloorToInt(tenthPlaceTemp) == noon || Mathf.FloorToInt(tenthPlaceTemp) == midnight /*|| Mathf.FloorToInt(tenthPlaceTemp) ==1 || Mathf.FloorToInt(tenthPlaceTemp) ==3 || Mathf.FloorToInt(tenthPlaceTemp) ==7*/) && !Session.isPerformingRandomEvent) {
+			Session.isPerformingRandomEvent = true;
 			float chanceOfEvent = .95f; //0 - 1 value representing chance of a random event occuring
 										//We determine if the 
 			if (Random.Range(0f, 1f) <= chanceOfEvent) {
 				//Debug.Log ("Triggering Random Event");
 				//When we trigger a random event, let's make the ship drop anchor!
-				gameVars.playerShipVariables.rayCheck_stopShip = true;
+				Session.playerShipVariables.rayCheck_stopShip = true;
 
 				//We separate Random events into two possible categories: Positive, and Negative.
 				//First we need to determine if the player has a positive or negative event occur
@@ -48,29 +52,29 @@ public static class RandomEvents
 				//Get the 0-1 aggregate clout score. Here we use the current zone of influence's network id to check
 				int currentZoneID = 0;
 				//TODO Right now this just uses the relevant city's ID to check--but in the aggregate score function--it should start using the networks--not the city.
-				if (gameVars.activeSettlementInfluenceSphereList.Count > 0) currentZoneID = gameVars.activeSettlementInfluenceSphereList[0];
-				float aggregateCloutScore = gameVars.GetOverallCloutModifier(currentZoneID);
+				if (World.activeSettlementInfluenceSphereList.Count > 0) currentZoneID = World.activeSettlementInfluenceSphereList[0];
+				float aggregateCloutScore = Session.GetOverallCloutModifier(currentZoneID);
 				//Now determine the final weighted chance score that will be .5f and under
 				chanceOfEvent = .5f - ship.crewRoster.Sum(c => c.changeOnHire.PositiveEvent / 100f) - (.2f * aggregateCloutScore);
 
 
 				//If we roll under our range, that means we hit a NEGATIVE random event
 				if (Random.Range(0f, 1f) <= chanceOfEvent) {
-					ExecuteEvent(GetSubclassesOfType<NegativeEvent>(), gameVars, ship, shipSpeedModifiers, shipTransform, aggregateCloutScore);
+					ExecuteEvent(GetSubclassesOfType<NegativeEvent>(), ship, shipSpeedModifiers, shipTransform, aggregateCloutScore);
 				}
 				else {
-					ExecuteEvent(GetSubclassesOfType<PositiveEvent>(), gameVars, ship, shipSpeedModifiers, shipTransform, aggregateCloutScore);
+					ExecuteEvent(GetSubclassesOfType<PositiveEvent>(), ship, shipSpeedModifiers, shipTransform, aggregateCloutScore);
 				}
 
 			}
 			//If we do or don't get a random event, we should always get a message from the crew--let's call them tales
 			//here they describe things like any cities nearby if the crew is familiar or snippets of greek mythology, or they
 			//may be from a list of messages concering any nearby zones of influence from passing settlements/locations of interest
-			var log = gameVars.GetRandomCaptainsLogFromPool();
+			var log = Session.GetRandomCaptainsLogFromPool();
 			if(log != null) {
 				ship.shipCaptainsLog.Add(log);
 				log.dateTimeOfEntry = ship.totalNumOfDaysTraveled + " days";
-				gameVars.AddToCaptainsLog(log.dateTimeOfEntry + "\n" + log.logEntry);
+				Session.AddToCaptainsLog(log.dateTimeOfEntry + "\n" + log.logEntry);
 			}
 		}
 
@@ -79,7 +83,7 @@ public static class RandomEvents
 		//	by turning it off when the the trigger number changes--which means it won't take effect
 		//	again until the next time the trigger number occurs
 		//Debug.Log (Mathf.FloorToInt(tenthPlaceTemp));
-		if (Mathf.FloorToInt(tenthPlaceTemp) != noon && Mathf.FloorToInt(tenthPlaceTemp) != midnight /*&& Mathf.FloorToInt(tenthPlaceTemp) !=1 && Mathf.FloorToInt(tenthPlaceTemp) !=3 && Mathf.FloorToInt(tenthPlaceTemp) !=7*/) 		gameVars.isPerformingRandomEvent = false;
+		if (Mathf.FloorToInt(tenthPlaceTemp) != noon && Mathf.FloorToInt(tenthPlaceTemp) != midnight /*&& Mathf.FloorToInt(tenthPlaceTemp) !=1 && Mathf.FloorToInt(tenthPlaceTemp) !=3 && Mathf.FloorToInt(tenthPlaceTemp) !=7*/) 		Session.isPerformingRandomEvent = false;
 
 	}
 
@@ -87,14 +91,18 @@ public static class RandomEvents
 	public abstract class NegativeEvent : Event { }
 	public abstract class Event
 	{
-		protected GameVars gameVars { get; private set; }
+		protected World World => Globals.World;
+		protected GameSession Session => Globals.Game.Session;
+		protected Database Database => Globals.Database;
+		protected Notifications Notifications => Globals.Notifications;
+		protected MiniGames MiniGames => Globals.MiniGames;
+
 		protected Ship ship { get; private set; }
 		protected ShipSpeedModifiers shipSpeedModifiers { get; private set; }
 		protected Transform shipTransform { get; private set; }
 		protected float aggregateCloutScore { get; private set; }
 
-		public void Init(GameVars gameVars, Ship ship, ShipSpeedModifiers shipSpeedModifiers, Transform shipTransform, float aggregateCloutScore) {
-			this.gameVars = gameVars;
+		public void Init(Ship ship, ShipSpeedModifiers shipSpeedModifiers, Transform shipTransform, float aggregateCloutScore) {
 			this.ship = ship;
 			this.shipSpeedModifiers = shipSpeedModifiers;
 			this.shipTransform = shipTransform;
@@ -148,15 +156,15 @@ public static class RandomEvents
 			.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)));
 	}
 
-	static Event CreateEvent(System.Type eventType, GameVars gameVars, Ship ship, ShipSpeedModifiers shipSpeedModifiers, Transform shipTransform, float aggregateCloutScore) {
+	static Event CreateEvent(System.Type eventType, Ship ship, ShipSpeedModifiers shipSpeedModifiers, Transform shipTransform, float aggregateCloutScore) {
 		var result = System.Activator.CreateInstance(eventType) as Event;
-		result.Init(gameVars, ship, shipSpeedModifiers, shipTransform, aggregateCloutScore);
+		result.Init(ship, shipSpeedModifiers, shipTransform, aggregateCloutScore);
 		return result;
 	}
 
-	static void ExecuteEvent(IEnumerable<System.Type> options, GameVars gameVars, Ship ship, ShipSpeedModifiers shipSpeedModifiers, Transform shipTransform, float aggregateCloutScore) {
+	static void ExecuteEvent(IEnumerable<System.Type> options, Ship ship, ShipSpeedModifiers shipSpeedModifiers, Transform shipTransform, float aggregateCloutScore) {
 		
-		IEnumerable<Event> events = options.Select(type => CreateEvent(type, gameVars, ship, shipSpeedModifiers, shipTransform, aggregateCloutScore));
+		IEnumerable<Event> events = options.Select(type => CreateEvent(type, ship, shipSpeedModifiers, shipTransform, aggregateCloutScore));
 
 		IEnumerable<Event> filteredEvents = events.Where(evnt => evnt.isValid() == true);
 

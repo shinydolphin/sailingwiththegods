@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class SettingsPanel : MonoBehaviour
 {
+#pragma warning disable 0649
 	//A script for the settings panel in the main menu
 	[SerializeField] private GameObject settingsPanel;
 	[SerializeField] private GameObject audioSettings;
 	[SerializeField] private GameObject videoSettings;
+#pragma warning restore 0649
 
 	private void Awake() {
 		CloseSettings();

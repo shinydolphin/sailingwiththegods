@@ -1,0 +1,85 @@
+title: Start_Debug
+tags: 
+colorID: 2
+position: 430,1067
+---
+<< reset DialogScreen >>
+<< setpartner DialogScreen Telones >>
+<< setpartnername DialogScreen Telones >>
+<< setconvotitle DialogScreen Docking_at_Port >>
+<< setsprite Telones neutral >>
+
+<< set $asked_types to false >>
+<< set $cargo_pay to false >> 
+
+<< set $have_herald to false >> 
+
+<< citynetworks DialogScreen >>
+<< networkconnections DialogScreen >> 
+<< checkcitytaxes DialogScreen >> 
+
+<< setspeaker DialogScreen other >>
+<< setend DialogScreen>>
+FAST DEBUG DIALOG
+
+
+[[ (TESTING) ENTER WATER |enter_water_debug]]
+[[ (TESTING) ENTER TRADING |enter_trading_debug]]
+[[ (TESTING) ENTER TAVERN |enter_tavern_debug]]
+[[ (TESTING) ENTER FULL |enter_full_debug]]
+[[ (TESTING) LEAVE WITHOUT PAYING |exit_debug]]
+===
+title: enter_water_debug
+tags: 
+colorID: 3
+position: 797,1517
+---
+<< setspeaker DialogScreen other >>
+<< setsprite Telones happy >>
+<< set $intent to "water" >>
+<< set $entering_city to true >>
+ENTERING CITY: WATER
+===
+title: enter_trading_debug
+tags: 
+colorID: 3
+position: 112,1521
+---
+<< setspeaker DialogScreen other >>
+<< setsprite Telones happy >>
+<< set $intent to "trading" >>
+<< set $entering_city to true >>
+ENTERING CITY: TRADING
+===
+title: enter_tavern_debug
+tags: 
+colorID: 3
+position: 582,1519
+---
+<< setspeaker DialogScreen other >>
+<< setsprite Telones happy >>
+<< set $intent to "tavern" >>
+<< set $entering_city to true >>
+ENTERING CITY: TAVERNA
+===
+title: enter_full_debug
+tags: 
+colorID: 3
+position: 353,1520
+---
+<< setspeaker DialogScreen other >>
+<< setsprite Telones bragging >>
+<< set $entering_city to true >>
+<< set $intent to "all" >>
+ENTERING CITY: ALL
+===
+title: exit_debug
+tags: 
+colorID: 4
+position: 1072,1514
+---
+<< setspeaker DialogScreen Jason >>
+<< setsprite Telones unhappy >>
+<< set $entering_city to false >>
+LEAVING CITY
+===
