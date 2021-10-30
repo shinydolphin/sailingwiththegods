@@ -128,7 +128,7 @@ It seems to have slipped my mind! Perhaps some {$random_food} would help my memo
 title: hire_guide
 tags: 
 colorID: 0
-position: -521,454
+position: -522,453
 ---
 << randomcost DialogScreen 75 100>> 
 << randomfood DialogScreen>> 
@@ -251,11 +251,11 @@ colorID: 0
 position: -843,459
 ---
 << setspeaker DialogScreen Jason>> 
-Local knowledge, tired ears: a worthy balance. I will hire a guide! {$flavor_text2}
+Local knowledge, tired ears: a worthy balance. I will hire a guide!
 
 << setspeaker DialogScreen other>>
-<< setend DialogScreen >>
-It is true, they are often given to too much chatter: {$flavor_text3}
+
+He will meet you on your ship and show you the way to {$known_city}.
 << set $first_time to true >> 
 
 << hirenavigator DialogScreen >> 
