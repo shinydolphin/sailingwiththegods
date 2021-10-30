@@ -146,6 +146,7 @@ public class SongGameController : MonoBehaviour
 		int x = Random.Range(1, 4);
 		endGameState = true;
 		lose.interactable = true;
+		lose.blocksRaycasts = true;
 		//lose.alpha += Time.deltaTime; cant use here
 		setmessage = true;
 	}
@@ -169,6 +170,7 @@ public class SongGameController : MonoBehaviour
 		
 		endGameState = true;		
 		win.interactable = true;
+		win.blocksRaycasts = true;
 		win.alpha += Time.deltaTime;
 		if (!endGameState && Globals.GameVars != null) { Globals.GameVars.AdjustPlayerClout(clout, false); }
 		setmessage = true;
