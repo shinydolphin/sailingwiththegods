@@ -1132,7 +1132,7 @@ public class GameVars : MonoBehaviour
 		else if (clout > 3500 && clout <= 3999) title = "Ambassador";
 		else if (clout > 4000 && clout <= 4499) title = "Prince";
 		else if (clout > 4500 && clout <= 4999) title = "King";
-		else if (clout >= 5000) title = "The God";
+		else if (clout >= 5000) title = "A god!";
 		else if (clout == 0) title = "Dead";
 		else title = "ERROR: clout is not between 0 and 100";
 		return title;

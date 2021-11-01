@@ -26,7 +26,7 @@ While the main game code is open source, the game depends on a private repo for 
 ## Setup Using SourceTree (recommended)
 * Check if you have / need access to the proprietary repo, and create a Github account if you have not
   * Send your Github username to Kevin for access
-* Download and Install SourceTree
+* Download and Install [SourceTree](https://www.sourcetreeapp.com/)
   * If asked, say you want embedded git, and you don't want mercurial
   * When asked if you want Bitbucket Server or Bitbucket, click "Skip"
   * So no when asked about loading an SSH key
@@ -37,10 +37,11 @@ While the main game code is open source, the game depends on a private repo for 
   * Authenticate Github in the browser
 * Clone the Repo
   * [Make your own fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the repository on the GitHub website
-  * Click the Clone button
+  * Click the Clone button **on your fork**
   * Copy paste the fork's HTTPS url into the URL field on the Clone screen
+  * Turn on recurse submodules and choose "develop" as the branch name in advanced
   * Choose manager-core on the popup that appear, and choose "Always use this"
-  * If you get errors cloning the submodule, try going to Repository -> Respository Settings and double click your remote, and make sure Remote Account is your Github, not Generic
+  * If you get errors cloning the submodule, try Adding the partially cloned local repo it's made, then delete the .git folder in \_Proprietary then go to Repository -> Respository Settings and double click your remote, and make sure Remote Account is your Github, not Generic
 * Add the kddressel repo as upstream remote
   * Click Repository -> Repository Settings
   * Click Add
