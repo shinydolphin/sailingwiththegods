@@ -41,7 +41,7 @@ public class SongMenuController : MonoBehaviour
 	public void MainMenuScene()
     {
 		//use to relod the seen
-		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+		TavernaController.ReloadTavernaGame("SongGame");
 	}
 
 	public void BackToTavern() {
