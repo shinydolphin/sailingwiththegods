@@ -309,19 +309,6 @@ public class GameVars : MonoBehaviour
 		CSVLoader.LoadUrText(out urGameIntro, out urGameRosette, out urGameCapture, out urGameFlip, out urGameMoveOff, out urGameMoveOn,
 			out urGameLost, out urGameWin, out urGameInsults);
 
-		// Mylo's Addition
-		//networkDialogText = CSVLoader.LoadNetworkDialog();
-		//pirateDialogText = CSVLoader.LoadPirateDialog();
-		//mythDialogText = CSVLoader.LoadMythDialog();
-		//guideDialogText = CSVLoader.LoadHireGuideDialog();
-		//// trading goods here
-		//foodItemText = CSVLoader.LoadFoodItemsList();
-		//foodDialogText = CSVLoader.LoadFoodDialogList();
-		//wineInfoText = CSVLoader.LoadWineInfoList();
-
-
-		// end Mylo's Addition
-
 		region_masterList = CSVLoader.LoadRegionList();
 		settlement_masterList = CSVLoader.LoadSettlementList();     // depends on resource list, region list, and crew list
 
@@ -349,6 +336,7 @@ public class GameVars : MonoBehaviour
 		AddEntriesToCurrentLogPool(0);
 		StartPlayerShipAtOriginCity();
 		GenerateCityLights();
+
 	}
 
 
@@ -1056,8 +1044,8 @@ public class GameVars : MonoBehaviour
 		while (numberOfCrewmanNeeded != availableCrew.Count) {
 			CrewMember thisMember = Crew.StandardCrew.RandomElement();
 			if (!thisMember.isPartOfMainQuest) {
-				//Now make sure this crewmember isn't already in the current crew
-				if(!playerShipVariables.ship.crewRoster.Contains(thisMember)) {
+				//Now make sure this crewmember isn't already in the current crew or available to hire
+				if(!playerShipVariables.ship.crewRoster.Contains(thisMember) && !availableCrew.Contains(thisMember)) {
 					availableCrew.Add(thisMember);
 				}
 			}

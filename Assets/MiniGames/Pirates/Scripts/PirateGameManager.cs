@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using System.Linq;
 using System;
 
-public class MiniGameManager : MonoBehaviour
+public class PirateGameManager : MonoBehaviour
 {
 	[Header("UI")]
 	public MiniGameInfoScreen mgInfo;
@@ -30,7 +30,7 @@ public class MiniGameManager : MonoBehaviour
 
 	[Header("Gameplay")]
 	public Vector2 runningBounds = new Vector2(0.1f, 0.9f);
-	public Transform piratesParent, crewParent;
+	public Transform piratesParent, crewParent, crewParentInOrigin;
 
 	[Header("Clout")]
 	public int wonFightClout;
@@ -103,7 +103,6 @@ public class MiniGameManager : MonoBehaviour
 			//commented out the "1 + " to test for text matching up to type of Pirate in PMG
 			//works as of 08/14/2020
 			pirateTypeText = typeInfo + " " + Globals.GameVars.pirateTypeIntroText[/*1 + */rsp.CurrentPirates.ID];
-			Debug.Log("current pirate ID: " + rsp.CurrentPirates.ID);
 		}
 		else 
 		{
@@ -151,7 +150,8 @@ public class MiniGameManager : MonoBehaviour
 			IEnumerable<Settlement> crewNetwork = Globals.GameVars.Network.GetCrewMemberNetwork(c);
 			foreach (CrewMember p in allPirates) 
 			{
-				if (crewNetwork.Contains(Globals.GameVars.GetSettlementFromID(p.originCity))) 
+				Settlement pirateHometown = Globals.GameVars.GetSettlementFromID(p.originCity);
+				if (crewNetwork.Contains(pirateHometown))
 				{
 					//Debug.Log($"{c.name} knows the home city of Pirate {p.name}: {Globals.GameVars.GetSettlementFromID(c.originCity).name}");
 					return c;
@@ -162,25 +162,9 @@ public class MiniGameManager : MonoBehaviour
 		return null;
 	}
 
-	public void InitializeCrewSlots(List<CardDropZone> playableSlots) {
-
-		//foreach (Transform p in piratesParent.transform) {
-		//	pirates.Add(p.gameObject);
-		//}
-		//Debug.Log("Pirate cout: " + pirates.Count);
-		//pirates = pirates.OrderBy(GameObject => GameObject.transform.GetComponent<CrewCard>().cardIndex).ToList<GameObject>();
-
-		//foreach (Transform c in crewParent.transform) {
-		//	//crew.Add(c.gameObject);
-		//	//Debug.Log(c.transform.GetComponent<CrewCard>().cardIndex + "\t" + c.transform.GetComponent<CrewCard>().nameText.name + "\t" + c);
-		//}
-
-		//crew = playableSlots.ToList();
-
+	public void InitializeCrewSlots(List<CardDropZone> playableSlots) 
+	{
 		crewSlots = playableSlots;
-		
-
-		//crewSlots = crewSlots.OrderBy(GameObject => GameObject.transform.GetComponent<CardDropZone>().dropIndex).ToList<GameObject>();
 	}
 
 	#region Negotiation
@@ -409,7 +393,6 @@ public class MiniGameManager : MonoBehaviour
 
 	public void Fight() 
 	{
-		Debug.Log("FIGHT BUTTON");
 		CrewCard crewMember, pirate;
 
 		//adding the crewmembers in the play area to the list of playable crew
@@ -434,7 +417,6 @@ public class MiniGameManager : MonoBehaviour
 					crewMember.gameObject.SetActive(false);
 					//crew.Remove(crewMember.gameObject);
 					//crew[zeroBasedIndex] = null;
-					Debug.Log("CREW MEMBER " + crewMember.nameText.text + " DIED with index = " + index + " and POWER = " + crewMember.Power + "\n\n");
 				}
 				//if the crewmem's power is greater than the pirate's, the pirate will "die" 
 				//crewmem's power goes down by the amount of power the pirate had
@@ -444,7 +426,6 @@ public class MiniGameManager : MonoBehaviour
 					pirate.gameObject.SetActive(false);
 					//pirates.Remove(pirate.gameObject);
 					//pirates[zeroBasedIndex] = null;
-					Debug.Log("PIRATE " + pirate.nameText.text + " DIED with index = " + index + " and POWER = " + crewMember.Power + "\n\n");
 				}
 				//if the crewmem and the pirate have powers of equal value, they cancel out
 				//the crewmem MUST be removed from the crew list to keep the count updated
@@ -456,20 +437,15 @@ public class MiniGameManager : MonoBehaviour
 
 					//crew[zeroBasedIndex] = null;
 					//pirates[zeroBasedIndex] = null;
-
-					Debug.Log("CREW MEMBER AND PIRATE DIED\n\n");
 				}
 			}
-			else {
-				Debug.Log("One of the above gameobject was not active or null.");
-			}
-			Debug.Log("\n\n");
 			//no need for an else statement because of the updates within the above if/else if/else statements 
 		}
 
 		int pirateCounter = piratesParent.GetComponentsInChildren<CrewCard>().Count();
 
-		int crewCounter = crewParent.GetComponentsInChildren<CrewCard>().Count();
+		int crewCounter = crewParent.childCount + crewParentInOrigin.childCount;
+		Debug.Log($"Total crew left: {crewCounter} ({crewParent.childCount} on board, {crewParentInOrigin.childCount} in reserve)");
 		
 		if (pirateCounter <= 0) {
 			WinGame(crewCounter * 5);

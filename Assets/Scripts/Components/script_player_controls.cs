@@ -306,6 +306,7 @@ public class script_player_controls : MonoBehaviour
 				else if (GameVars.isPassingTime) {
 					//Debug.Log ("passing time....");
 					CheckCameraRotationControls();
+					CheckZoomControls();
 					//Else we are not at the title screen and just in the game
 				}
 				else {
@@ -322,6 +323,7 @@ public class script_player_controls : MonoBehaviour
 							current_shipSpeed_Magnitude = 0f;
 						}
 						CheckCameraRotationControls();
+						CheckZoomControls();
 					}
 					else {
 						//we are in the settlement menu GUI so just do nothing
@@ -404,7 +406,7 @@ public class script_player_controls : MonoBehaviour
 					CalculateShipTrajectoryPreview(firstRelevantHit.point);
 
 					//Now check to see if the player clicks the left mouse button to travel
-					if (Input.GetButton("Select")) {
+					if (Input.GetKeyDown(KeyCode.Mouse0)) {
 						//lock controls so that the travel function is triggered on the next update cycle
 						GameVars.controlsLocked = true;
 
