@@ -19,6 +19,8 @@ public class PoseidonsBounty : RandomEvents.PositiveEvent
 		//if there is less than 50kg of room, but the ship is low on Provisions, then the crew can have the Provisions
 		if (amountCanHold > 50 || ship.cargo[1].amount_kg <= 100) {
 			int amountToAdd = (int)(Random.Range(1, amountCanHold) * aggregateCloutScore);
+			//need to make sure you get at least *something*
+			amountToAdd = Mathf.Clamp(amountToAdd, 1, 10000);
 			finalMessage += "The crew catches " + amountToAdd + " kg of Provisions from the fish. What luck! Praise be to Poseidon! Hopefully this isn't one of his tricks!";
 			ship.cargo[1].amount_kg += amountToAdd;
 		}

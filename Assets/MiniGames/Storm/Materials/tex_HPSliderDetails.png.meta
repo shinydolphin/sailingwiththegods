@@ -1,7 +1,73 @@
 fileFormatVersion: 2
 guid: 36916fc6941f9a54a8707e39aa3840ec
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: -7699595236557798526
+    second: tex_HPSliderDetails_0
+  - first:
+      213: -7524684387266974179
+    second: tex_HPSliderDetails_1
+  - first:
+      213: -4160698398555738476
+    second: tex_HPSliderDetails_2
+  - first:
+      213: 2960455592622023565
+    second: tex_HPSliderDetails_3
+  - first:
+      213: -8646543495805370458
+    second: tex_HPSliderDetails_4
+  - first:
+      213: 4987199660884393925
+    second: tex_HPSliderDetails_5
+  - first:
+      213: 1242977200849671727
+    second: tex_HPSliderDetails_6
+  - first:
+      213: 187279369192462300
+    second: tex_HPSliderDetails_7
+  - first:
+      213: -8889752150112118765
+    second: tex_HPSliderDetails_8
+  - first:
+      213: 2765669610618772745
+    second: tex_HPSliderDetails_9
+  - first:
+      213: 560319605794652879
+    second: tex_HPSliderDetails_10
+  - first:
+      213: -2266260432608835212
+    second: tex_HPSliderDetails_11
+  - first:
+      213: -9091024742820665275
+    second: tex_HPSliderDetails_12
+  - first:
+      213: 2724795244263729282
+    second: tex_HPSliderDetails_13
+  - first:
+      213: 3175895309501108630
+    second: tex_HPSliderDetails_14
+  - first:
+      213: 1572418341154145986
+    second: tex_HPSliderDetails_15
+  - first:
+      213: -3147411353040069587
+    second: tex_HPSliderDetails_16
+  - first:
+      213: 2698879820006722188
+    second: tex_HPSliderDetails_17
+  - first:
+      213: -3229437796258954310
+    second: tex_HPSliderDetails_18
+  - first:
+      213: -8308061411478026290
+    second: tex_HPSliderDetails_19
+  - first:
+      213: 2756537986706751347
+    second: tex_HPSliderDetails_20
+  - first:
+      213: -4204434433403424973
+    second: tex_HPSliderDetails_21
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -42,11 +108,11 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 1
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteBorder: {x: 35, y: 35, z: 35, w: 35}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -71,9 +137,222 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: tex_HPSliderDetails_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 133.33334
+        width: 160
+        height: 66.666664
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 283cea23dea852590800000000000000
+      internalID: -7699595236557798526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tex_HPSliderDetails_1
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 133.33334
+        width: 160
+        height: 66.666664
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1e2602da63f29790800000000000000
+      internalID: -7524684387266974179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tex_HPSliderDetails_2
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 133
+        width: 160
+        height: 67
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49e6c80d9da3246c0800000000000000
+      internalID: -4160698398555738476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tex_HPSliderDetails_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 67.333336
+        width: 160
+        height: 66.666664
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d83ed832da6a51920800000000000000
+      internalID: 2960455592622023565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tex_HPSliderDetails_4
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 67.333336
+        width: 160
+        height: 66.666664
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6af7e8d708e410880800000000000000
+      internalID: -8646543495805370458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tex_HPSliderDetails_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 67.333336
+        width: 160
+        height: 66.666664
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5cf76f21ba7163540800000000000000
+      internalID: 4987199660884393925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tex_HPSliderDetails_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1.3333359
+        width: 160
+        height: 66.666664
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f26dd88bd21ff3110800000000000000
+      internalID: 1242977200849671727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tex_HPSliderDetails_7
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 1.3333359
+        width: 160
+        height: 66.666664
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd7d9721899599200800000000000000
+      internalID: 187279369192462300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tex_HPSliderDetails_8
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 1.3333359
+        width: 160
+        height: 66.666664
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3185d47f48141a480800000000000000
+      internalID: -8889752150112118765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
