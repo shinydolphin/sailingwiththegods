@@ -33,41 +33,49 @@ public static class CSVLoader
 		var headers = fileByLine[0].Split(lineDelimiter, StringSplitOptions.None);
 		for (int row = 1; row < fileByLine.Length; row++) {
 			string[] records = fileByLine[row].Split(lineDelimiter, StringSplitOptions.None);
-			
-			// parse indices before cargo list
-			int id = int.Parse(records[0]);
 
-			var settlement = new Settlement(
-				settlementID: id,
-				name: records[1],
-				location_longXlatY: ParseEastingNorthing(records[2], records[3]),
-				elevation: float.Parse(records[4]),
-				population: int.Parse(records[5])
-			);
+			try {
 
-			settlement.networks = ParseIntList(records[7]);
-			settlement.tax_neutral = float.Parse(records[9]);
-			settlement.tax_network = float.Parse(records[10]);
+				// parse indices before cargo list
+				int id = int.Parse(records[0]);
 
-			const int cargoStartIndex = 11;
-			settlement.cargo = ParseSettlementCargo(records, headers, cargoStartIndex, settlement.population);
+				var settlement = new Settlement(
+					settlementID: id,
+					name: records[1],
+					location_longXlatY: ParseEastingNorthing(records[2], records[3]),
+					elevation: float.Parse(records[4]),
+					population: int.Parse(records[5])
+				);
 
-			// parse indices after cargo list (using an offset from the end of it)
-			int afterCargo = cargoStartIndex + Resource.All.Length;
-			settlement.typeOfSettlement = int.Parse(records[afterCargo]);
-			settlement.prefabName = records[afterCargo + 1];
-			settlement.description = records[afterCargo + 2];
-			settlement.godTax = int.Parse(records[afterCargo + 3]) == 1;
-			settlement.godTaxAmount = int.Parse(records[afterCargo + 4]);
-			settlement.transitTax = int.Parse(records[afterCargo + 5]) == 1;
-			settlement.transitTaxPercent = float.Parse(records[afterCargo + 6]);
-			settlement.foreignerFee = int.Parse(records[afterCargo + 7]) == 1;
-			settlement.foreignerFeePercent = float.Parse(records[afterCargo + 8]);
-			settlement.ellimenionPercent = float.Parse(records[afterCargo + 9]);
-			settlement.coinText = records[afterCargo + 10];
-			settlement.Region = Globals.GameVars.GetRegionByName(records[afterCargo + 11]);
+				settlement.networks = ParseIntList(records[7]);
+				settlement.tax_neutral = float.Parse(records[9]);
+				settlement.tax_network = float.Parse(records[10]);
 
-			settlement_masterList.Add(id, settlement);
+				const int cargoStartIndex = 11;
+				settlement.cargo = ParseSettlementCargo(records, headers, cargoStartIndex, settlement.population);
+
+				// parse indices after cargo list (using an offset from the end of it)
+				int afterCargo = cargoStartIndex + Resource.All.Length;
+				settlement.typeOfSettlement = int.Parse(records[afterCargo]);
+				settlement.prefabName = records[afterCargo + 1];
+				settlement.description = records[afterCargo + 2];
+				settlement.godTax = int.Parse(records[afterCargo + 3]) == 1;
+				settlement.godTaxAmount = int.Parse(records[afterCargo + 4]);
+				settlement.transitTax = int.Parse(records[afterCargo + 5]) == 1;
+				settlement.transitTaxPercent = float.Parse(records[afterCargo + 6]);
+				settlement.foreignerFee = int.Parse(records[afterCargo + 7]) == 1;
+				settlement.foreignerFeePercent = float.Parse(records[afterCargo + 8]);
+				settlement.ellimenionPercent = float.Parse(records[afterCargo + 9]);
+				settlement.coinText = records[afterCargo + 10];
+				settlement.Region = Globals.GameVars.GetRegionByName(records[afterCargo + 11]);
+
+				settlement_masterList.Add(id, settlement);
+
+			}
+			catch(Exception e) {
+				Debug.LogError($"CSV Parse error on line {row}:");
+				Debug.LogException(e);
+			}
 		}
 
 		LoadAdjustedSettlementLocations(settlement_masterList);
