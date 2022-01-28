@@ -569,8 +569,8 @@ public class Game
 		while (numberOfCrewmanNeeded != availableCrew.Count) {
 			CrewMember thisMember = Session.Crew.StandardCrew.RandomElement();
 			if (!thisMember.isPartOfMainQuest) {
-				//Now make sure this crewmember isn't already in the current crew
-				if (!Session.playerShipVariables.ship.crewRoster.Contains(thisMember)) {
+				//Now make sure this crewmember isn't already in the current crew or available to hire
+				if (!Session.playerShipVariables.ship.crewRoster.Contains(thisMember) && !availableCrew.Contains(thisMember)) {
 					availableCrew.Add(thisMember);
 				}
 			}

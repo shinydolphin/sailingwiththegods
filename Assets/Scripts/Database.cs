@@ -21,14 +21,13 @@ public class Database
 	public List<DialogText> portDialogText { get; private set; } = new List<DialogText>();
 
 	//Taverna
-	public List<DialogPair> networkDialogText = new List<DialogPair>();
-	public List<DialogPair> pirateDialogText = new List<DialogPair>();
-	public List<DialogPair> mythDialogText = new List<DialogPair>();
-	public List<string> guideDialogText = new List<string>();
-	public List<DialogPair> tradingDialogText = new List<DialogPair>(); // Perhaps
-	public List<FoodText> foodItemText = new List<FoodText>();
-	public List<FoodText> wineInfoText = new List<FoodText>();
-	public List<string> foodDialogText = new List<string>();
+	public List<DialogPair> networkDialogText;
+	public List<DialogPair> pirateDialogText;
+	public List<DialogPair> mythDialogText;
+	public List<string> guideDialogText;
+	public List<string> foodDialogText;
+	public List<FoodText> wineInfoText;
+	public List<FoodText> foodItemText;
 
 	public List<string> tavernaGameInsults;
 	public List<string> tavernaGameBragging;
@@ -137,7 +136,7 @@ public class Database
 		else if (clout > 3500 && clout <= 3999) title = "Ambassador";
 		else if (clout > 4000 && clout <= 4499) title = "Prince";
 		else if (clout > 4500 && clout <= 4999) title = "King";
-		else if (clout >= 5000) title = "The God";
+		else if (clout >= 5000) title = "A God";
 		else if (clout == 0) title = "Dead";
 		else title = "ERROR: clout is not between 0 and 100";
 		return title;
