@@ -13587,7 +13587,7 @@ PrefabInstance:
     - target: {fileID: 7291197330739748088, guid: a5f752995f09a884da6d2e5d35202d46,
         type: 3}
       propertyPath: hotkeysOn
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7291197331948264484, guid: a5f752995f09a884da6d2e5d35202d46,
         type: 3}
