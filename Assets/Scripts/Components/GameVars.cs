@@ -54,6 +54,8 @@ public class GameVars : MonoBehaviour
 	public const string TD_minute = "0";
 	public const string TD_second = "0";
 
+	public GameObject endingScreen;
+
 	// TODO: These should be removed eventually in favor of using Globals.GameVars.Crew.Jason, so that GameVars isn't so overloaded with util functions
 	public CrewMember Jason => Crew.Jason;
 	public IEnumerable<CrewMember> StandardCrew => Crew.StandardCrew;
@@ -309,19 +311,6 @@ public class GameVars : MonoBehaviour
 		CSVLoader.LoadUrText(out urGameIntro, out urGameRosette, out urGameCapture, out urGameFlip, out urGameMoveOff, out urGameMoveOn,
 			out urGameLost, out urGameWin, out urGameInsults);
 
-		// Mylo's Addition
-		//networkDialogText = CSVLoader.LoadNetworkDialog();
-		//pirateDialogText = CSVLoader.LoadPirateDialog();
-		//mythDialogText = CSVLoader.LoadMythDialog();
-		//guideDialogText = CSVLoader.LoadHireGuideDialog();
-		//// trading goods here
-		//foodItemText = CSVLoader.LoadFoodItemsList();
-		//foodDialogText = CSVLoader.LoadFoodDialogList();
-		//wineInfoText = CSVLoader.LoadWineInfoList();
-
-
-		// end Mylo's Addition
-
 		region_masterList = CSVLoader.LoadRegionList();
 		settlement_masterList = CSVLoader.LoadSettlementList();     // depends on resource list, region list, and crew list
 
@@ -349,6 +338,7 @@ public class GameVars : MonoBehaviour
 		AddEntriesToCurrentLogPool(0);
 		StartPlayerShipAtOriginCity();
 		GenerateCityLights();
+
 	}
 
 
@@ -1056,8 +1046,8 @@ public class GameVars : MonoBehaviour
 		while (numberOfCrewmanNeeded != availableCrew.Count) {
 			CrewMember thisMember = Crew.StandardCrew.RandomElement();
 			if (!thisMember.isPartOfMainQuest) {
-				//Now make sure this crewmember isn't already in the current crew
-				if(!playerShipVariables.ship.crewRoster.Contains(thisMember)) {
+				//Now make sure this crewmember isn't already in the current crew or available to hire
+				if(!playerShipVariables.ship.crewRoster.Contains(thisMember) && !availableCrew.Contains(thisMember)) {
 					availableCrew.Add(thisMember);
 				}
 			}
@@ -1190,9 +1180,18 @@ public class GameVars : MonoBehaviour
 			updatePlayerCloutMeter = true;
 			//Next we need to determine whether or not it was a level down or level up
 			//If it was an increase then show a positive message
-			if (clout < (clout + cloutAdjustment)) {
-				Debug.Log("Gained a level");
-				ShowANotificationMessage("Congratulations! You have reached a new level of influence! Before this day you were Jason, " + GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
+			if (clout < (clout + cloutAdjustment)) 
+			{
+				Debug.Log("Gained a level: " + clout);
+				if (clout >= 4000) 
+				{
+					Debug.Log("Winning the game");
+					endingScreen.SetActive(true);
+				}
+				else 
+				{
+					ShowANotificationMessage("Congratulations! You have reached a new level of influence! Before this day you were Jason, " + GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
+				}
 				//If it was a decrease then show a negative message to the player
 			}
 			else {

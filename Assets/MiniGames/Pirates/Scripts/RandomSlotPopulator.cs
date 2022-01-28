@@ -13,12 +13,7 @@ public class RandomSlotPopulator : MonoBehaviour
 	public Transform[] crewZones = new Transform[2];
 	public CardDropZone enemySlot;
 	public CardDropZone crewSlot;
-	#region Obsolete Variables
-	//public GameObject[] enemySlotsEven;
-	//public GameObject[] enemySlotsOdd;
-	//public GameObject[] playableSlotsEven;
-	//public GameObject[] playableSlotsOdd;
-	#endregion
+
 	[Header("Crew Slots")]
 	public GameObject crewOriginSlot;
 	public Transform crewOriginParent;
@@ -112,7 +107,7 @@ public class RandomSlotPopulator : MonoBehaviour
 			crewSlots.Add(newCrewSlot);
 		}
 
-		GetComponent<MiniGameManager>().InitializeCrewSlots(crewSlots);
+		GetComponent<PirateGameManager>().InitializeCrewSlots(crewSlots);
 
 		//once the slots are in place, they won't be moving, so you can add the pirates
 		//you can't add the pirates at the same time because the slots are in a horizontal layout group, so they'll be moving as new slots are added
