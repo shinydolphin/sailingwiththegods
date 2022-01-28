@@ -23,6 +23,7 @@ public class FriendlyShip : RandomEvents.PositiveEvent
 		//--If the player is low on Provisions
 		if (ship.cargo[1].amount_kg <= 100) {
 			//add a random amount of Provisions to the stores between 30 and 60 and modified by clout
+			//this one doesn't need to be clamped because aggregateCloutScore is already clamped at no smaller than 0.1f and the reward is above 10
 			int ProvisionsBonus = Mathf.FloorToInt(Random.Range(30, 60) * aggregateCloutScore);
 			messageProvisionsModifier += "Thankfully you were given  " + ProvisionsBonus + " kg of Provisions ";
 

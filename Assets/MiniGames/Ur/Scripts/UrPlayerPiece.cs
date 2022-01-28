@@ -99,7 +99,7 @@ public class UrPlayerPiece : UrPiece
 
 	private void OnMouseUp() 
 	{
-		if (urGC.AllowPlayerMove && enabled) 
+		if (urGC.AllowPlayerMove && enabled && selected) 
 		{
 			selected = false;
 			DestroyGhost();

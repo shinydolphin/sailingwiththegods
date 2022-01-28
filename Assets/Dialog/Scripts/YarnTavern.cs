@@ -195,7 +195,7 @@ public class YarnTavern : MonoBehaviour
 	{
 		List<string> guideText = Globals.Database.guideDialogText;
 
-		int i = Random.Range(1, guideText.Count);
+		int i = Random.Range(0, guideText.Count);
 
 		ds.Storage.SetValue("$flavor_text1", guideText[i]); // Wrongfully added in CityType.
 	}
@@ -203,7 +203,10 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("hirenavigator")]
 	public void SetSettlementWaypoint()
 	{
-		_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.Game.Session.AllNonCrew.RandomElement().ID);		
+		Globals.Game.Session.playerShipVariables.ship.currentNavigatorTarget = (int)ds.Storage.GetValue("$known_city_ID").AsNumber;
+		Vector3 location = Globals.Database.GetSettlementByName(ds.Storage.GetValue("$known_city").AsString).adjustedGamePosition;
+		Globals.Game.Session.ActivateNavigatorBeacon(Globals.World.navigatorBeacon, location);
+		//_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.Game.Session.AllNonCrew.RandomElement().ID);		
 	}
 	#endregion
 

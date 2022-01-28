@@ -59,11 +59,13 @@ public static class RandomEvents
 
 
 				//If we roll under our range, that means we hit a NEGATIVE random event
+				//Clout is clamped to prevent positive events from giving 0 resource as a reward, for example
+				float clampedClout = Mathf.Clamp(aggregateCloutScore, 0.1f, 1f);
 				if (Random.Range(0f, 1f) <= chanceOfEvent) {
-					ExecuteEvent(GetSubclassesOfType<NegativeEvent>(), ship, shipSpeedModifiers, shipTransform, aggregateCloutScore);
+					ExecuteEvent(GetSubclassesOfType<NegativeEvent>(), ship, shipSpeedModifiers, shipTransform, clampedClout);
 				}
 				else {
-					ExecuteEvent(GetSubclassesOfType<PositiveEvent>(), ship, shipSpeedModifiers, shipTransform, aggregateCloutScore);
+					ExecuteEvent(GetSubclassesOfType<PositiveEvent>(), ship, shipSpeedModifiers, shipTransform, clampedClout);
 				}
 
 			}
