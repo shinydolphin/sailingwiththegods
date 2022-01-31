@@ -12,7 +12,7 @@ public class GameSession
 	QuestSystem Quests => Globals.Quests;
 	Database Database => Globals.Database;
 	Notifications Notifications => Globals.Notifications;
-	UISystem UI => Globals.UI;
+	GameUISystem UI => Globals.UI;
 
 	// TODO: These should be removed eventually in favor of using Globals.World.Crew.Jason, so that World isn't so overloaded with util functions
 	public CrewMember Jason => Crew.Jason;
@@ -224,11 +224,11 @@ public class GameSession
 				if (clout >= 4000)
 				{
 			        Debug.Log("Winning the game");
-			        endingScreen.SetActive(true);
+			        UI.EndingScreen.SetActive(true);
 				}
 				else
 				{
-				    ShowANotificationMessage("Congratulations! You have reached a new level of influence! Before this day you were Jason, " + Database.GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + Database.GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
+				    Notifications.ShowANotificationMessage("Congratulations! You have reached a new level of influence! Before this day you were Jason, " + Database.GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + Database.GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
 				}
 			}
 			else {
