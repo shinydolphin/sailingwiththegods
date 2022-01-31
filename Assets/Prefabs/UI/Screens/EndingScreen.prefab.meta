@@ -1,12 +1,6 @@
 fileFormatVersion: 2
-<<<<<<< HEAD:Assets/3DModels/Materials.meta
-guid: a926bc69b15e23d44889ae6520ab9649
-folderAsset: yes
-DefaultImporter:
-=======
 guid: 9c3833f45dedabe48896ae194d099bab
 PrefabImporter:
->>>>>>> origin/develop:Assets/Prefabs/UI/Screens/EndingScreen.prefab.meta
   externalObjects: {}
   userData: 
   assetBundleName: 
