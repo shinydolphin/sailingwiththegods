@@ -63,13 +63,10 @@ public class Game
 			World.newGameCrewSelectList[i] = true;
 		}
 
-		// TODO: For now, skip straight to starting the game since i turned off crew selection
 		StartMainGameInternal();
+
 		//play the intro for the game
 		//time_Line_controll.play();//start the intro seen
-		// TODO: Turned off crew selection because it's too overwhelming. Needs to be reworked.
-		//title_crew_select.SetActive(true);
-		//GUI_SetupStartScreenCrewSelection();
 
 	}
 
@@ -216,9 +213,6 @@ public class Game
 		//Initiate the main questline
 		Quests.InitiateMainQuestLineForPlayer();
 
-		// TODO: Crew select disabled for now
-		//title_crew_select.SetActive(false);
-
 		//Turn on the ship HUD
 		UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel(Session));
 	}
@@ -243,15 +237,13 @@ public class Game
 			return false;
 		}
 
-		// load new JSON data, but throw most of it out for now
-		// TODO: move all save data to this structure so we can load in one line
 		try {
 			// TODO: Migrate all save data loading to load from JSON. for now most of this data is thrown away (see TODOs in the GameData class)
 			session.data = JsonUtility.FromJson<GameData>(System.IO.File.ReadAllText(Application.persistentDataPath + "/save.json"));
 
 #if LOAD_FROM_JSON
 			// TODO: this is temporary until we make all data actually live on the data object
-			// this allows us to start saving new ship data only to json without needing to add it to the CSV
+			// this allows us to start saving new ship data only to json without needing to add it to the CSV (new fields can be added to GameState even if this block is disabled, too)
 			// data comes from JSON first, then is overwritten by the values in the CSV
 			session.playerShipVariables.ship = session.data.Current.ship;
 			session.playerShipVariables.journey = session.data.journey;
@@ -410,7 +402,7 @@ public class Game
 		session.SetShipModel(ship.upgradeLevel);
 
 		// KDTODO: Once the save game routines are rewritten, need to save the crew available in each city instead of regenerating since this is exploitable
-		// it's just too much hassle to support saving this right now because the save format is limiting
+		// it's just too much hassle to support saving this right now because the CSV save format is limiting
 		// setup each city with 5 crew available and for now, they never regenerate.
 		foreach (var settlement in Database.settlement_masterList) {
 			settlement.availableCrew.Clear();

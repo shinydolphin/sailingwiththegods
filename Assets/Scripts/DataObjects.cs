@@ -43,8 +43,9 @@ public class GameState
 {
 	// TODO: add new captain's log data here
 
-	// TODO: Still loaded from CSV. Review and load from JSON later.
-	// since this is a reference to the real ship, it's safe to modify from here as well as playerShipVariables.ship
+	// this is a reference to the real ship so that it will be safe to modify from here as well as playerShipVariables.ship
+	// TODO: However, this is still loaded from CSV right now unless LOAD_FROM_JSON is set, so we don't 
+	// TODO: Still loaded from CSV.Review and load from JSON later.
 	public Ship ship;
 }
 
@@ -186,7 +187,7 @@ public class PlayerRoute
 
 }
 
-// KDTODO: Need to do a deep dive into everything in AddOtherAttributes / CSVHeader to make sure it's handled correctly before loading from CSV
+// TODO: Need to do a deep dive into everything in AddOtherAttributes / CSVHeader to make sure it's handled correctly before loading from CSV
 [Serializable]
 public class PlayerJourneyLog
 {

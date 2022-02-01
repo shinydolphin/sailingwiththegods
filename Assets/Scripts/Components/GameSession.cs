@@ -16,7 +16,6 @@ public class GameSession
 
 	public GameData data { get; set; }
 
-	// TODO: These should be removed eventually in favor of using Globals.World.Crew.Jason, so that World isn't so overloaded with util functions
 	public CrewMember Jason => Crew.Jason;
 	public IEnumerable<CrewMember> StandardCrew => Crew.StandardCrew;
 	public IEnumerable<CrewMember> Pirates => Crew.Pirates;

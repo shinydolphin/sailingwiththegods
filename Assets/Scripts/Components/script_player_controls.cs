@@ -420,7 +420,7 @@ public class script_player_controls : MonoBehaviour
 					//Now check to see if the player clicks the left mouse button to open the port menu
 					//Clicking here will pop the city dialog as long as you're in the docking zone. 
 					if (Input.GetKeyDown(KeyCode.Mouse0)) {
-						GameObject.FindObjectOfType<script_GUI>().GUI_checkOutOrDockWithPort(true);		// TODO: Move this into Globals for now until I've pulled everything out.
+						GameObject.FindObjectOfType<script_GUI>().GUI_checkOutOrDockWithPort(true);		// TODO: Remove script_GUI soon. There's < 5 references left.
 					}
 
 				}
@@ -932,7 +932,6 @@ public class script_player_controls : MonoBehaviour
 			}
 			//now update the notification string with the message
 			if (!string.IsNullOrEmpty(notificationMessage)) {
-				// KD TODO: Need to revisit if i reimplemented this as robert had it
 				notificationMessage += ".";
 				Notifications.ShowANotificationMessage(notificationMessage);
 			}
