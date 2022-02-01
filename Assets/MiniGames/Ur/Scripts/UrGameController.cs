@@ -162,7 +162,11 @@ public class UrGameController : TavernaGameControllerParent
 	public void SwitchTurn(bool playerTurn) {
 		isPlayerTurn = playerTurn;
 		allowPlayerMove = false;
-		rollDiceButton.interactable = isPlayerTurn;
+		if (!isGameOver) 
+		{
+			rollDiceButton.interactable = isPlayerTurn;
+		}
+
 
 		playerPathLine.SetActive(isPlayerTurn);
 		enemyPathLine.SetActive(!isPlayerTurn);
@@ -320,7 +324,9 @@ public class UrGameController : TavernaGameControllerParent
 			enemyAI.enemyPieces.Remove(c);
 			c.GetComponent<MeshRenderer>().enabled = false;
 			Destroy(c.gameObject, 1f);
+			Debug.Log("Enemy point scored, remaining pieces " + enemyAI.enemyPieces.Count);
 			if (enemyAI.enemyPieces.Count == 0) {
+				Debug.Log("Ending the game - enemy win");
 				LoseGame();
 			}
 		}
@@ -392,6 +398,7 @@ public class UrGameController : TavernaGameControllerParent
 		rollDiceButton.interactable = false;
 		allowPlayerMove = false;
 
+		mgScreen.gameObject.SetActive(true);
 		string text = loseText + "\n\n" + "Although you have lost this round, you can always find a willing opponent to try again!" + "\n\n" + loseText.RandomElement();
 		mgScreen.DisplayText("The Game of Ur: Defeat!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);
 	}

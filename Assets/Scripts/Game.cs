@@ -421,9 +421,9 @@ public class Game
 
 	void SaveUserGameDataToServer(string localPath, string localFile) {
 		Debug.Log("Starting FTP");
-		string user = "SamoGameBot";
-		string pass = "%Mgn~WxH+CRzj>4Z";
-		string host = "34.193.207.222";
+		string user = "samogamebot";
+		string pass = "8LV-GC>uw92rE4d%";
+		string host = "datauploads.sailingwiththegods.org";
 		string initialPath = "";
 
 		FileInfo file = new FileInfo(localPath + localFile);
@@ -601,8 +601,8 @@ public class Game
 		while (numberOfCrewmanNeeded != availableCrew.Count) {
 			CrewMember thisMember = Session.Crew.StandardCrew.RandomElement();
 			if (!thisMember.isPartOfMainQuest) {
-				//Now make sure this crewmember isn't already in the current crew
-				if (!Session.playerShipVariables.ship.crewRoster.Contains(thisMember)) {
+				//Now make sure this crewmember isn't already in the current crew or available to hire
+				if (!Session.playerShipVariables.ship.crewRoster.Contains(thisMember) && !availableCrew.Contains(thisMember)) {
 					availableCrew.Add(thisMember);
 				}
 			}

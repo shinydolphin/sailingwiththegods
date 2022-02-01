@@ -207,6 +207,10 @@ public class script_player_controls : MonoBehaviour
 			{
 				MiniGames.Exit();
 			}
+
+			if (Input.GetKeyUp(KeyCode.Space)) {
+				Globals.Game.Session.AdjustPlayerClout(1000, false);
+			}
 		}
 
 		//Make sure the camera transform is always tied to the front of the ship model's transform if the FPV camera is enabled
@@ -289,6 +293,7 @@ public class script_player_controls : MonoBehaviour
 				else if (Session.isPassingTime) {
 					//Debug.Log ("passing time....");
 					CheckCameraRotationControls();
+					CheckZoomControls();
 					//Else we are not at the title screen and just in the game
 				}
 				else {
@@ -305,6 +310,7 @@ public class script_player_controls : MonoBehaviour
 							current_shipSpeed_Magnitude = 0f;
 						}
 						CheckCameraRotationControls();
+						CheckZoomControls();
 					}
 					else {
 						//we are in the settlement menu GUI so just do nothing
@@ -387,7 +393,7 @@ public class script_player_controls : MonoBehaviour
 					CalculateShipTrajectoryPreview(firstRelevantHit.point);
 
 					//Now check to see if the player clicks the left mouse button to travel
-					if (Input.GetButton("Select")) {
+					if (Input.GetKeyDown(KeyCode.Mouse0)) {
 						//lock controls so that the travel function is triggered on the next update cycle
 						Session.controlsLocked = true;
 
@@ -413,7 +419,7 @@ public class script_player_controls : MonoBehaviour
 
 					//Now check to see if the player clicks the left mouse button to open the port menu
 					//Clicking here will pop the city dialog as long as you're in the docking zone. 
-					if (Input.GetButton("Select")) {
+					if (Input.GetKeyDown(KeyCode.Mouse0)) {
 						GameObject.FindObjectOfType<script_GUI>().GUI_checkOutOrDockWithPort(true);		// TODO: Move this into Globals for now until I've pulled everything out.
 					}
 

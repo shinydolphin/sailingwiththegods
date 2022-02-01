@@ -12,7 +12,7 @@ public class GameSession
 	QuestSystem Quests => Globals.Quests;
 	Database Database => Globals.Database;
 	Notifications Notifications => Globals.Notifications;
-	UISystem UI => Globals.UI;
+	GameUISystem UI => Globals.UI;
 
 	public GameData data { get; set; }
 
@@ -206,7 +206,12 @@ public class GameSession
 	//====================================================================================================
 	//    PLAYER MODIFICATION FUNCTIONS
 	//====================================================================================================   
-
+	
+	/// <summary>
+	/// Changes the player's clout score
+	/// </summary>
+	/// <param name="cloutAdjustment">Change in the clout</param>
+	/// <param name="useMod">If you are writing new code, set this to false</param>
 	public void AdjustPlayerClout(int cloutAdjustment, bool useMod = true) {
 		int cloutModifier = useMod ? 100 : 1; //We have a modifier to help link the new system in with the old functions.
 		int clout = (int)playerShipVariables.ship.playerClout;
@@ -225,9 +230,16 @@ public class GameSession
 			//Next we need to determine whether or not it was a level down or level up
 			//If it was an increase then show a positive message
 			if (clout < (clout + cloutAdjustment)) {
-				Debug.Log("Gained a level");
-				Notifications.ShowANotificationMessage("Congratulations! You have reached a new level of influence! Before this day you were Jason, " + Database.GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + Database.GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
-				//If it was a decrease then show a negative message to the player
+				Debug.Log("Gained a level: " + clout);
+				if (clout >= 4000)
+				{
+			        Debug.Log("Winning the game");
+			        UI.EndingScreen.SetActive(true);
+				}
+				else
+				{
+				    Notifications.ShowANotificationMessage("Congratulations! You have reached a new level of influence! Before this day you were Jason, " + Database.GetCloutTitleEquivalency(clout) + ".....But now...You have become Jason " + Database.GetCloutTitleEquivalency((int)playerShipVariables.ship.playerClout) + "!");
+				}
 			}
 			else {
 				Debug.Log("Lost a level");

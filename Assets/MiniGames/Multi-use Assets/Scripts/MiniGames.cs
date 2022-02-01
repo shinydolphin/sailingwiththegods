@@ -64,6 +64,15 @@ public class MiniGames : MonoBehaviour
 		StartCoroutine(ExitInternal());
 	}
 
+	/// <summary>
+	/// Reloads the given minigame scene
+	/// </summary>
+	/// <param name="additiveSceneName"></param>
+	public void ReloadScene(string additiveSceneName) 
+	{
+		StartCoroutine(Reload(additiveSceneName));
+	}
+
 	void EnterInternal(bool disableCamera) {
 		CutsceneMode.Enter();
 		IsMiniGameActive = true;
@@ -95,6 +104,24 @@ public class MiniGames : MonoBehaviour
 		World.camera_Mapview.SetActive(true);
 		World.FPVCamera.SetActive(true);
 
+	}
+
+	/// <summary>
+	/// Unloads and reloads the given scene
+	/// </summary>
+	/// <param name="additiveSceneName"></param>
+	/// <returns></returns>
+	IEnumerator Reload(string additiveSceneName) 
+	{
+		yield return SceneManager.UnloadSceneAsync(additiveSceneName);
+
+		//Often you'll be reloading from a pause menu where timeScale = 0 so we need to fix that
+		Time.timeScale = 1;
+
+		yield return SceneManager.LoadSceneAsync(additiveSceneName, LoadSceneMode.Additive);
+		yield return null;
+		Scene = SceneManager.GetSceneByName(additiveSceneName);
+		SceneManager.SetActiveScene(Scene.Value);
 	}
 
 	// scene minigames usually live at the origin, so this disables things that get in the way of the additively loaded minigames
