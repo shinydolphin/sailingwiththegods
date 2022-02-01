@@ -13,7 +13,7 @@ public class Icons
 	private const string _defaultCoinIcon = "settlement_coins/default_coin_texture";
 	private const string _defaultCrewPortrait = "crew_portraits/phoenician_sailor";
 
-	// just a readonly reference to the one in GameVars
+	// just a readonly reference to the one in World
 	IEnumerable<MetaResource> _masterResourceList;
 
 	public Icons(IEnumerable<MetaResource> masterResourceList) {
@@ -35,11 +35,13 @@ public class Icons
 
 public static class IconExtensions
 {
-	public static Sprite IconSprite(this MetaResource self) => Globals.GameVars.Icons.GetCargoIcon(self);
-	public static Sprite IconSprite(this Resource self) => Globals.GameVars.Icons.GetCargoIcon(self);
+	static Database Database => Globals.Database;
 
-	public static Sprite PortraitSprite(this CrewMember self) => Globals.GameVars.Icons.GetCrewPortrait(self);
+	public static Sprite IconSprite(this MetaResource self) => Database.Icons.GetCargoIcon(self);
+	public static Sprite IconSprite(this Resource self) => Database.Icons.GetCargoIcon(self);
 
-	public static Sprite PortIcon(this Settlement self) => Globals.GameVars.Icons.GetPortIcon(self);
-	public static Sprite PortCoinIcon(this Settlement self) => Globals.GameVars.Icons.GetPortCoinIcon(self);
+	public static Sprite PortraitSprite(this CrewMember self) => Database.Icons.GetCrewPortrait(self);
+
+	public static Sprite PortIcon(this Settlement self) => Database.Icons.GetPortIcon(self);
+	public static Sprite PortCoinIcon(this Settlement self) => Database.Icons.GetPortCoinIcon(self);
 }

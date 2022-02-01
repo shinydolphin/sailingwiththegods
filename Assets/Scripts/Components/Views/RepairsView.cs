@@ -8,7 +8,9 @@ using UnityEngine.UI;
 
 public class RepairsViewModel : Model
 {
-	GameVars GameVars => Globals.GameVars;
+	Notifications Notifications => Globals.Notifications;
+
+	GameSession Session { get; set; }
 
 	public int costToRepair { get; private set; }
 	public int costToBuyUpgrade => 10000;			// TODO: Drive with something.
@@ -16,55 +18,56 @@ public class RepairsViewModel : Model
 	public BoundModel<float> shipHealth { get; private set; }
 	public BoundModel<int> shipLevel { get; private set; }
 
-	public RepairsViewModel() {
+	public RepairsViewModel(GameSession session) {
+		Session = session;
 
 		//We need to do a clout check as well as a network checks
-		int baseModifier = Mathf.CeilToInt(2 - GameVars.GetOverallCloutModifier(GameVars.currentSettlement.settlementID));
-		if (GameVars.Network.CheckIfCityIDIsPartOfNetwork(GameVars.currentSettlement.settlementID)) {
-			costToRepair = Mathf.CeilToInt(GameVars.currentSettlement.tax_network * baseModifier * 1);
+		int baseModifier = Mathf.CeilToInt(2 - Session.GetOverallCloutModifier(Session.currentSettlement.settlementID));
+		if (Session.Network.CheckIfCityIDIsPartOfNetwork(Session.currentSettlement.settlementID)) {
+			costToRepair = Mathf.CeilToInt(Session.currentSettlement.tax_network * baseModifier * 1);
 		}
 		else {
-			costToRepair = Mathf.CeilToInt(GameVars.currentSettlement.tax_neutral * baseModifier * 1);
+			costToRepair = Mathf.CeilToInt(Session.currentSettlement.tax_neutral * baseModifier * 1);
 		}
 
-		shipHealth = new BoundModel<float>(GameVars.playerShipVariables.ship, nameof(GameVars.playerShipVariables.ship.health));
-		shipLevel = new BoundModel<int>(GameVars.playerShipVariables.ship, nameof(GameVars.playerShipVariables.ship.upgradeLevel));
+		shipHealth = new BoundModel<float>(Session.playerShipVariables.ship, nameof(Session.playerShipVariables.ship.health));
+		shipLevel = new BoundModel<int>(Session.playerShipVariables.ship, nameof(Session.playerShipVariables.ship.upgradeLevel));
 
 	}
 
 	public void GUI_RepairShipByOneHP() {
-		GameVars.playerShipVariables.ship.health += 1f;
+		Session.playerShipVariables.ship.health += 1f;
 		//make sure the hp can't go above 100
-		if (GameVars.playerShipVariables.ship.health > 100) {
-			GameVars.playerShipVariables.ship.health = 100;
-			GameVars.ShowANotificationMessage("Your ship is already fully repaired");
+		if (Session.playerShipVariables.ship.health > 100) {
+			Session.playerShipVariables.ship.health = 100;
+			Notifications.ShowANotificationMessage("Your ship is already fully repaired");
 		}
 		else {
-			GameVars.playerShipVariables.ship.currency -= costToRepair;
+			Session.playerShipVariables.ship.currency -= costToRepair;
 		}
 
 		NotifyAny();
 	}
 
 	public void GUI_RepairShipByAllHP() {
-		if (Mathf.CeilToInt(GameVars.playerShipVariables.ship.health) >= 100) {
-			GameVars.ShowANotificationMessage("Your ship is already fully repaired");
+		if (Mathf.CeilToInt(Session.playerShipVariables.ship.health) >= 100) {
+			Notifications.ShowANotificationMessage("Your ship is already fully repaired");
 		}
 		else {
-			GameVars.playerShipVariables.ship.currency -= (int)(costToRepair * Mathf.CeilToInt(100 - GameVars.playerShipVariables.ship.health));
-			GameVars.playerShipVariables.ship.health = 100f;
+			Session.playerShipVariables.ship.currency -= (int)(costToRepair * Mathf.CeilToInt(100 - Session.playerShipVariables.ship.health));
+			Session.playerShipVariables.ship.health = 100f;
 		}
 
 		NotifyAny();
 	}
 
 	public void GUI_BuyNewShip() {
-		if(GameVars.playerShipVariables.ship.currency > costToBuyUpgrade) {
-			GameVars.UpgradeShip(costToBuyUpgrade);
-			GameVars.ShowANotificationMessage("We have a larger ship! More benches, more oars, more men and more bellies… We need more food and ample water to keep men at oars and mutiny at bay!");
+		if(Session.playerShipVariables.ship.currency > costToBuyUpgrade) {
+			Session.UpgradeShip(costToBuyUpgrade);
+			Notifications.ShowANotificationMessage("We have a larger ship! More benches, more oars, more men and more bellies… We need more food and ample water to keep men at oars and mutiny at bay!");
 		}
 		else { 
-			GameVars.ShowANotificationMessage("Earn more drachma through trade to upgrade your ship!");
+			Notifications.ShowANotificationMessage("Earn more drachma through trade to upgrade your ship!");
 		}
 	}
 
@@ -72,6 +75,8 @@ public class RepairsViewModel : Model
 
 public class RepairsView : ViewBehaviour<RepairsViewModel>
 {
+	GameSession Session => Globals.Game.Session;
+
 	[SerializeField] StringView ShipHealth = null;
 	[SerializeField] StringView CostOneHp = null;
 	[SerializeField] StringView CostAllHp = null;
@@ -83,7 +88,7 @@ public class RepairsView : ViewBehaviour<RepairsViewModel>
 		base.Bind(model);
 
 		ShipHealth.Bind(ValueModel.Wrap(model.shipHealth)
-			.Select(h => Mathf.CeilToInt(Globals.GameVars.playerShipVariables.ship.health))
+			.Select(h => Mathf.CeilToInt(Session.playerShipVariables.ship.health))
 			.AsString()
 		);
 
@@ -123,7 +128,7 @@ public class RepairsView : ViewBehaviour<RepairsViewModel>
 				.AsString());
 
 			CostAllHp.Bind(ValueModel.New(Model.costToRepair)
-				.Select(cost => (Mathf.CeilToInt(100 - Mathf.CeilToInt(Globals.GameVars.playerShipVariables.ship.health)) * cost))
+				.Select(cost => (Mathf.CeilToInt(100 - Mathf.CeilToInt(Session.playerShipVariables.ship.health)) * cost))
 				.AsString());
 
 			RepairOneButton.GetComponent<Button>().interactable = true;

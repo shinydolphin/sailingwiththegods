@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CrewDetailsScreen : ViewBehaviour<CrewManagementMemberViewModel>
 {
+	UISystem UI => Globals.UI;
+
 	[SerializeField] CrewManagementMemberView CrewMember = null;
 	[SerializeField] StringView FlavorText = null;
 	[SerializeField] ButtonView CloseButton = null;
@@ -20,11 +22,11 @@ public class CrewDetailsScreen : ViewBehaviour<CrewManagementMemberViewModel>
 			OnClick = () => {
 
 				// the city tooltip might be up from clicking a city in a crew member's network
-				if (Globals.UI.IsShown<CityView>()) {
-					Globals.UI.Hide<CityView>();
+				if (UI.IsShown<CityView>()) {
+					UI.Hide<CityView>();
 				}
 
-				Globals.UI.Hide<CrewDetailsScreen>();
+				UI.Hide<CrewDetailsScreen>();
 
 			}
 		}));

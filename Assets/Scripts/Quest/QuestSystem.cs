@@ -9,10 +9,15 @@ public class QuestSystem : MonoBehaviour
 {
 	public const string QuestMessageIntro = "The Argonautica Quest: ";
 
-	GameVars gameVars => Globals.GameVars;
-	GameObject playerShip => gameVars.playerShip;
+	GameSession Session => Globals.Game.Session;
+	World World => Globals.World;
+	Database Database => Globals.Database;
+	Game Game => Globals.Game;
+	Notifications Notifications => Globals.Notifications;
+
+	GameObject playerShip => Session.playerShip;
 	MainQuestLine quest => playerShipVariables.ship.mainQuest;
-	script_player_controls playerShipVariables => gameVars.playerShipVariables;
+	script_player_controls playerShipVariables => Session.playerShipVariables;
 
 	// manually chosen to cover the entire space where the clashing rocks are so you can't miss it (in unity world space)
 	const float CoordTriggerDistance = 10;
@@ -52,7 +57,7 @@ public class QuestSystem : MonoBehaviour
 				dateTimeOfEntry = playerShipVariables.ship.totalNumOfDaysTraveled + " days"
 			};
 			playerShipVariables.ship.shipCaptainsLog.Add(nextDestEntry);
-			gameVars.AddToCaptainsLog(nextDestEntry.dateTimeOfEntry + "\n" + nextDestEntry.logEntry);
+			Session.AddToCaptainsLog(nextDestEntry.dateTimeOfEntry + "\n" + nextDestEntry.logEntry);
 		}
 
 		//Remove any crew members if the questline calls for it
@@ -60,7 +65,7 @@ public class QuestSystem : MonoBehaviour
 			Debug.Log("CREW ID REMOVING: " + crewID);
 			//Make sure the crew ID values are not -1(a null value which means no changes)
 			if (crewID != -1)
-				playerShipVariables.ship.crewRoster.Remove(gameVars.GetCrewMemberFromID(crewID));
+				playerShipVariables.ship.crewRoster.Remove(Database.GetCrewMemberFromID(crewID));
 		}
 
 		//Add any new crew members if the questline calls for it
@@ -68,7 +73,7 @@ public class QuestSystem : MonoBehaviour
 			//Make sure the crew ID values are not -1(a null value which means no changes)
 			//Also make sure they aren't already in your crew or Jason himself
 			if (crewID != -1) {
-				CrewMember cm = gameVars.GetCrewMemberFromID(crewID);
+				CrewMember cm = Database.GetCrewMemberFromID(crewID);
 				if (!cm.isJason && !playerShipVariables.ship.crewRoster.Contains(cm)) {
 					playerShipVariables.ship.crewRoster.Add(cm);
 				}
@@ -91,18 +96,18 @@ public class QuestSystem : MonoBehaviour
 				dateTimeOfEntry = playerShipVariables.ship.totalNumOfDaysTraveled + " days"
 			};
 			playerShipVariables.ship.shipCaptainsLog.Add(nextDestEntry);
-			gameVars.AddToCaptainsLog(nextDestEntry.dateTimeOfEntry + "\n" + nextDestEntry.logEntry);
+			Session.AddToCaptainsLog(nextDestEntry.dateTimeOfEntry + "\n" + nextDestEntry.logEntry);
 
 			//Now add the city name of the next journey quest to the players known settlements
 			// this is only valid for city destinations, obviously
-			Debug.Log("Adding known city from next quest destination: " + Globals.GameVars.currentSettlement.name);
+			Debug.Log("Adding known city from next quest destination: " + Session.currentSettlement.name);
 			playerShipVariables.ship.playerJournal.AddNewSettlementToLog(cityTrigger2.DestinationId);
 			Debug.Log("next seg: " + cityTrigger2.DestinationId);
 		}
 		else {
 			// TODO: until we have a better idea, show the description as a message box for quest segments that aren't targeting a specific city (and so can't use the usual captain's log entry system which depends on city ids)
-			//if (segmentId != 0) { gameVars.ShowANotificationMessage(QuestMessageIntro + nextSegment.descriptionOfQuest); }
-			gameVars.ShowANotificationMessage(QuestMessageIntro + nextSegment.descriptionOfQuest);
+			//if (segmentId != 0) { Notifications.ShowANotificationMessage(QuestMessageIntro + nextSegment.descriptionOfQuest); }
+			Notifications.ShowANotificationMessage(QuestMessageIntro + nextSegment.descriptionOfQuest);
 		}
 
 		//Now add the mentioned places attached to this quest leg
@@ -110,7 +115,7 @@ public class QuestSystem : MonoBehaviour
 			Debug.Log("mentioning: " + i);
 			//Make sure we don't add any null values--a -1 represents no mentions of any settlements
 			if (i != -1) {
-				Debug.Log("Adding known city from quest: " + Globals.GameVars.currentSettlement.name);
+				Debug.Log("Adding known city from quest: " + Session.currentSettlement.name);
 				playerShipVariables.ship.playerJournal.AddNewSettlementToLog(i);
 			}
 
@@ -157,7 +162,7 @@ public class QuestSystem : MonoBehaviour
 			);
 
 		if (match != null) {
-			gameVars.playerShipVariables.rayCheck_stopShip = true;		// drop anchor (TODO: ought to be a function)
+			Session.playerShipVariables.rayCheck_stopShip = true;		// drop anchor (TODO: ought to be a function)
 			match.arrivalEvent.Execute(match);
 		}
 	}
@@ -175,15 +180,15 @@ public class QuestSystem : MonoBehaviour
 	#endregion
 
 	public void InitiateMainQuestLineForPlayer() {
-		var playerShipVariables = gameVars.playerShipVariables;
+		var playerShipVariables = Session.playerShipVariables;
 
 		//For the argonautica, let's set the crew capacity to 30
 		playerShipVariables.ship.crewCapacity = Ship.StartingCrewCap;
 
 		//Now let's add all the initial crew from the start screen selection and start the first leg of the quest
-		for (int i = 0; i < gameVars.newGameAvailableCrew.Count; i++) {
-			if (gameVars.newGameCrewSelectList[i]) {
-				playerShipVariables.ship.crewRoster.Add(gameVars.newGameAvailableCrew[i]);
+		for (int i = 0; i < World.newGameAvailableCrew.Count; i++) {
+			if (World.newGameCrewSelectList[i]) {
+				playerShipVariables.ship.crewRoster.Add(World.newGameAvailableCrew[i]);
 			}
 		}
 
@@ -242,19 +247,19 @@ public class QuestSystem : MonoBehaviour
 		playerShipVariables.lastPlayerShipPosition = playerShip.transform.position;
 
 		//Setup Difficulty Level
-		gameVars.SetupBeginnerGameDifficulty();
+		Game.SetupBeginnerGameDifficulty();
 
 		// setup each city with 5 crew available and for now, they never regenerate.
-		foreach (var settlement in gameVars.settlement_masterList) {
+		foreach (var settlement in Database.settlement_masterList) {
 			settlement.availableCrew.Clear();
-			gameVars.GenerateRandomCrewMembers(5).ForEach(c => settlement.availableCrew.Add(c));
+			Game.GenerateRandomCrewMembers(5).ForEach(c => settlement.availableCrew.Add(c));
 		}
 
-		Globals.Quests.StartQuestSegment(0);
+		StartQuestSegment(0);
 		Debug.Log("Current quest segment " + quest.currentQuestSegment);
 
 		//Flag the main GUI scripts to turn on
-		gameVars.runningMainGameGUI = true;
+		Game.runningMainGameGUI = true;
 	}
 
 }

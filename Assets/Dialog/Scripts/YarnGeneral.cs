@@ -62,7 +62,7 @@ public class YarnGeneral : MonoBehaviour
 		}
 
 		//Gets a list of text that matches just the type and then the type and emotion of the desired random text
-		List<DialogText> matchingType = Globals.GameVars.portDialogText.FindAll(x => x.TextType == t);
+		List<DialogText> matchingType = Globals.Database.portDialogText.FindAll(x => x.TextType == t);
 		List<DialogText> matchingBoth = matchingType.FindAll(x => x.TextEmotion == e);
 
 		if (matchingBoth.Count == 0) {
@@ -103,7 +103,7 @@ public class YarnGeneral : MonoBehaviour
 		else {
 			itemCost = Mathf.CeilToInt(float.Parse(cost));
 		}
-		ds.Storage.SetValue("$can_afford", Globals.GameVars.playerShipVariables.ship.currency >= itemCost);
+		ds.Storage.SetValue("$can_afford", Globals.Game.Session.playerShipVariables.ship.currency >= itemCost);
 	}
 
 	[YarnCommand("roundup")]
@@ -128,7 +128,7 @@ public class YarnGeneral : MonoBehaviour
 			itemCost = Mathf.RoundToInt(float.Parse(cost));
 		}
 
-		Globals.GameVars.playerShipVariables.ship.currency -= itemCost;
+		Globals.Game.Session.playerShipVariables.ship.currency -= itemCost;
 		ds.UpdateMoney();
 	}
 	#endregion

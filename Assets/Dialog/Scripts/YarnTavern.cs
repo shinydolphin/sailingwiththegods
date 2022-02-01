@@ -30,20 +30,20 @@ public class YarnTavern : MonoBehaviour
 	
 	[YarnCommand("getcurrentsettlement")]
 	public void GetCurrentSettlement() {
-		ds.Storage.SetValue("$known_city", Globals.GameVars.currentSettlement.name);
-		ds.Storage.SetValue("$known_city_ID", Globals.GameVars.currentSettlement.settlementID);
-		ds.Storage.SetValue("$known_city_type", Globals.GameVars.currentSettlement.typeOfSettlement);
+		ds.Storage.SetValue("$known_city", Globals.Game.Session.currentSettlement.name);
+		ds.Storage.SetValue("$known_city_ID", Globals.Game.Session.currentSettlement.settlementID);
+		ds.Storage.SetValue("$known_city_type", Globals.Game.Session.currentSettlement.typeOfSettlement);
 	}
 
 	//We need this so we can make sure not to let the player order a guide to the city they're currently at
 	[YarnCommand("checkifcurrent")]
 	public void CheckIfAskingAboutCurrentSettlement() {
-		ds.Storage.SetValue("$asking_current", ds.Storage.GetValue("$known_city_ID").AsNumber == Globals.GameVars.currentSettlement.settlementID);
+		ds.Storage.SetValue("$asking_current", ds.Storage.GetValue("$known_city_ID").AsNumber == Globals.Game.Session.currentSettlement.settlementID);
 	}
 
 	[YarnCommand("getknownsettlementnumber")]
 	public void GetNumberOfKnownSettlements() {
-		ds.Storage.SetValue("$settlement_number", Globals.GameVars.playerShipVariables.ship.playerJournal.knownSettlements.Count);
+		ds.Storage.SetValue("$settlement_number", Globals.Game.Session.playerShipVariables.ship.playerJournal.knownSettlements.Count);
 	}
 
 	[YarnCommand("setcitygoods")]
@@ -90,7 +90,7 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("randomfooddialog")]
 	public void GenerateRandomFoodDialog() {
 		// Begin pulling random food item.
-		List<string> foodList = Globals.GameVars.foodDialogText;
+		List<string> foodList = Globals.Database.foodDialogText;
 
 		int i = Random.Range(1, foodList.Count);
 
@@ -101,7 +101,7 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("randomwine")]
 	public void GenerateRandomWineInfo() {
 		// Begin pulling random wine items
-		List<FoodText> wineList = Globals.GameVars.wineInfoText;
+		List<FoodText> wineList = Globals.Database.wineInfoText;
 
 		int i = Random.Range(1, wineList.Count);
 		
@@ -114,7 +114,7 @@ public class YarnTavern : MonoBehaviour
 	public void GenerateRandomFoodItem() 
 	{
 		// Begin pulling random food item.
-		List<FoodText> foodList =  Globals.GameVars.foodItemText;
+		List<FoodText> foodList =  Globals.Database.foodItemText;
 
 		int i = Random.Range(1, foodList.Count);
 		
@@ -134,12 +134,12 @@ public class YarnTavern : MonoBehaviour
 		switch (input) 
 		{
 			case "network":
-				cityName = Globals.GameVars.networkDialogText.Exists(x => x.CityName == cityName) ? cityName : "ALLOTHERS";
-				matchingType = Globals.GameVars.networkDialogText.FindAll(x => x.CityName == cityName);
+				cityName = Globals.Database.networkDialogText.Exists(x => x.CityName == cityName) ? cityName : "ALLOTHERS";
+				matchingType = Globals.Database.networkDialogText.FindAll(x => x.CityName == cityName);
 				break;
 			case "pirate":
-				cityName = Globals.GameVars.pirateDialogText.Exists(x => x.CityName == cityName) ? cityName : "ALLOTHERS";
-				matchingType = Globals.GameVars.pirateDialogText.FindAll(x => x.CityName == cityName);
+				cityName = Globals.Database.pirateDialogText.Exists(x => x.CityName == cityName) ? cityName : "ALLOTHERS";
+				matchingType = Globals.Database.pirateDialogText.FindAll(x => x.CityName == cityName);
 				break;
 			case "myth":
 				if (!cityName.Equals(ds.Storage.GetValue("$current_myth_city").AsString)) 
@@ -149,8 +149,8 @@ public class YarnTavern : MonoBehaviour
 				}
 				else
 					ds.Storage.SetValue("$current_myth_count", ds.Storage.GetValue("$current_myth_count").AsNumber + 1);
-				cityName = Globals.GameVars.mythDialogText.Exists(x => x.CityName == cityName) ? cityName : "ALLOTHERS";
-				matchingType = Globals.GameVars.mythDialogText.FindAll(x => x.CityName == cityName);
+				cityName = Globals.Database.mythDialogText.Exists(x => x.CityName == cityName) ? cityName : "ALLOTHERS";
+				matchingType = Globals.Database.mythDialogText.FindAll(x => x.CityName == cityName);
 				break;
 			default:
 				Debug.Log("Error, probaby because of a misspelling");
@@ -170,7 +170,7 @@ public class YarnTavern : MonoBehaviour
 				{
 					// Clean this up for readability.
 					ds.Storage.SetValue("$response", matchingType[(int)ds.Storage.GetValue("$current_myth_count").AsNumber].Answer);
-					Globals.GameVars.AddToCaptainsLog("Myth of " + cityName + ":\n" + ds.Storage.GetValue("$response").AsString);
+					Globals.Game.Session.AddToCaptainsLog("Myth of " + cityName + ":\n" + ds.Storage.GetValue("$response").AsString);
 				}
 				else
 					ds.Storage.SetValue("$response", "There is nothing more for me to say!");
@@ -193,7 +193,7 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("randomguide")]
 	public void GenerateGuideDialogue() 
 	{
-		List<string> guideText = Globals.GameVars.guideDialogText;
+		List<string> guideText = Globals.Database.guideDialogText;
 
 		int i = Random.Range(0, guideText.Count);
 
@@ -203,23 +203,23 @@ public class YarnTavern : MonoBehaviour
 	[YarnCommand("hirenavigator")]
 	public void SetSettlementWaypoint()
 	{
-		Globals.GameVars.playerShipVariables.ship.currentNavigatorTarget = (int)ds.Storage.GetValue("$known_city_ID").AsNumber;
-		Vector3 location = Globals.GameVars.GetSettlementByName(ds.Storage.GetValue("$known_city").AsString).adjustedGamePosition;
-		Globals.GameVars.ActivateNavigatorBeacon(Globals.GameVars.navigatorBeacon, location);
-		//_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.GameVars.AllNonCrew.RandomElement().ID);		
+		Globals.Game.Session.playerShipVariables.ship.currentNavigatorTarget = (int)ds.Storage.GetValue("$known_city_ID").AsNumber;
+		Vector3 location = Globals.Database.GetSettlementByName(ds.Storage.GetValue("$known_city").AsString).adjustedGamePosition;
+		Globals.Game.Session.ActivateNavigatorBeacon(Globals.World.navigatorBeacon, location);
+		//_Nav.SetDestination(ds.Storage.GetValue("$known_city").AsString,Globals.Game.Session.AllNonCrew.RandomElement().ID);		
 	}
 	#endregion
 
 	public void GenerateKnownSettlementUI(string [] parameters, System.Action onComplete) 
 	{
 		ds.yarnOnComplete = onComplete;
-		Globals.UI.Show<TavernView, TavernViewModel>(new TavernViewModel(ds));
+		Globals.UI.Show<TavernView, TavernViewModel>(new TavernViewModel(Globals.Game.Session, ds));
 	}
 
 	private Settlement CityFromName(string name) 
 	{
 		// Obtain the known settlements we can talk about! (NOTE: will change to display known settlements and we'll search our info based on selection)
-		Settlement[] settlementList = Globals.GameVars.settlement_masterList;
+		Settlement[] settlementList = Globals.Database.settlement_masterList;
 		Settlement targetSettlement = settlementList[0]; // Simple Assignment to ease compile errors.
 
 		// Finding the currentSettlement

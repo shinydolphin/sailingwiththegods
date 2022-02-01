@@ -12,28 +12,27 @@ public class script_settlement_functions : MonoBehaviour, IPointerEnterHandler, 
 
 	public Transform anchor;
 	public Settlement thisSettlement;
-	GameVars GameVars;
+
+	World World => Globals.World;
+	GameSession Session => Globals.Game.Session;
+	UISystem UI => Globals.UI;
 
 	// debug display of settlement id so you can easily find them
 	[ShowNativeProperty] int SettlementId => thisSettlement != null ? thisSettlement.settlementID : -1;
 
 	
-	void Start() {
-		GameVars = Globals.GameVars;
-	}
-
 	// TODO: Remove this once we're sure we don't want any of this selection_ring code
 	/*
 	public void ActivateHighlightOnMouseOver() {
 		//child selection ring to current settlement
-		GameVars.selection_ring.transform.SetParent(transform);
+		World.selection_ring.transform.SetParent(transform);
 		//set the ring to the origin coordinates of the settlement
-		GameVars.selection_ring.transform.localPosition = new Vector3(0, 2, 0);
+		World.selection_ring.transform.localPosition = new Vector3(0, 2, 0);
 		//turn the ring on
-		GameVars.selection_ring.SetActive(true);
+		World.selection_ring.SetActive(true);
 
-		GameVars.currentSettlementGameObject = gameObject;
-		GameVars.currentSettlement = thisSettlement;
+		Session.currentSettlementGameObject = gameObject;
+		Session.currentSettlement = thisSettlement;
 
 	}
 	*/
@@ -47,20 +46,20 @@ public class script_settlement_functions : MonoBehaviour, IPointerEnterHandler, 
 	}
 
 	void TryShowTooltip() {
-		if (!Globals.UI.IsShown<CityView>() && !GameVars.IsCutsceneMode) {
-			var ui = Globals.UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(thisSettlement, null));
-			ui.transform.position = Globals.UI.WorldToUI(GameVars.FPVCamera.GetComponent<Camera>(), transform.position);
+		if (!UI.IsShown<CityView>() && !Session.IsCutsceneMode) {
+			var ui = UI.Show<CityView, CityViewModel>(new CityDetailsViewModel(Session, thisSettlement, null));
+			ui.transform.position = UI.WorldToUI(World.FPVCamera.GetComponent<Camera>(), transform.position);
 		}
 	}
 
 	bool TryHideTooltip(bool requirePendingHide) {
 
 		// allow he pointer to hover over the tooltip without closing it so we can make it clickable and not flicker on the edge
-		if (Globals.UI.IsShown<CityView>() && UISystem.IsMouseOverUI(Globals.UI.Get<CityView>().GetComponent<Graphic>())) {
+		if (UI.IsShown<CityView>() && UISystem.IsMouseOverUI(UI.Get<CityView>().GetComponent<Graphic>())) {
 			return false;
 		}
 		else if(IsTooltipPendingHide || !requirePendingHide) {
-			Globals.UI.Hide<CityView>();
+			UI.Hide<CityView>();
 			IsTooltipPendingHide = false;
 			return true;
 		}

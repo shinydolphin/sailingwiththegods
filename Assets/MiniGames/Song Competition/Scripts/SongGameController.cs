@@ -52,16 +52,9 @@ public class SongGameController : MonoBehaviour
 	//text boxes
 	public Text scoreText;
     public Text multiText;
-   // public Text lyricsText;
-	//private Color lyricsColor;
 
     //Made static so that there is only one instance of mattsGameManager at a time
     public static SongGameController instance;
-	public void reset() 
-	{
-		//Awake();
-		//Start();
-	}
 	public static void set_song(int x) 
 	{
 		//quick check to see what song to play
@@ -116,8 +109,6 @@ public class SongGameController : MonoBehaviour
     {
 		//not sure if this is used now
         instance = this;
-        //lyricsColor = lyricsText.color;  //  sets color to object
-        //lyricsColor.a = 0.0f; // makes the color transparent
         
 		
 		//josh's notes set the ending target (may not be used after the last cchanges)
@@ -170,7 +161,7 @@ public class SongGameController : MonoBehaviour
 		endGameState = true;		
 		win.interactable = true;
 		win.alpha += Time.deltaTime;
-		if (!endGameState && Globals.GameVars != null) { Globals.GameVars.AdjustPlayerClout(clout, false); }
+		if (!endGameState && Globals.World != null) { Globals.Game.Session.AdjustPlayerClout(clout, false); }
 		setmessage = true;
 	}
 	// Update is called once per frame

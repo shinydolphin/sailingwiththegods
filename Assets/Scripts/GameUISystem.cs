@@ -29,6 +29,10 @@ public class GameUISystem : UISystem
 	[SerializeField] TimePassingView TimePassingView = null;
 	[SerializeField] DialogScreen DialogScreen = null;
 
+	// manually shown UIs that don't use UISystem.Show
+	[SerializeField] GameObject _endingScreen = null;
+	public GameObject EndingScreen => _endingScreen;
+
 	void AddViews() {
 		Add(Dashboard);
 		Add(TitleScreen);

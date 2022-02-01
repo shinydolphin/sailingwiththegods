@@ -8,7 +8,8 @@ using UnityEngine;
 
 public class CrewManagementViewModel : Model
 {
-	private GameVars GameVars;
+	GameSession Session { get; set; }
+	Notifications Notifications { get; set; }
 
 	public readonly ICollectionModel<CrewManagementMemberViewModel> AvailableCrew;
 	public readonly ICollectionModel<CrewManagementMemberViewModel> MyCrew;
@@ -19,22 +20,24 @@ public class CrewManagementViewModel : Model
 
 	Settlement Settlement { get; set; }
 
-	public CrewManagementViewModel(Settlement settlement) {
-		GameVars = Globals.GameVars;
+	public CrewManagementViewModel(GameSession session, Notifications notifications, Settlement settlement) {
+		Session = session;
+		Notifications = notifications;
 		Settlement = settlement;
+		Notifications = notifications;
 
-		Money = new BoundModel<int>(GameVars.playerShipVariables.ship, nameof(GameVars.playerShipVariables.ship.currency));
-		CrewCapacity = new BoundModel<int>(GameVars.playerShipVariables.ship, nameof(GameVars.playerShipVariables.ship.crewCapacity));
+		Money = new BoundModel<int>(Session.playerShipVariables.ship, nameof(Session.playerShipVariables.ship.currency));
+		CrewCapacity = new BoundModel<int>(Session.playerShipVariables.ship, nameof(Session.playerShipVariables.ship.crewCapacity));
 
-		CrewCount = ValueModel.Wrap(GameVars.playerShipVariables.ship.crewRoster)
+		CrewCount = ValueModel.Wrap(Session.playerShipVariables.ship.crewRoster)
 			.Select(c => c.Count());
 
 		AvailableCrew = ValueModel.Wrap(settlement.availableCrew)
-			.Where(crew => !GameVars.playerShipVariables.ship.crewRoster.Contains(crew))
-			.Select(crew => new CrewManagementMemberViewModel(crew, OnCrewClicked, null));
+			.Where(crew => !Session.playerShipVariables.ship.crewRoster.Contains(crew))
+			.Select(crew => new CrewManagementMemberViewModel(Session, crew, OnCrewClicked, null));
 
-		MyCrew = ValueModel.Wrap(GameVars.playerShipVariables.ship.crewRoster)
-			.Select(crew => new CrewManagementMemberViewModel(crew, OnCrewClicked, null));
+		MyCrew = ValueModel.Wrap(Session.playerShipVariables.ship.crewRoster)
+			.Select(crew => new CrewManagementMemberViewModel(Session, crew, OnCrewClicked, null));
 	}
 
 	//=================================================================================================================
@@ -57,10 +60,10 @@ public class CrewManagementViewModel : Model
 		var crewman = crew.Member;
 
 		// remove from your crew first so the where filter for not in your crew applies on add to settlement list
-		GameVars.playerShipVariables.ship.crewRoster.Remove(crewman);
+		Session.playerShipVariables.ship.crewRoster.Remove(crewman);
 		Settlement.availableCrew.Add(crewman);
 
-		GameVars.ShowANotificationMessage(crewman.name + " looked at you sadly and said before leaving, 'I thought I was doing so well. I'm sorry I let you down. Guess I'll go drink some cheap wine...");
+		Notifications.ShowANotificationMessage(crewman.name + " looked at you sadly and said before leaving, 'I thought I was doing so well. I'm sorry I let you down. Guess I'll go drink some cheap wine...");
 	}
 
 
@@ -68,30 +71,30 @@ public class CrewManagementViewModel : Model
 		var crewman = crew.Member;
 
 		//Check to see if player has enough money to hire
-		if (GameVars.playerShipVariables.ship.currency >= crew.CostToHire) {
+		if (Session.playerShipVariables.ship.currency >= crew.CostToHire) {
 			//Now check to see if there is room to hire a new crew member!
-			if (GameVars.playerShipVariables.ship.crewRoster.Count < GameVars.playerShipVariables.ship.crewCapacity) {
+			if (Session.playerShipVariables.ship.crewRoster.Count < Session.playerShipVariables.ship.crewCapacity) {
 
 				// remove from settlement first so the where filter for not in your crew still applies on remove
 				Settlement.availableCrew.Remove(crewman);
-				GameVars.playerShipVariables.ship.crewRoster.Add(crewman);
+				Session.playerShipVariables.ship.crewRoster.Add(crewman);
 
 				//Subtract the cost from the ship's money
-				GameVars.playerShipVariables.ship.currency -= crew.CostToHire;
+				Session.playerShipVariables.ship.currency -= crew.CostToHire;
 
 				//If there isn't room, then let the player know
 			}
 			else {
-				GameVars.ShowANotificationMessage("You don't have room on the ship to hire " + crewman.name + ".");
+				Notifications.ShowANotificationMessage("You don't have room on the ship to hire " + crewman.name + ".");
 			}
 			//If not enough money, then let the player know
 		}
 		else {
-			GameVars.ShowANotificationMessage("You can't afford to hire " + crewman.name + ".");
+			Notifications.ShowANotificationMessage("You can't afford to hire " + crewman.name + ".");
 		}
 	}
 
 	public void GUI_GetBackgroundInfo(CrewManagementMemberViewModel crew) {
-		GameVars.ShowANotificationMessage(crew.BackgroundInfo);
+		Notifications.ShowANotificationMessage(crew.BackgroundInfo);
 	}
 }

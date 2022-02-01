@@ -3,14 +3,17 @@ using UnityEngine.UI;
 
 public class ShrineOptionModel : Model
 {
-	GameVars GameVars => Globals.GameVars;
+	Notifications Notifications => Globals.Notifications;
+
+	GameSession Session { get; set; }
 
 	public string Name;
 	public int Cost;
 	public int CloutGain;
 	public string BenefitHint;
 
-	public ShrineOptionModel(string name, int cost, int cloutGain, string benefitHint) {
+	public ShrineOptionModel(GameSession session, string name, int cost, int cloutGain, string benefitHint) {
+		Session = session;
 		Name = name;
 		Cost = cost;
 		CloutGain = cloutGain;
@@ -19,15 +22,15 @@ public class ShrineOptionModel : Model
 
 	public void Buy() {
 
-		if (GameVars.playerShipVariables.ship.currency > Cost) {
-			GameVars.playerShipVariables.ship.currency -= Cost;
-			GameVars.ShowANotificationMessage("You built a " + Name + " for " + GameVars.currentSettlement.name + "! " + BenefitHint);
-			GameVars.AdjustPlayerClout(1);
-			GameVars.playerShipVariables.ship.builtMonuments += GameVars.currentSettlement.name + " -- " + Name + "\n";
+		if (Session.playerShipVariables.ship.currency > Cost) {
+			Session.playerShipVariables.ship.currency -= Cost;
+			Notifications.ShowANotificationMessage("You built a " + Name + " for " + Session.currentSettlement.name + "! " + BenefitHint);
+			Session.AdjustPlayerClout(1);
+			Session.playerShipVariables.ship.builtMonuments += Session.currentSettlement.name + " -- " + Name + "\n";
 
 		}
 		else {
-			GameVars.ShowANotificationMessage("You don't have enough money to build a " + Name + " for " + GameVars.currentSettlement.name);
+			Notifications.ShowANotificationMessage("You don't have enough money to build a " + Name + " for " + Session.currentSettlement.name);
 		}
 
 	}

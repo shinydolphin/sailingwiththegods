@@ -45,7 +45,7 @@ public class PirateGameManager : MonoBehaviour
 	private RandomSlotPopulator rsp;
 	private int cloutChange;
 	private int moneyDemand = 0;
-	private Resource[] playerInvo => Globals.GameVars.playerShipVariables.ship.cargo;
+	private Resource[] playerInvo => Globals.Game.Session.playerShipVariables.ship.cargo;
 	int[] demandedAmounts;
 
 	private void OnEnable() 
@@ -66,20 +66,20 @@ public class PirateGameManager : MonoBehaviour
 
 		//check true zones, out of those, have a pirate type spawn from one of the "true" areas
 		//no pirates should appear if there aren't any actve zones
-		if (Globals.GameVars.playerShipVariables.zonesList.Count > 0) {
+		if (Globals.Game.Session.playerShipVariables.zonesList.Count > 0) {
 			//below line is unneeded
-			//int randomPirateTypeFromActiveZones = UnityEngine.Random.Range(1, Globals.GameVars.playerShipVariables.zonesList.Count);
+			//int randomPirateTypeFromActiveZones = UnityEngine.Random.Range(1, Globals.Game.Session.playerShipVariables.zonesList.Count);
 
-			string randomPirateTypeName = Globals.GameVars.playerShipVariables.zonesList.RandomElement();
+			string randomPirateTypeName = Globals.Game.Session.playerShipVariables.zonesList.RandomElement();
 
-			PirateType theType = Globals.GameVars.PirateTypes.FirstOrDefault(t => t.name == randomPirateTypeName);
+			PirateType theType = Globals.Game.Session.PirateTypes.FirstOrDefault(t => t.name == randomPirateTypeName);
 			//Debug.Log("theType = " + theType);
 			rsp.SetPirateType(theType);
 			//Debug.Log("Pirate type in game is: " + rsp.GetType());
 		}
 		else {
 			//temporary code 
-			//rsp.SetPirateType(Globals.GameVars.PirateTypes.RandomElement());
+			//rsp.SetPirateType(Globals.Database.pirateTypes.RandomElement());
 		}
 
 		runChance = CalculateRunChance();
@@ -96,13 +96,13 @@ public class PirateGameManager : MonoBehaviour
 
 		if (pirateKnower != null) 
 		{
-			string typeInfo = Globals.GameVars.pirateTypeIntroText[0];
+			string typeInfo = Globals.Database.pirateTypeIntroText[0];
 			typeInfo = typeInfo.Replace("{0}", pirateKnower.name);
 			typeInfo = typeInfo.Replace("{1}", rsp.CurrentPirates.name);
 
 			//commented out the "1 + " to test for text matching up to type of Pirate in PMG
 			//works as of 08/14/2020
-			pirateTypeText = typeInfo + " " + Globals.GameVars.pirateTypeIntroText[/*1 + */rsp.CurrentPirates.ID];
+			pirateTypeText = typeInfo + " " + Globals.Database.pirateTypeIntroText[/*1 + */rsp.CurrentPirates.ID];
 		}
 		else 
 		{
@@ -112,16 +112,16 @@ public class PirateGameManager : MonoBehaviour
 
 		mgInfo.gameObject.SetActive(true);
 		mgInfo.DisplayText(
-			Globals.GameVars.pirateTitles[0], 
-			Globals.GameVars.pirateSubtitles[0], 
-			Globals.GameVars.pirateStartText[0] + "\n\n" + pirateTypeText + "\n\n" + pirateInstructions + "\n\n" + Globals.GameVars.pirateStartText[UnityEngine.Random.Range(1, Globals.GameVars.pirateStartText.Count)], 
+			Globals.Database.pirateTitles[0], 
+			Globals.Database.pirateSubtitles[0], 
+			Globals.Database.pirateStartText[0] + "\n\n" + pirateTypeText + "\n\n" + pirateInstructions + "\n\n" + Globals.Database.pirateStartText[UnityEngine.Random.Range(1, Globals.Database.pirateStartText.Count)], 
 			pirateIcon, 
 			MiniGameInfoScreen.MiniGame.Pirates);
 	}
 
 	public void GameOver() 
 	{
-		Globals.GameVars.isGameOver = true;
+		Globals.Game.isGameOver = true;
 	}
 	
 	private string NetCloutText(int clout) 
@@ -143,17 +143,17 @@ public class PirateGameManager : MonoBehaviour
 	/// <returns></returns>
 	private CrewMember CrewFromPirateHometown(PirateType pirate) 
 	{
-		List<CrewMember> allPirates = Globals.GameVars.Pirates.Where(x => x.pirateType.Equals(pirate)).ToList();
+		List<CrewMember> allPirates = Globals.Game.Session.Pirates.Where(x => x.pirateType.Equals(pirate)).ToList();
 
-		foreach (CrewMember c in Globals.GameVars.playerShipVariables.ship.crewRoster) 
+		foreach (CrewMember c in Globals.Game.Session.playerShipVariables.ship.crewRoster) 
 		{
-			IEnumerable<Settlement> crewNetwork = Globals.GameVars.Network.GetCrewMemberNetwork(c);
+			IEnumerable<Settlement> crewNetwork = Globals.Game.Session.Network.GetCrewMemberNetwork(c);
 			foreach (CrewMember p in allPirates) 
 			{
-				Settlement pirateHometown = Globals.GameVars.GetSettlementFromID(p.originCity);
+				Settlement pirateHometown = Globals.Database.GetSettlementFromID(p.originCity);
 				if (crewNetwork.Contains(pirateHometown))
 				{
-					//Debug.Log($"{c.name} knows the home city of Pirate {p.name}: {Globals.GameVars.GetSettlementFromID(c.originCity).name}");
+					//Debug.Log($"{c.name} knows the home city of Pirate {p.name}: {Globals.Database.GetSettlementFromID(c.originCity).name}");
 					return c;
 				}
 			}
@@ -172,11 +172,11 @@ public class PirateGameManager : MonoBehaviour
 
 	public void OpenNegotiations() 
 	{
-		demandedAmounts = new int[Globals.GameVars.playerShipVariables.ship.cargo.Length];
+		demandedAmounts = new int[Globals.Game.Session.playerShipVariables.ship.cargo.Length];
 
 		if (!alreadyTriedNegotiating) 
 		{
-			int currentPlayerMoney = Globals.GameVars.playerShipVariables.ship.currency;
+			int currentPlayerMoney = Globals.Game.Session.playerShipVariables.ship.currency;
 
 			//Only consider stuff you have any actual quantity of
 			List<Resource> availableInvo = new List<Resource>();
@@ -212,7 +212,7 @@ public class PirateGameManager : MonoBehaviour
 			//Add random stuff to the list of demands
 			for (int i = 0; i < typesOfCargo; i++) {
 				Resource randomResource = availableInvo[UnityEngine.Random.Range(0, availableInvo.Count)];
-				int randomResourceIndex = Globals.GameVars.masterResourceList.FindIndex(x => x.name == randomResource.name);
+				int randomResourceIndex = Globals.Database.masterResourceList.FindIndex(x => x.name == randomResource.name);
 
 				float cargoMod = UnityEngine.Random.Range(amountMod.x, amountMod.y);
 				int amountToTake = (int)(playerInvo[randomResourceIndex].amount_kg * cargoMod);
@@ -248,10 +248,10 @@ public class PirateGameManager : MonoBehaviour
 
 			mgInfo.gameObject.SetActive(true);
 			mgInfo.DisplayText(
-				Globals.GameVars.pirateTitles[1],
-				Globals.GameVars.pirateSubtitles[1],
-				Globals.GameVars.pirateNegotiateText[0] + "\n\n" + deal + "\n\nIf you take this deal, you will escape with your lives, but you will be thought a coward for avoiding a fight - your clout will go down!\n\n" +
-					Globals.GameVars.pirateNegotiateText[UnityEngine.Random.Range(1, Globals.GameVars.pirateNegotiateText.Count)],
+				Globals.Database.pirateTitles[1],
+				Globals.Database.pirateSubtitles[1],
+				Globals.Database.pirateNegotiateText[0] + "\n\n" + deal + "\n\nIf you take this deal, you will escape with your lives, but you will be thought a coward for avoiding a fight - your clout will go down!\n\n" +
+					Globals.Database.pirateNegotiateText[UnityEngine.Random.Range(1, Globals.Database.pirateNegotiateText.Count)],
 				pirateIcon,
 				MiniGameInfoScreen.MiniGame.Negotiation);
 
@@ -266,21 +266,21 @@ public class PirateGameManager : MonoBehaviour
 	public void AcceptDeal() {
 		//Subtract out resources
 
-		Globals.GameVars.playerShipVariables.ship.currency -= moneyDemand;
+		Globals.Game.Session.playerShipVariables.ship.currency -= moneyDemand;
 
 		for (int i = 0; i < demandedAmounts.Length; i++) {
-			Globals.GameVars.playerShipVariables.ship.cargo[i].amount_kg -= demandedAmounts[i];
+			Globals.Game.Session.playerShipVariables.ship.cargo[i].amount_kg -= demandedAmounts[i];
 		}
 
 		closeButton.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = acceptedNegotiationClose;
 		closeButton.onClick.RemoveAllListeners();
 		closeButton.onClick.AddListener(UnloadMinigame);
 
-		Globals.GameVars.AdjustPlayerClout(tookNegotiationClout + cloutChange, false);
+		Globals.Game.Session.AdjustPlayerClout(tookNegotiationClout + cloutChange, false);
 
 		mgInfo.DisplayText(
-			Globals.GameVars.pirateTitles[1],
-			Globals.GameVars.pirateSubtitles[1],
+			Globals.Database.pirateTitles[1],
+			Globals.Database.pirateSubtitles[1],
 			"You accepted the trade deal. You hand over what the pirates asked for and sail away. Though you have survived, your cowardly avoidance of a fight will stick with you. Your clout has gone down by" +
 				$"{Mathf.Abs(tookNegotiationClout)}. Combined with the earlier {cloutChange}, that is a net clout change of {tookNegotiationClout + cloutChange}.",
 			pirateIcon,
@@ -293,8 +293,8 @@ public class PirateGameManager : MonoBehaviour
 		closeButton.onClick.AddListener(mgInfo.CloseDialog);
 
 		mgInfo.DisplayText(
-			Globals.GameVars.pirateTitles[1],
-			Globals.GameVars.pirateSubtitles[1],
+			Globals.Database.pirateTitles[1],
+			Globals.Database.pirateSubtitles[1],
 			$"You reject the pirate's deal and prepare to fight. Even if it was not your first choice, you will have to prove your heroism now.",
 			pirateIcon,
 			MiniGameInfoScreen.MiniGame.Finish);
@@ -325,7 +325,7 @@ public class PirateGameManager : MonoBehaviour
 	public void RanAway() 
 	{
 		//You can adjust clout here because this is the end of the game, so you don't need to save that for later
-		Globals.GameVars.AdjustPlayerClout(succeedRunClout + cloutChange, false);
+		Globals.Game.Session.AdjustPlayerClout(succeedRunClout + cloutChange, false);
 		string cloutText = $"Your cowardice has tarnished your reputation and your clout has gone down by {succeedRunClout}.";
 		if (cloutChange != 0) {
 			cloutText += $" Combined with the earlier {cloutChange}, that is a net clout change of {succeedRunClout + cloutChange}.";
@@ -336,9 +336,9 @@ public class PirateGameManager : MonoBehaviour
 
 		mgInfo.gameObject.SetActive(true);
 		mgInfo.DisplayText(
-			Globals.GameVars.pirateTitles[2],
-			Globals.GameVars.pirateSubtitles[2],
-			Globals.GameVars.pirateRunSuccessText[0] + "\n\n" + cloutText + "\n\n" + Globals.GameVars.pirateRunSuccessText[UnityEngine.Random.Range(1, Globals.GameVars.pirateRunSuccessText.Count)],
+			Globals.Database.pirateTitles[2],
+			Globals.Database.pirateSubtitles[2],
+			Globals.Database.pirateRunSuccessText[0] + "\n\n" + cloutText + "\n\n" + Globals.Database.pirateRunSuccessText[UnityEngine.Random.Range(1, Globals.Database.pirateRunSuccessText.Count)],
 			pirateIcon,
 			MiniGameInfoScreen.MiniGame.Finish);
 
@@ -364,9 +364,9 @@ public class PirateGameManager : MonoBehaviour
 
 		mgInfo.gameObject.SetActive(true);
 		mgInfo.DisplayText(
-			Globals.GameVars.pirateTitles[2],
-			Globals.GameVars.pirateSubtitles[2],
-			Globals.GameVars.pirateRunFailText[0] + "\n\n" + cloutText + "\n\n" + Globals.GameVars.pirateRunFailText[UnityEngine.Random.Range(1, Globals.GameVars.pirateRunFailText.Count)],
+			Globals.Database.pirateTitles[2],
+			Globals.Database.pirateSubtitles[2],
+			Globals.Database.pirateRunFailText[0] + "\n\n" + cloutText + "\n\n" + Globals.Database.pirateRunFailText[UnityEngine.Random.Range(1, Globals.Database.pirateRunFailText.Count)],
 			pirateIcon,
 			MiniGameInfoScreen.MiniGame.Finish);
 	}
@@ -376,7 +376,7 @@ public class PirateGameManager : MonoBehaviour
 		int difficulty = rsp.CurrentPirates.difficulty;
 
 		float baseShipSpeed = 7.408f;
-		float crewMod = Globals.GameVars.playerShipVariables.shipSpeed_Actual / baseShipSpeed / 1.5f;
+		float crewMod = Globals.Game.Session.playerShipVariables.shipSpeed_Actual / baseShipSpeed / 1.5f;
 		float run = (1.0f / difficulty) * crewMod;
 		run = Mathf.Max(runningBounds.x, run);
 		run = Mathf.Min(runningBounds.y, run);
@@ -464,13 +464,13 @@ public class PirateGameManager : MonoBehaviour
 		closeButton.onClick.RemoveAllListeners();
 		closeButton.onClick.AddListener(UnloadMinigame);
 
-		Globals.GameVars.AdjustPlayerClout(clout + cloutChange, false);
+		Globals.Game.Session.AdjustPlayerClout(clout + cloutChange, false);
 
 		mgInfo.gameObject.SetActive(true);
 		mgInfo.DisplayText(
-			Globals.GameVars.pirateTitles[3],
-			Globals.GameVars.pirateSubtitles[3],
-			Globals.GameVars.pirateSuccessText[0] + "\n\n" + NetCloutText(clout) + "\n\n" + Globals.GameVars.pirateSuccessText[UnityEngine.Random.Range(1, Globals.GameVars.pirateSuccessText.Count)],
+			Globals.Database.pirateTitles[3],
+			Globals.Database.pirateSubtitles[3],
+			Globals.Database.pirateSuccessText[0] + "\n\n" + NetCloutText(clout) + "\n\n" + Globals.Database.pirateSuccessText[UnityEngine.Random.Range(1, Globals.Database.pirateSuccessText.Count)],
 			pirateIcon,
 			MiniGameInfoScreen.MiniGame.Finish);
 	}
@@ -484,9 +484,9 @@ public class PirateGameManager : MonoBehaviour
 
 		mgInfo.gameObject.SetActive(true);
 		mgInfo.DisplayText(
-			Globals.GameVars.pirateTitles[3],
-			Globals.GameVars.pirateSubtitles[3],
-			Globals.GameVars.pirateFailureText[0] + "\n\n" + Globals.GameVars.pirateFailureText[UnityEngine.Random.Range(1, Globals.GameVars.pirateFailureText.Count)],
+			Globals.Database.pirateTitles[3],
+			Globals.Database.pirateSubtitles[3],
+			Globals.Database.pirateFailureText[0] + "\n\n" + Globals.Database.pirateFailureText[UnityEngine.Random.Range(1, Globals.Database.pirateFailureText.Count)],
 			pirateIcon,
 			MiniGameInfoScreen.MiniGame.Finish);
 	}
