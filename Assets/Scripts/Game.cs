@@ -389,9 +389,9 @@ public class Game
 
 	void SaveUserGameDataToServer(string localPath, string localFile) {
 		Debug.Log("Starting FTP");
-		string user = "SamoGameBot";
-		string pass = "%Mgn~WxH+CRzj>4Z";
-		string host = "34.193.207.222";
+		string user = "samogamebot";
+		string pass = "8LV-GC>uw92rE4d%";
+		string host = "datauploads.sailingwiththegods.org";
 		string initialPath = "";
 
 		FileInfo file = new FileInfo(localPath + localFile);
