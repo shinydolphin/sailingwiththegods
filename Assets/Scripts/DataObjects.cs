@@ -112,6 +112,7 @@ public class Loan
 public class MainQuestLine
 {
 	// quest segements come from CSV, not serialized to json
+	// TODO: Should eventually come from JSON. Review later. This was disabled for LOAD_FROM_JSON due to a bug.
 	[NonSerialized] public List<QuestSegment> questSegments;
 	public int currentQuestSegment;
 
