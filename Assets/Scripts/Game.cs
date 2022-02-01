@@ -262,8 +262,8 @@ public class Game
 			session.ResetGameData();
 		}
 
-			//	TextAsset saveGame = (TextAsset)Resources.Load("player_save_game", typeof(TextAsset));
-			string[] fileByLine = saveText.Split(splitFile, StringSplitOptions.None);
+		//	TextAsset saveGame = (TextAsset)Resources.Load("player_save_game", typeof(TextAsset));
+		string[] fileByLine = saveText.Split(splitFile, StringSplitOptions.None);
 		Debug.Log("file://" + Application.persistentDataPath + "/player_save_game.txt");
 		Debug.Log(saveText);
 
@@ -385,13 +385,21 @@ public class Game
 		else {
 			ship.currentNavigatorTarget = -1;
 		}
-		//Add the Known Settlements
 
+		//Add the Known Settlements
 		string[] parsedKnowns = playerVars[38].Split(recordDelimiter, StringSplitOptions.None);
 		ship.playerJournal.knownSettlements.Clear();    // TODO: completely move to JSON. For now the JSON values are replaced with the CSV values.
 		foreach (string settlementID in parsedKnowns) {
+
+			// parsedKnowns contains an empty string entry if you've never been to any cities, and other issues will come up too later in the process, so just warn and give up
+			if(string.IsNullOrEmpty(settlementID)) {
+				Notifications.ShowANotificationMessage("Loading a save file that has not visited any cities is not supported. Start a new game.");
+				return false;
+			}
+
 			ship.playerJournal.knownSettlements.Add(int.Parse(settlementID));
 		}
+
 		//Add Captains Log
 		string restoreCommasAndNewLines = playerVars[39].Replace('^', ',');
 		session.ResetCaptainsLog(restoreCommasAndNewLines.Replace('*', '\n'));
