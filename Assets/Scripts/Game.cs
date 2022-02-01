@@ -249,6 +249,7 @@ public class Game
 			// TODO: Migrate all save data loading to load from JSON. for now most of this data is thrown away (see TODOs in the GameData class)
 			session.data = JsonUtility.FromJson<GameData>(System.IO.File.ReadAllText(Application.persistentDataPath + "/save.json"));
 
+#if LOAD_FROM_JSON
 			// TODO: this is temporary until we make all data actually live on the data object
 			// this allows us to start saving new ship data only to json without needing to add it to the CSV
 			// data comes from JSON first, then is overwritten by the values in the CSV
@@ -256,6 +257,7 @@ public class Game
 			session.playerShipVariables.journey = session.data.journey;
 			ship = session.data.Current.ship;
 			loadedJourney = session.data.journey;
+#endif
 
 			if (session.data.Version < GameData.LatestVersion) {
 				Notifications.ShowANotificationMessage("JSON save data was on an old breaking version number. Was: " + session.data.Version + " Now: " + GameData.LatestVersion + ". JSON save data reset.");
@@ -268,8 +270,8 @@ public class Game
 			session.ResetGameData();
 		}
 
-		//	TextAsset saveGame = (TextAsset)Resources.Load("player_save_game", typeof(TextAsset));
-		string[] fileByLine = saveText.Split(splitFile, StringSplitOptions.None);
+			//	TextAsset saveGame = (TextAsset)Resources.Load("player_save_game", typeof(TextAsset));
+			string[] fileByLine = saveText.Split(splitFile, StringSplitOptions.None);
 		Debug.Log("file://" + Application.persistentDataPath + "/player_save_game.txt");
 		Debug.Log(saveText);
 
@@ -587,9 +589,9 @@ public class Game
 		}
 	}
 
-	#endregion
+#endregion
 
-	#region TODO: Weird functions coupled with QuestSystem.InitiateQuestLineForPlayer
+#region TODO: Weird functions coupled with QuestSystem.InitiateQuestLineForPlayer
 
 	public List<CrewMember> GenerateRandomCrewMembers(int numberOfCrewmanNeeded) {
 		//This function pulls from the list of available crewmembers in the world and selects random crewman from that list of a defined
@@ -625,5 +627,5 @@ public class Game
 			World.camera_Mapview.GetComponent<Camera>().enabled = false;
 	}
 
-	#endregion
+#endregion
 }
