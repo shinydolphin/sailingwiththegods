@@ -9,6 +9,8 @@ using UnityEngine.UI;
 
 public class TownScreen : ViewBehaviour<TradeViewModel>
 {
+	UISystem UI => Globals.UI;
+
 	[SerializeField] CargoTradeListView Available = null;
 	[SerializeField] CargoTradeListView Mine = null;
 
@@ -44,7 +46,7 @@ public class TownScreen : ViewBehaviour<TradeViewModel>
 
 		Monuments?.Bind(ValueModel.New(new ButtonViewModel {
 			Label = "Monuments",
-			OnClick = () => Globals.UI.Show<ShrinesView, ShrinesViewModel>(new ShrinesViewModel())
+			OnClick = () => UI.Show<ShrinesView, ShrinesViewModel>(new ShrinesViewModel(model.Session))
 		}));
 		Monuments.Interactable = model.monuments;
 
@@ -54,7 +56,7 @@ public class TownScreen : ViewBehaviour<TradeViewModel>
 		}));
 
 		Info?.Bind(ValueModel.New(new ButtonViewModel {
-			OnClick = () => Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
+			OnClick = () => UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
 				Icon = model.PortCoin,
 				Title = model.PortName,
 				Subtitle = model.PortPopulationRank,

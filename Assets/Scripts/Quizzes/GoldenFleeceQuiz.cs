@@ -71,16 +71,16 @@ namespace Quizzes
 
 		private void LowerCloutAndMoney() {
 			LowerClout();
-			Globals.GameVars.playerShipVariables.ship.currency = Mathf.Max(Globals.GameVars.playerShipVariables.ship.currency - 1000, 0);
+			Session.playerShipVariables.ship.currency = Mathf.Max(Session.playerShipVariables.ship.currency - 1000, 0);
 		}
 
 		private void LowerClout() {
-			Globals.GameVars.AdjustPlayerClout(-1);
+			Session.AdjustPlayerClout(-1);
 		}
 
 		private void LowerCloutToGoatherd() {
 			// lower as far as we can without hitting 0. because of the multiplier, this is super gross :(
-			Globals.GameVars.AdjustPlayerClout(-Mathf.CeilToInt(Globals.GameVars.playerShipVariables.ship.playerClout / 100f) + 1);
+			Session.AdjustPlayerClout(-Mathf.CeilToInt(Session.playerShipVariables.ship.playerClout / 100f) + 1);
 		}
 
 		private void NoPunishment() {
@@ -105,7 +105,7 @@ namespace Quizzes
 		}
 
 		private void Win() {
-			Globals.GameVars.AdjustPlayerClout(10);
+			Session.AdjustPlayerClout(10);
 			Message("Time to sow the dragon’s teeth, fight the earthborn men, and really really make Aeetes mad – because you have prepared yourself as per Medea’s instructions, and her magic and guidance do not fail.  You retire for the day from your labors: Aeetes burns with rage and Medea with anxiety, still torn to leave her homeland with the man she loves.  She comes to your ship and offers to get the fleece for you; you accept, Jason, and follow her to the grove where she puts the serpent to sleep with magical songs and drugs. This lets you, Jason, snatch the fleece from the oak over the body of the snoozing beastie.  The fleece is shiny, you are glowing, the sun is rising, and you have accomplished your quest! But now Aeetes is waking up... better run to the ship and catch a good strong wind!", Complete);
 		}
 	}

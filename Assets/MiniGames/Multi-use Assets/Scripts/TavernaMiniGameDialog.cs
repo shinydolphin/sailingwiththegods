@@ -25,9 +25,9 @@ public class TavernaMiniGameDialog : MonoBehaviour
 		if (gameType == MinigameType.Petteia) 
 		{
 			//petteia brag/insult
-			if (Globals.GameVars != null) {
-				insultingTexts = Globals.GameVars.petteiaGameInsults;
-				braggingTexts = Globals.GameVars.petteiaGameBragging;
+			if (Globals.Database != null) {
+				insultingTexts = Globals.Database.petteiaGameInsults;
+				braggingTexts = Globals.Database.petteiaGameBragging;
 			}
 			else {
 				insultingTexts = new List<string> { "Petteia insult 1", "Petteia insult 2", "Petteia insult 3" };
@@ -37,9 +37,9 @@ public class TavernaMiniGameDialog : MonoBehaviour
 		else 
 		{
 			//ur brag/insult
-			if (Globals.GameVars != null) {
-				insultingTexts = Globals.GameVars.urGameInsults;
-				braggingTexts = Globals.GameVars.tavernaGameBragging;
+			if (Globals.Database != null) {
+				insultingTexts = Globals.Database.urGameInsults;
+				braggingTexts = Globals.Database.tavernaGameBragging;
 			}
 			else {
 				insultingTexts = new List<string> { "Ur insult 1", "Ur insult 2", "Ur insult 3" };

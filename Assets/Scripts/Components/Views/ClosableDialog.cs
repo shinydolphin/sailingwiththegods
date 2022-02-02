@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class ClosableDialog : OwnerBehaviour
 {
+	UISystem UI => Globals.UI;
+
 	[SerializeField] Button Button = null;
 
 	public Action Callback;
@@ -13,7 +15,7 @@ public class ClosableDialog : OwnerBehaviour
 	private void Start() {
 		Subscribe(Button.onClick, () => {
 			Callback?.Invoke();
-			Globals.UI.Hide(GetComponent<ViewBehaviour>());
+			UI.Hide(GetComponent<ViewBehaviour>());
 		});
 	}
 }

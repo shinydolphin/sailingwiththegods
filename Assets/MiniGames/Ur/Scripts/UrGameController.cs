@@ -66,16 +66,15 @@ public class UrGameController : TavernaGameControllerParent
 		//Show the UI
 		mgScreen.gameObject.SetActive(true);
 
-		if (Globals.GameVars != null) {
-			//Load the lists in from GameVars
-			introFlavor = Globals.GameVars.urGameIntro;
-			winFlavor = Globals.GameVars.urGameWin;
-			loseFlavor = Globals.GameVars.urGameLost;
-			rosetteFlavor = Globals.GameVars.urGameRosette;
-			captureFlavor = Globals.GameVars.urGameCapture;
-			flipFlavor = Globals.GameVars.urGameFlip;
-			moveOffFlavor = Globals.GameVars.urGameMoveOff;
-			moveOnFlavor = Globals.GameVars.urGameMoveOn;
+		if (Globals.Database != null) {
+			introFlavor = Globals.Database.urGameIntro;
+			winFlavor = Globals.Database.urGameWin;
+			loseFlavor = Globals.Database.urGameLost;
+			rosetteFlavor = Globals.Database.urGameRosette;
+			captureFlavor = Globals.Database.urGameCapture;
+			flipFlavor = Globals.Database.urGameFlip;
+			moveOffFlavor = Globals.Database.urGameMoveOff;
+			moveOnFlavor = Globals.Database.urGameMoveOn;
 		}
 		else {
 			introFlavor = new List<string> { "Ur intro flavor 1", "Ur intro flavor 2", "Ur intro flavor 3" };
@@ -385,8 +384,8 @@ public class UrGameController : TavernaGameControllerParent
 			reward = rewardAmts.y;
 		}
 
-		if (Globals.GameVars != null) {
-			Globals.GameVars.playerShipVariables.ship.AddToFoodAndWater(reward);
+		if (Globals.Game.Session != null) {
+			Globals.Game.Session.playerShipVariables.ship.AddToFoodAndWater(reward);
 		}
 
 		string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!" + "\n\n" + winFlavor.RandomElement();

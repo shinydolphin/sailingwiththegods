@@ -6,10 +6,10 @@ using System.Collections.Generic;
 
 public class WorldTools : MonoBehaviour
 {
-	GameVars _gameVars;
+	World _World;
 
 	private void Awake() {
-		_gameVars = GetComponent<GameVars>();
+		_World = GetComponent<World>();
 	}
 
 #if UNITY_EDITOR
@@ -40,8 +40,8 @@ public class WorldTools : MonoBehaviour
 		//Loop through all of the child objects of the current zone parent object
 		//The parent stores them in a sequential list so every 40 objects represents a new line in the spread sheet csv file
 		//The coordinate for the zones is 0,0 for the top left, ending with 39,39 on the bottom right
-		for (int currentZone = 0; currentZone < _gameVars.currentZoneParent.transform.childCount; currentZone++) {
-			waterZone = _gameVars.currentZoneParent.transform.GetChild(currentZone);
+		for (int currentZone = 0; currentZone < _World.currentZoneParent.transform.childCount; currentZone++) {
+			waterZone = _World.currentZoneParent.transform.GetChild(currentZone);
 			waterRoseData += waterZone.GetChild(0).transform.localRotation.eulerAngles.y;
 			waterRoseData += ",";
 			waterRoseData += waterZone.GetChild(0).GetComponent<script_WaterWindCurrentVector>().currentMagnitude;
@@ -64,7 +64,7 @@ public class WorldTools : MonoBehaviour
 	[Button("Save Settlement Positions")]
 	void Tool_SaveCurrentSettlementPositionsToFile() {
 		string writeToFile = "";
-		var settlementParent = _gameVars.settlement_masterList_parent;
+		var settlementParent = _World.settlement_masterList_parent;
 		var sortedChildren = settlementParent.transform.GetChildren()
 			.Select(c => c.GetComponent<script_settlement_functions>())
 			.OrderBy(c => c.thisSettlement.settlementID)

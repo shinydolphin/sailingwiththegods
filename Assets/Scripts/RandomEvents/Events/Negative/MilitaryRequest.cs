@@ -42,6 +42,6 @@
 
 //		finalMessage += "You think to yourself, as the commander sails away with his small fleet, how odd it is to thank someone for stealing from them. Your crew seems equally frustrated, but equally glad they aren't sailing to some unknown battle against some unknown king. You unfurl the sails and go about your journey!";
 
-//		gameVars.ShowANotificationMessage(finalMessage);
+//		Notifications.ShowANotificationMessage(finalMessage);
 //	}
 //}

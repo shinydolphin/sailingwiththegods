@@ -3,7 +3,7 @@ using System.Linq;
 
 public class Crew
 {
-	// just a readonly reference to the one in GameVars
+	// just a readonly reference to the one in World
 	IEnumerable<CrewMember> _masterCrewList;
 	IEnumerable<PirateType> _masterPirateTypeList;
 	Ship _ship;

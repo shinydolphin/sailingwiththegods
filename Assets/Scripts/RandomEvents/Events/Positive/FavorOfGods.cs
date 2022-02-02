@@ -14,6 +14,6 @@ public class FavorOfGods : RandomEvents.PositiveEvent
 							" The waters seem to push you forward in a suspicious but fortunate manner!";
 		shipSpeedModifiers.Event++;
 
-		gameVars.ShowANotificationMessage(finalMessage);
+		Notifications.ShowANotificationMessage(finalMessage);
 	}
 }

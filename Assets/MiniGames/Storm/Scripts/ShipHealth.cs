@@ -35,7 +35,7 @@ public class ShipHealth : MonoBehaviour
 		rightSlider.maxValue = maxShipHealth / 2f;
 
 		//currentShipHealth = maxShipHealth;
-		currentShipHealth = Globals.GameVars.playerShipVariables.ship.health;
+		currentShipHealth = Globals.Game.Session.playerShipVariables.ship.health;
 
 		UpdateHealthBar();
 		initialized = true;
@@ -44,7 +44,7 @@ public class ShipHealth : MonoBehaviour
 	//using this to avoid typing the whole long this every time
 	private void SetHealth(float h) 
 	{
-		Globals.GameVars.playerShipVariables.ship.health = h;
+		Globals.Game.Session.playerShipVariables.ship.health = h;
 	}
 
 	public void TakeDamage(float damage) 

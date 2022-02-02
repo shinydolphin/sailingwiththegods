@@ -48,22 +48,11 @@ public class TitleScreen : ViewBehaviour<GameViewModel>
 	int green_text_pos = 0;
 	Color green_text_color = new Color32(00, 150, 00, 255);
 
-	[Header("Regional Zones")]
-	//any time a new regional zone is added to this list or to the IDE, 
-	//the regional_zones array will need to be hard-code edited in this script's start method
-	//AND the game object within the IDE needs to be inactive to start off with 
-	[SerializeField] GameObject Aetolian_Region_Zone = null;
-	[SerializeField] GameObject Cretan_Region_Zone = null;
-	[SerializeField] GameObject Etruscan_Pirate_Region_Zone = null;
-	[SerializeField] GameObject Illyrian_Region_Zone = null;
-
-	GameObject[] regional_zones;
-
 	Vector2Int[] supportedResolutions;
 
 	private void Start() {
-		Subscribe(title_newgame_button.onClick, () => Model.GUI_startNewGame(GameViewModel.Difficulty.Normal));
-		Subscribe(title_loadgame_button.onClick, () => Model.GUI_loadGame(GameViewModel.Difficulty.Normal));
+		Subscribe(title_newgame_button.onClick, () => Model.GUI_startNewGame(Game.Difficulty.Normal));
+		Subscribe(title_loadgame_button.onClick, () => Model.GUI_loadGame(Game.Difficulty.Normal));
 		Subscribe(title_quitgame_button.onClick, Application.Quit);
 
 		Subscribe(title_credits_button.onClick, () => GUI_showCredits());
@@ -73,9 +62,6 @@ public class TitleScreen : ViewBehaviour<GameViewModel>
 		Subscribe(resolutions_settings_exit.onClick, () => GUI_HideResolutionsSettings());
 
 		information_texts = new Text[5] { highest_text, higher_text, default_text, lower_text, lowest_text };
-		regional_zones = new GameObject[] { Aetolian_Region_Zone, Cretan_Region_Zone, Etruscan_Pirate_Region_Zone, Illyrian_Region_Zone };
-
-		Make_Zones_Invisible_On_Play_Start();
 
 		fullResolutionButtons = new Button[5] { highest_full_resolution_button, higher_full_resolution_button, 
 			default_full_resolution_button, lower_full_resolution_button, lowest_full_resolution_button };
@@ -173,18 +159,6 @@ public class TitleScreen : ViewBehaviour<GameViewModel>
 
 	public void GUI_HideResolutionsSettings() {
 		resolutions_settings_screen.SetActive(false);
-	}
-	#endregion
-
-	#region Making Regional Zones Invisible in Game
-
-	public void Make_Zones_Invisible_On_Play_Start() {
-		foreach( GameObject zone in regional_zones) {
-			zone.SetActive(true);
-			foreach (var zonePiece in zone.GetComponentsInChildren<MeshRenderer>()) {
-				zonePiece.enabled = false;
-			}
-		}
 	}
 	#endregion
 }

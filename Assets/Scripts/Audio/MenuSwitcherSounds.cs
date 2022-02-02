@@ -8,6 +8,10 @@ public class MenuSwitcherSounds : MonoBehaviour
 
 	//THIS ENTIRE CLASS IS TO START AND STOP SOUNDS FROM PLAYING WHEN CERTIAN PANELS ARE OPEN
 
+	void Awake() {
+		Globals.Register(this);
+	}
+
 	//These are being called by various buttons
 
 	public void PlaySound(string name) {

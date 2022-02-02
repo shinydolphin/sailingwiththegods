@@ -6,6 +6,9 @@ using TMPro;
 
 public class CrewCard : MonoBehaviour
 {
+	UISystem UI => Globals.UI;
+	Database Database => Globals.Database;
+
 #pragma warning disable 0649
 	[SerializeField] ButtonView infoButton;
 #pragma warning restore 0649
@@ -128,10 +131,10 @@ public class CrewCard : MonoBehaviour
 	{
 		infoButton?.Bind(ValueModel.New(new ButtonViewModel {
 			OnClick = () =>
-			Globals.UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
+			UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel {
 				Icon = crewImage.sprite,
 				Title = crew.name,
-				Subtitle = Globals.GameVars.GetJobClassEquivalency(crew.typeOfCrew),
+				Subtitle = Database.GetJobClassEquivalency(crew.typeOfCrew),
 				Message = crew.backgroundInfo
 			})
 		}));

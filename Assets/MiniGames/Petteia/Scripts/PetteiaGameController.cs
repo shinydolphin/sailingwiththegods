@@ -46,12 +46,12 @@ public class PetteiaGameController : TavernaGameControllerParent
 	
 	void Start() 
 	{
-		if (Globals.GameVars != null) 
+		if (Globals.Database != null) 
 		{
-			flavor = Globals.GameVars.petteiaGameFlavor;
-			winFlavor = Globals.GameVars.petteiaGameWin;
-			loseFlavor = Globals.GameVars.petteiaGameLost;
-			blockedFlavor = Globals.GameVars.petteiaGameBlocked;
+			flavor = Globals.Database.petteiaGameFlavor;
+			winFlavor = Globals.Database.petteiaGameWin;
+			loseFlavor = Globals.Database.petteiaGameLost;
+			blockedFlavor = Globals.Database.petteiaGameBlocked;
 		}
 		else 
 		{
@@ -257,9 +257,9 @@ public class PetteiaGameController : TavernaGameControllerParent
 
 		string text = winText + "\n\n" + $"For your victory, you win {reward} food and water!" + "\n\n" + winFlavor.RandomElement();
 
-		if (Globals.GameVars != null) 
+		if (Globals.Game.Session != null) 
 		{
-			Globals.GameVars.playerShipVariables.ship.AddToFoodAndWater(reward);
+			Globals.Game.Session.playerShipVariables.ship.AddToFoodAndWater(reward);
 		}
 
 		mgScreen.DisplayText("Petteia: Victory!", "Taverna Game", text, gameIcon, MiniGameInfoScreen.MiniGame.TavernaEnd);

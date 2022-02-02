@@ -21,6 +21,7 @@ public class AbandonedShip : RandomEvents.PositiveEvent
 		//If there is room on board(There will almost ALWAYS be some room) then tell the player how much they found
 		if (amountCanHold > 0) {
 			int amountToAdd = (int)(Random.Range(1, amountCanHold) * aggregateCloutScore);
+			amountToAdd = Mathf.Clamp(amountToAdd, 1, 10000);
 			finalMessage += "The crew finds " + amountToAdd + " kg of " + ship.cargo[typeOfCargo].name + ". What luck! I'm sure Poseidon won't mind if we just take a little something for our troubles! This should fetch a fair price at the market!";
 			ship.cargo[typeOfCargo].amount_kg += amountToAdd;
 		}
@@ -30,6 +31,6 @@ public class AbandonedShip : RandomEvents.PositiveEvent
 
 		//now add the final bit to the event
 		finalMessage += "We watch the ship sink as we sail away--ever mindful that if we aren't careful, the same could happen to us!";
-		gameVars.ShowANotificationMessage(finalMessage);
+		Notifications.ShowANotificationMessage(finalMessage);
 	}
 }
