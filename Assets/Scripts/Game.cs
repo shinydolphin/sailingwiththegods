@@ -63,13 +63,10 @@ public class Game
 			World.newGameCrewSelectList[i] = true;
 		}
 
-		// TODO: For now, skip straight to starting the game since i turned off crew selection
 		StartMainGameInternal();
+
 		//play the intro for the game
 		//time_Line_controll.play();//start the intro seen
-		// TODO: Turned off crew selection because it's too overwhelming. Needs to be reworked.
-		//title_crew_select.SetActive(true);
-		//GUI_SetupStartScreenCrewSelection();
 
 	}
 
@@ -180,7 +177,7 @@ public class Game
 			Debug.Log(Application.persistentDataPath);
 
 			// secretly save a JSON version of the save data to prep for a move to make that the canonical save file - but it's not hooked up to be loaded yet
-			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(session.playerShipVariables.ship));
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/save.json", JsonUtility.ToJson(session.data));
 		}
 		catch (Exception e) {
 			Notifications.ShowANotificationMessage("ERROR: a backup wasn't saved at: " + Application.persistentDataPath + "  - which means it may not have uploaded either: " + e.Message);
@@ -216,9 +213,6 @@ public class Game
 		//Initiate the main questline
 		Quests.InitiateMainQuestLineForPlayer();
 
-		// TODO: Crew select disabled for now
-		//title_crew_select.SetActive(false);
-
 		//Turn on the ship HUD
 		UI.Show<Dashboard, DashboardViewModel>(new DashboardViewModel(Session));
 	}
@@ -242,6 +236,33 @@ public class Game
 			Notifications.ShowANotificationMessage("Sorry! No load game 'player_save_game.txt' was found in the game directory '" + Application.persistentDataPath + "' or the save file is corrupt!\nError Code: " + error);
 			return false;
 		}
+
+		try {
+			// TODO: Migrate all save data loading to load from JSON. for now most of this data is thrown away (see TODOs in the GameData class)
+			session.data = JsonUtility.FromJson<GameData>(System.IO.File.ReadAllText(Application.persistentDataPath + "/save.json"));
+
+#if LOAD_FROM_JSON
+			// TODO: this is temporary until we make all data actually live on the data object
+			// this allows us to start saving new ship data only to json without needing to add it to the CSV (new fields can be added to GameState even if this block is disabled, too)
+			// data comes from JSON first, then is overwritten by the values in the CSV
+			session.playerShipVariables.ship = session.data.Current.ship;
+			session.playerShipVariables.journey = session.data.journey;
+			ship = session.data.Current.ship;
+			loadedJourney = session.data.journey;
+#endif
+
+			if (session.data.Version < GameData.LatestVersion) {
+				Notifications.ShowANotificationMessage("JSON save data was on an old breaking version number. Was: " + session.data.Version + " Now: " + GameData.LatestVersion + ". JSON save data reset.");
+				session.ResetGameData();
+
+			}
+		}
+		catch (Exception) {
+			Notifications.ShowANotificationMessage("JSON save data incompatible with latest version. Now: " + GameData.LatestVersion + ". JSON save data reset.");
+			session.ResetGameData();
+		}
+
+		//	TextAsset saveGame = (TextAsset)Resources.Load("player_save_game", typeof(TextAsset));
 		string[] fileByLine = saveText.Split(splitFile, StringSplitOptions.None);
 		Debug.Log("file://" + Application.persistentDataPath + "/player_save_game.txt");
 		Debug.Log(saveText);
@@ -250,6 +271,10 @@ public class Game
 		//start at index 1 to skip the record headers we have to then subtract 
 		//one when adding NEW entries to the list to ensure we start at ZERO and not ONE
 		//all past routes will be stored as text, but the last route(last line of file) will also be done this way, but will additionally be parsed out for editing in-game values
+		// the values from the csv completely replace the values from JSON to avoid double adding. TODO: load entirely from JSON instead
+		loadedJourney.routeLog.Clear();
+		loadedJourney.cargoLog.Clear();
+		loadedJourney.otherAttributes.Clear();
 		for (int lineCount = 1; lineCount < fileByLine.Length; lineCount++) {
 			string[] records = fileByLine[lineCount].Split(lineDelimiter, StringSplitOptions.None);
 
@@ -360,12 +385,21 @@ public class Game
 		else {
 			ship.currentNavigatorTarget = -1;
 		}
-		//Add the Known Settlements
 
+		//Add the Known Settlements
 		string[] parsedKnowns = playerVars[38].Split(recordDelimiter, StringSplitOptions.None);
+		ship.playerJournal.knownSettlements.Clear();    // TODO: completely move to JSON. For now the JSON values are replaced with the CSV values.
 		foreach (string settlementID in parsedKnowns) {
+
+			// parsedKnowns contains an empty string entry if you've never been to any cities, and other issues will come up too later in the process, so just warn and give up
+			if(string.IsNullOrEmpty(settlementID)) {
+				Notifications.ShowANotificationMessage("Loading a save file that has not visited any cities is not supported. Start a new game.");
+				return false;
+			}
+
 			ship.playerJournal.knownSettlements.Add(int.Parse(settlementID));
 		}
+
 		//Add Captains Log
 		string restoreCommasAndNewLines = playerVars[39].Replace('^', ',');
 		session.ResetCaptainsLog(restoreCommasAndNewLines.Replace('*', '\n'));
@@ -376,7 +410,7 @@ public class Game
 		session.SetShipModel(ship.upgradeLevel);
 
 		// KDTODO: Once the save game routines are rewritten, need to save the crew available in each city instead of regenerating since this is exploitable
-		// it's just too much hassle to support saving this right now because the save format is limiting
+		// it's just too much hassle to support saving this right now because the CSV save format is limiting
 		// setup each city with 5 crew available and for now, they never regenerate.
 		foreach (var settlement in Database.settlement_masterList) {
 			settlement.availableCrew.Clear();
@@ -555,9 +589,9 @@ public class Game
 		}
 	}
 
-	#endregion
+#endregion
 
-	#region TODO: Weird functions coupled with QuestSystem.InitiateQuestLineForPlayer
+#region TODO: Weird functions coupled with QuestSystem.InitiateQuestLineForPlayer
 
 	public List<CrewMember> GenerateRandomCrewMembers(int numberOfCrewmanNeeded) {
 		//This function pulls from the list of available crewmembers in the world and selects random crewman from that list of a defined
@@ -593,5 +627,5 @@ public class Game
 			World.camera_Mapview.GetComponent<Camera>().enabled = false;
 	}
 
-	#endregion
+#endregion
 }

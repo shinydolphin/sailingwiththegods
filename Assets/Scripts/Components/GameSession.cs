@@ -14,7 +14,8 @@ public class GameSession
 	Notifications Notifications => Globals.Notifications;
 	GameUISystem UI => Globals.UI;
 
-	// TODO: These should be removed eventually in favor of using Globals.World.Crew.Jason, so that World isn't so overloaded with util functions
+	public GameData data { get; set; }
+
 	public CrewMember Jason => Crew.Jason;
 	public IEnumerable<CrewMember> StandardCrew => Crew.StandardCrew;
 	public IEnumerable<CrewMember> Pirates => Crew.Pirates;
@@ -77,6 +78,9 @@ public class GameSession
 		playerShip = GameObject.FindGameObjectWithTag("playerShip");
 		playerShipVariables = playerShip.GetComponent<script_player_controls>();
 
+		// must be after playerShipVariables found
+		ResetGameData();
+
 		// must be after csv are loaded
 		Network = new Network(this, Database);
 		Trade = new Trade();
@@ -92,6 +96,11 @@ public class GameSession
 		AddEntriesToCurrentLogPool(0);
 		StartPlayerShipAtOriginCity();
 		World.GenerateCityLights();
+	}
+	
+	// this pulls the references to the ship and journey log
+	public void ResetGameData() {
+		data = GameData.New(playerShipVariables.ship, playerShipVariables.journey);
 	}
 
 	public void ActivateNavigatorBeacon(Beacon beacon, Vector3 location) {
