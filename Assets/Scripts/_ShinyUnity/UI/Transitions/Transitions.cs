@@ -17,7 +17,17 @@ public interface ITransitionOut
 
 public static class Transitions
 {
-	public static void FadeInCanvasGroup(CanvasGroup group) {
+	public static void SlideAndFadeIn(CanvasGroup group, Vector3 fromPos, Vector3 toPos, float duration) {
+		SlideIn(group, fromPos, toPos, duration);
+		FadeInCanvasGroup(group, duration);
+	}
+
+	public static void SlideAndFadeOut(CanvasGroup group, Action done, Vector3 fromPos, Vector3 toPos, float duration) {
+		FadeOutCanvasGroup(group, done, duration);
+		SlideOut(group, () => { }, fromPos, toPos, duration);
+	}
+
+	public static void FadeInCanvasGroup(CanvasGroup group, float duration) {
 		if (group == null) {
 			return;
 		}
@@ -25,12 +35,12 @@ public static class Transitions
 		group.interactable = false;
 		group.alpha = 0;
 
-		DOTween.To(() => group.alpha, val => group.alpha = val, 1, 0.3f)
+		DOTween.To(() => group.alpha, val => group.alpha = val, 1, duration)
 		  .SetUpdate(true)
 		  .OnComplete(() => group.interactable = true);
 	}
 
-	public static void FadeOutCanvasGroup(CanvasGroup group, Action done) {
+	public static void FadeOutCanvasGroup(CanvasGroup group, Action done, float duration) {
 		if (group == null) {
 			done();
 			return;
@@ -38,7 +48,7 @@ public static class Transitions
 
 		group.interactable = false;
 
-		DOTween.To(() => group.alpha, val => group.alpha = val, 0, 0.3f)
+		DOTween.To(() => group.alpha, val => group.alpha = val, 0, duration)
 		  .SetUpdate(true)
 		  .OnComplete(() => done());
 	}

@@ -62,6 +62,9 @@ public static class Utils
 	public static Color With(this Color self, float? r = null, float? g = null, float? b = null, float? a = null) =>
 		new Color(r ?? self.r, g ?? self.g, b ?? self.b, a ?? self.a);
 
+	public static Vector2 WithOffset(this Vector2 self, float x = 0, float y = 0) => self + new Vector2(x, y);
+	public static Vector3 WithOffset(this Vector3 self, float x = 0, float y = 0, float z = 0) => self + new Vector3(x, y, z);
+
 	public static T RandomElement<T>(this IEnumerable<T> list) {
 		return list.ElementAtOrDefault(UnityEngine.Random.Range(0, list.Count()));
 	}

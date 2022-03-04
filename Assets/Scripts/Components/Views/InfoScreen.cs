@@ -25,13 +25,24 @@ public class InfoScreenModel : Model
 	public Action OnClose { get => _OnClose; set { _OnClose = value; Notify(); } }
 }
 
-public class InfoScreen : ViewBehaviour<InfoScreenModel>
+public class InfoScreen : ViewBehaviour<InfoScreenModel>, ITransitionOut, ITransitionIn
 {
 	[SerializeField] ImageView Icon = null;
 	[SerializeField] StringView Title = null;
 	[SerializeField] StringView Subtitle = null;
 	[SerializeField] StringView Message = null;
 	[SerializeField] ClosableDialog Closable = null;
+
+	CanvasGroup Group;
+	Vector3 ShowPos;
+
+	void Awake() {
+		Group = GetComponentInChildren<CanvasGroup>();
+		ShowPos = Group.transform.localPosition;
+	}
+
+	public void TransitionIn() => Transitions.SlideAndFadeIn(Group, ShowPos.WithOffset(y: -50), ShowPos, 0.1f);
+	public void TransitionOut(Action done) => Transitions.SlideAndFadeOut(Group, done, ShowPos, ShowPos.WithOffset(y: -50), 0.1f);
 
 	public override void Bind(InfoScreenModel model) {
 		base.Bind(model);
