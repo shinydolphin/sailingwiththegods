@@ -52,8 +52,7 @@ public class MessageBoxView : ViewBehaviour<MessageBoxViewModel>
 	public override void Bind(MessageBoxViewModel model) {
 		base.Bind(model);
 
-		if (model == null)
-		{
+		if (model == null) {
 			Debug.LogWarning("Tried to bind view to a null model on " + name);
 			return;
 		}

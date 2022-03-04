@@ -36,13 +36,11 @@ public class Model : INotifyPropertyChanged
 {
 	public event PropertyChangedEventHandler PropertyChanged;
 
-	public void Notify([CallerMemberName]string property = null) 
-	{
+	public void Notify([CallerMemberName] string property = null) {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
 	}
 
-	public void NotifyAny() 
-	{
+	public void NotifyAny() {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
 }
@@ -59,7 +57,7 @@ public class ListenerModel : Model, IDisposable
 	public void Dispose() {
 		Owner.Dispose();
 
-		foreach(var handle in Handles) {
+		foreach (var handle in Handles) {
 			handle.Dispose();
 		}
 	}
@@ -70,7 +68,7 @@ public class ListenerModel : Model, IDisposable
 	public void Listen(INotifyPropertyChanged source) {
 
 		if (source == null) Debug.LogError("Tried to bind a model to a null source model.");
-		
+
 		var handle = Owner.Subscribe(() => source.PropertyChanged += OnPropertyChanged, () => source.PropertyChanged -= OnPropertyChanged);
 		Handles.Add(handle);
 
@@ -89,6 +87,9 @@ public class BoundModel<T> : Model, IDisposable, IValueModel<T>
 
 	// keep a local cache of the value. we'll get notified if it ever changes
 	private T _value;
+
+	public event PropertyChangedEventHandlerDiff<T> PropertyChangedDiff;
+
 	public T Value {
 		get => _value;
 		set {
@@ -96,39 +97,36 @@ public class BoundModel<T> : Model, IDisposable, IValueModel<T>
 
 			// setting this should dispatch notify for us
 			Source
-				.GetType()
-				.GetProperty(SourceProperty)
-				.SetValue(Source, value);
+			  .GetType()
+			  .GetProperty(SourceProperty)
+			  .SetValue(Source, value);
 		}
 	}
 
-	void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-	{
-		if (sender == Source && (e.PropertyName == null || e.PropertyName == SourceProperty)) 
-		{
+	void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+		if (sender == Source && (e.PropertyName == null || e.PropertyName == SourceProperty)) {
+			var tmp = _value;
 			Refresh();
 			Notify(e.PropertyName);
+			PropertyChangedDiff?.Invoke(this, new PropertyChangedEventDiffArgs<T>(e.PropertyName, tmp, _value));
 		}
 	}
 
-	void Refresh() 
-	{
+	void Refresh() {
 		var val = Source
-				.GetType()
-				.GetProperty(SourceProperty)
-				.GetValue(Source);
+			.GetType()
+			.GetProperty(SourceProperty)
+			.GetValue(Source);
 
 		_value = Adaptor != null ? Adaptor(val) : (T)val;
 	}
 
-	public void Dispose()
-	{
+	public void Dispose() {
 		Owner.Dispose();
 		Handle.Dispose();
 	}
 
-	public BoundModel(INotifyPropertyChanged source, string property, Func<object, T> adaptor = null) 
-	{
+	public BoundModel(INotifyPropertyChanged source, string property, Func<object, T> adaptor = null) {
 		Adaptor = adaptor;
 		Bind(source, property);
 	}
@@ -148,9 +146,23 @@ public class BoundModel<T> : Model, IDisposable, IValueModel<T>
 	}
 }
 
+public class PropertyChangedEventDiffArgs<T> : PropertyChangedEventArgs
+{
+	public T OldValue;
+	public T NewValue;
+
+	public PropertyChangedEventDiffArgs(string propertyName, T oldValue, T newValue) : base(propertyName) {
+		OldValue = oldValue;
+		NewValue = newValue;
+	}
+}
+
+public delegate void PropertyChangedEventHandlerDiff<T>(object sender, PropertyChangedEventDiffArgs<T> e);
+
 public interface IValueModel<T> : INotifyPropertyChanged
 {
 	T Value { get; set; }
+	event PropertyChangedEventHandlerDiff<T> PropertyChangedDiff;
 }
 
 public class CompoundWrapperModel<TIn1, TIn2, TOut> : Model, IValueModel<TOut>
@@ -167,6 +179,11 @@ public class CompoundWrapperModel<TIn1, TIn2, TOut> : Model, IValueModel<TOut>
 
 	// keep a local cache of the value. we'll get notified if it ever changes
 	private TOut _value;
+
+#pragma warning disable CS0067
+	public event PropertyChangedEventHandlerDiff<TOut> PropertyChangedDiff;
+#pragma warning restore CS0067
+
 	public TOut Value {
 		get => _value;
 		set => throw new NotImplementedException("Cannot set a compound wrapper model. It's a mapping from 2 models into one read-only model.");
@@ -236,7 +253,10 @@ public interface ICollectionModel<T> : IValueModel<IEnumerable<T>>, ICollection<
 public class CollectionWrapperModel<T> : Model, ICollectionModel<T>
 {
 	// this is needed because IValueModel doesn't make sense for collections...
+#pragma warning disable CS0067
 	public event NotifyCollectionChangedEventHandler CollectionChanged;
+	public event PropertyChangedEventHandlerDiff<IEnumerable<T>> PropertyChangedDiff;
+#pragma warning restore CS0067
 
 	// lazy evaluation of the linq makes this work on every call
 	IEnumerable<T> Data => Source;
@@ -305,7 +325,10 @@ public class CollectionWrapperModel<T> : Model, ICollectionModel<T>
 public class CollectionWrapperModel<TIn, TOut, TOrderKey> : Model, ICollectionModel<TOut>
 {
 	// this is needed because IValueModel doesn't make sense for collections...
+#pragma warning disable CS0067
 	public event NotifyCollectionChangedEventHandler CollectionChanged;
+	public event PropertyChangedEventHandlerDiff<IEnumerable<TOut>> PropertyChangedDiff;
+#pragma warning restore CS0067
 
 	// TODO: it's a little unintutive that a CollectionWrapperModel breaks linq's laziness, but we need this so we can keep track of the old index
 	// there must be a better way. this was inspired by: https://stackoverflow.com/questions/26784373/filter-and-update-a-readonlyobservablecollection
@@ -315,8 +338,8 @@ public class CollectionWrapperModel<TIn, TOut, TOrderKey> : Model, ICollectionMo
 
 	IEnumerable<TIn> Filtered;
 	IEnumerable<TIn> RecomputeFiltered() => Source.Value
-		.Where(o => Filter(o))
-		.ToList();
+	  .Where(o => Filter(o))
+	  .ToList();
 
 	public IEnumerable<TOut> Value { get => Data; set => throw new NotImplementedException("Cannot set. CollectionWrapper is read-only."); }
 
@@ -331,7 +354,7 @@ public class CollectionWrapperModel<TIn, TOut, TOrderKey> : Model, ICollectionMo
 
 	void OnPropertyChanged(object sender, NotifyCollectionChangedEventArgs e) {
 		if (sender == Source) {
-			if((e.OldItems != null && e.OldItems.Cast<TIn>().Any(o => Filter(o))) || (e.NewItems != null && e.NewItems.Cast<TIn>().Any(o => Filter(o)))) {
+			if ((e.OldItems != null && e.OldItems.Cast<TIn>().Any(o => Filter(o))) || (e.NewItems != null && e.NewItems.Cast<TIn>().Any(o => Filter(o)))) {
 
 				NotifyCollectionChangedEventArgs mappedArgs = null;
 
@@ -368,7 +391,7 @@ public class CollectionWrapperModel<TIn, TOut, TOrderKey> : Model, ICollectionMo
 	}
 
 	public int IndexOf(IEnumerable<TIn> haystack, TIn needle) {
-		for(var i = 0; i < haystack.Count(); i++) {
+		for (var i = 0; i < haystack.Count(); i++) {
 			var curr = haystack.ElementAtOrDefault(i);
 			if (ReferenceEquals(curr, needle) || EqualityComparer<TIn>.Default.Equals(curr, needle)) {
 				return i;
@@ -442,6 +465,9 @@ public class WrapperModel<TIn, TOut> : Model, IValueModel<TOut>
 
 	// keep a local cache of the value. we'll get notified if it ever changes
 	private TOut _value;
+
+	public event PropertyChangedEventHandlerDiff<TOut> PropertyChangedDiff;
+
 	public TOut Value {
 		get => _value;
 		set {
@@ -454,8 +480,10 @@ public class WrapperModel<TIn, TOut> : Model, IValueModel<TOut>
 
 	void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
 		if (sender == Source) {
+			var tmp = _value;
 			Refresh();
 			NotifyAny();
+			PropertyChangedDiff?.Invoke(this, new PropertyChangedEventDiffArgs<TOut>(e.PropertyName, tmp, _value));
 		}
 	}
 
@@ -468,16 +496,14 @@ public class WrapperModel<TIn, TOut> : Model, IValueModel<TOut>
 		Handle.Dispose();
 	}
 
-	public WrapperModel(IValueModel<TIn> source, Func<TIn, TOut> adaptOut, Func<TOut, TIn> adaptIn)
-	{
+	public WrapperModel(IValueModel<TIn> source, Func<TIn, TOut> adaptOut, Func<TOut, TIn> adaptIn) {
 		AdaptOut = adaptOut;
 		AdaptIn = adaptIn;
 
 		Bind(source);
 	}
 
-	public void Bind(IValueModel<TIn> source)
-	{
+	public void Bind(IValueModel<TIn> source) {
 		if (source == null) Debug.LogError("Tried to bind a model to a null source model.");
 
 		Source = source;
@@ -493,13 +519,19 @@ public class WrapperModel<TIn, TOut> : Model, IValueModel<TOut>
 public class ValueModel<T> : Model, IValueModel<T>
 {
 	private T _value;
+
+	public event PropertyChangedEventHandlerDiff<T> PropertyChangedDiff;
+
 	public T Value {
 		get => _value;
-		set { _value = value; Notify(); }
+		set { var tmp = _value; _value = value; Notify(_value, value); Notify(); }
 	}
 
-	public ValueModel(T value) 
-	{
+	public void Notify(T oldValue, T newValue, [CallerMemberName] string property = null) {
+		PropertyChangedDiff?.Invoke(this, new PropertyChangedEventDiffArgs<T>(property, oldValue, newValue));
+	}
+
+	public ValueModel(T value) {
 		Value = value;
 	}
 }

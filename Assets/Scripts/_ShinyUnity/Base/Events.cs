@@ -22,10 +22,22 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class GameEvent { }
+public interface IGenericGameEvent { string EventName { get; } }
+public class GenericGameEvent : GameEvent, IGenericGameEvent
+{
+	public string EventName { get; set; }
+}
+
+// automatic static instances on events that happen often to reduce allocations
+public static class EventCache<T> where T : GameEvent, new()
+{
+	public static T Instance { get; private set; } = new T();
+	public static void Raise() => Events.Instance.Raise(Instance);
+}
 
 /// <summary>
 /// Event Manager manages publishing raised events to subscribing/listening classes.
@@ -44,12 +56,9 @@ public class GameEvent { }
 public class Events
 {
 
-	public static Events Instance
-	{
-		get
-		{
-			if (instance == null)
-			{
+	public static Events Instance {
+		get {
+			if (instance == null) {
 				instance = new Events();
 			}
 
@@ -65,20 +74,38 @@ public class Events
 	/// The actual delegate, there is one delegate per unique event. Each
 	/// delegate has multiple invocation list items.
 	/// </summary>
-	private Dictionary<System.Type, EventDelegate> delegates = new Dictionary<System.Type, EventDelegate>();
+	internal Dictionary<System.Type, EventDelegate> delegates = new Dictionary<System.Type, EventDelegate>();
 
 	/// <summary>
 	/// Lookups only, there is one delegate lookup per listener
 	/// </summary>
-	private Dictionary<System.Delegate, EventDelegate> delegateLookup = new Dictionary<System.Delegate, EventDelegate>();
+	internal Dictionary<System.Delegate, EventDelegate> delegateLookup = new Dictionary<System.Delegate, EventDelegate>();
+
+#if SHINY_EVENT_DEBUG
+    internal class EventDebugInfo
+    {
+      public System.Type EventType;
+      public System.Delegate Delegate;
+      public System.Diagnostics.StackTrace StackTrace;
+    }
+
+    internal Dictionary<System.Delegate, EventDebugInfo> debugLookup = new Dictionary<System.Delegate, EventDebugInfo>();
+
+    internal event System.Action<EventDebugInfo, GameEvent> EventRaised;
+    internal void ResetEventRaisedListeners() => EventRaised = null;
+#endif
 
 	/// <summary>
 	/// Add the delegate.
 	/// </summary>
-	public void AddListener<T>(EventDelegate<T> del) where T : GameEvent
-	{
-		if (delegateLookup.ContainsKey(del))
-		{
+	public void AddListener<T>(EventDelegate<T> del) where T : GameEvent {
+		if (delegateLookup.ContainsKey(del)) {
+#if SHINY_EVENT_DEBUG
+        var debug = debugLookup.ContainsKey(del) ? debugLookup[del] : null;
+        Debug.Log("Skipping AddListener because the delegate has already been added: " + del + " Stack: " + debug?.StackTrace);
+#else
+			Debug.Log("Skipping AddListener because the delegate has already been added: " + del);
+#endif
 			return;
 		}
 
@@ -93,45 +120,58 @@ public class Events
 	/// <summary>
 	/// Remove the delegate. Can be called multiple times on same delegate.
 	/// </summary>
-	public void RemoveListener<T>(EventDelegate<T> del) where T : GameEvent
-	{
+	public void RemoveListener<T>(EventDelegate<T> del) where T : GameEvent {
 		EventDelegate internalDelegate;
-		if (delegateLookup.TryGetValue(del, out internalDelegate))
-		{
+		if (delegateLookup.TryGetValue(del, out internalDelegate)) {
 			RemoveListener(typeof(T), internalDelegate);
+
+			// must be removed here, not in RemoveListener, because this dict contains the external delegate, notthe internalDelegate
+			delegateLookup.Remove(del);
 		}
 	}
 
-	public void AddListener(System.Type t, EventDelegate del)
-	{
+	public void AddListener(System.Type t, EventDelegate del) {
 		EventDelegate tempDel;
-		if (delegates.TryGetValue(t, out tempDel))
-		{
+		if (delegates.TryGetValue(t, out tempDel)) {
 			delegates[t] = tempDel += del;
 		}
-		else
-		{
+		else {
 			delegates[t] = del;
 		}
+
+#if SHINY_EVENT_DEBUG
+      debugLookup[del] = new EventDebugInfo { StackTrace = new System.Diagnostics.StackTrace(2, true), EventType = t, Delegate = del };
+      Debug.Log("Added listener: " + debugLookup[del].StackTrace.ToString());
+#endif
 	}
 
-	public void RemoveListener(System.Type t, EventDelegate del)
-	{
+	public void RemoveListener(System.Type t, EventDelegate del) {
 		EventDelegate tempDel;
-		if (delegates.TryGetValue(t, out tempDel))
-		{
+		if (delegates.TryGetValue(t, out tempDel)) {
 			tempDel -= del;
-			if (tempDel == null)
-			{
+			if (tempDel == null) {
 				delegates.Remove(t);
 			}
-			else
-			{
+			else {
 				delegates[t] = tempDel;
 			}
 		}
 
-		delegateLookup.Remove(del);
+#if SHINY_EVENT_DEBUG
+      if(delegateLookup.ContainsKey(del))
+      {
+        Debug.Log("Removed listener: " + debugLookup[delegateLookup[del]].StackTrace.ToString());
+        debugLookup.Remove(delegateLookup[del]);
+      }
+      else if(debugLookup.ContainsKey(del))
+      {
+        debugLookup.Remove(del);
+      }
+#endif
+
+		if (delegateLookup.ContainsKey(del)) {
+			delegateLookup.Remove(del);
+		}
 	}
 
 	/// <summary>
@@ -143,12 +183,18 @@ public class Events
 	/// <summary>
 	/// Raise the event to all the listeners
 	/// </summary>
-	public void Raise(GameEvent e)
-	{
+	public void Raise(GameEvent e) {
 		EventDelegate del;
-		if (delegates.TryGetValue(e.GetType(), out del))
-		{
+		if (delegates.TryGetValue(e.GetType(), out del)) {
 			del.Invoke(e);
+
+#if SHINY_EVENT_DEBUG && SHINY_EVENT_HIT_DEBUG
+        foreach(var entry in del.GetInvocationList())
+        {
+          var debugInfo = debugLookup[entry];
+          EventRaised?.Invoke(debugInfo, e);
+        }
+#endif
 		}
 	}
 
