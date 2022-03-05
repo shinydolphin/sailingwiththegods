@@ -107,6 +107,7 @@ public abstract class ListView<TModel, TCellModel> : ViewBehaviour<TModel>
 	ViewBehaviour<TCellModel> AllocateNewItem(TCellModel cellModel) {
 		var cell = GameObject.Instantiate(CellPrefab).GetComponent<ViewBehaviour<TCellModel>>();
 		cell.transform.SetParent(CellParent);
+		cell.transform.localScale = Vector3.one;
 		cell.gameObject.SetActive(false);
 		return cell;
 	}
