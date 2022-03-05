@@ -4,6 +4,14 @@ using System.Linq;
 
 public class World : MonoBehaviour
 {
+	//set the layer mask to only check for collisions on layer 10 ("terrain")
+	const int terrainLayerMask = 1 << 10;
+	const int waterLayerMask = 1 << 4;
+
+	// this number is fiddly. i just ran several times until i got results that balanced no trees in water with trees on shoreline
+	const float waterLevel = 0.0029f;
+
+
 	Game Game => Globals.Game;
 	Notifications Notifications => Globals.Notifications;
 	Database Database => Globals.Database;
@@ -344,6 +352,30 @@ public class World : MonoBehaviour
 			//else currentZoneParent.transform.GetChild (currentZone).GetChild(0).gameObject.SetActive(true);
 			//Debug.Log ("Turning water on?");
 		}
+
+	}
+
+	public static bool IsBelowWaterLevel(Vector3 pos) => !IsAboveWaterLevel(pos);
+	public static bool IsAboveWaterLevel(Vector3 pos) => pos.y > waterLevel;
+
+	public bool IsOnWater(Vector3 pos) => !IsOnLand(pos);
+	public bool IsOnLand(Vector3 pos) {
+		const float radius = 0.5f;
+		return Physics.OverlapCapsule(pos.WithOffset(y: -1), pos + Vector3.up * 2, radius, terrainLayerMask | waterLayerMask)
+			.None(hit => (hit.gameObject.layer & waterLayerMask) > 0);
+	}
+	
+	public Vector3 GetPosOnLand(Vector3 pos) {
+
+		// include a small buffer of 0.5 on either side to cover both points too low and too high
+		const float maxDistance = 5;
+		var results = Physics.RaycastAll(new Ray(pos.WithOffset(y: maxDistance / 2), Vector3.down), maxDistance, terrainLayerMask);
+
+		// fall back to the given position if we can't find land
+		if (results.Any()) {
+			return results.First().point;
+		}
+		else return pos;
 
 	}
 

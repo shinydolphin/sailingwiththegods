@@ -69,6 +69,17 @@ public static class Utils
 		return list.ElementAtOrDefault(UnityEngine.Random.Range(0, list.Count()));
 	}
 
+	public static bool None<T>(this IEnumerable<T> list, Func<T, bool> predicate) => 
+		!list.Any(predicate);
+
+	public static Vector3 RandomPositionIn(Bounds b) {
+		return new Vector3(
+		  UnityEngine.Random.Range(b.min.x, b.max.x),
+		  UnityEngine.Random.Range(b.min.y, b.max.y),
+		  UnityEngine.Random.Range(b.min.z, b.max.z)
+		);
+	}
+
 	public static IEnumerable<Transform> GetChildren(this Transform self) {
 		var result = new List<Transform>();
 		for (var i = 0; i < self.childCount; i++) {
