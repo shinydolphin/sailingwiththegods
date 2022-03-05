@@ -83,10 +83,10 @@ public class Game
 
 		//Reset Other Player Ship Variables
 		session.playerShipVariables.numOfDaysTraveled = 0;
-		session.playerShipVariables.numOfDaysWithoutProvisions = 0;
-		session.playerShipVariables.numOfDaysWithoutWater = 0;
-		session.playerShipVariables.dayCounterStarving = 0;
-		session.playerShipVariables.dayCounterThirsty = 0;
+		session.data.Current.numOfDaysWithoutProvisions = 0;
+		session.data.Current.numOfDaysWithoutWater = 0;
+		session.data.Current.dayCounterStarving = 0;
+		session.data.Current.dayCounterThirsty = 0;
 
 		//Take player back to title screen
 		//Debug.Log ("GOING TO TITLE SCREEN");
@@ -355,8 +355,9 @@ public class Game
 		ship.networks = loadedNetworks;
 
 		//Update player starving and thirsty day counters
-		session.playerShipVariables.dayCounterStarving = int.Parse(playerVars[32]);
-		session.playerShipVariables.dayCounterThirsty = int.Parse(playerVars[33]);
+		// NOTE: These are stored here for legacy reasons, but the system is buggy without the additional JSON save data. See comment in GameState.
+		session.data.Current.numOfDaysWithoutProvisions = float.Parse(playerVars[32]);
+		session.data.Current.numOfDaysWithoutWater = float.Parse(playerVars[33]);
 
 		//Update Currency
 		ship.currency = int.Parse(playerVars[34]);

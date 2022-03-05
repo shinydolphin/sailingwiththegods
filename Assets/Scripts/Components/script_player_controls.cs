@@ -46,12 +46,6 @@ public class script_player_controls : MonoBehaviour
 
 	bool getSettlementDockButtonReady = false;
 
-	[HideInInspector] public float numOfDaysWithoutProvisions = 0;
-	[HideInInspector] public float numOfDaysWithoutWater = 0;
-
-	[HideInInspector] public int dayCounterStarving = 0;
-	[HideInInspector] public int dayCounterThirsty = 0;
-
 	bool notEnoughSpeedToMove = false;
 
 	float initialAngle = 0f;
@@ -746,38 +740,40 @@ public class script_player_controls : MonoBehaviour
 	}
 
 	void CheckIfProvisionsOrWaterIsDepleted(float travelTimeToAddIfDepleted) {
+		var state = Session.data.Current;
+
 		if (ship.cargo[0].amount_kg <= 0) {
-			numOfDaysWithoutWater += travelTimeToAddIfDepleted;
-			CheckToSeeIfCrewWillDieFromThirst();
+			state.numOfDaysWithoutWater += travelTimeToAddIfDepleted;
+			CheckToSeeIfCrewWillDieFromThirst(state);
 		}
 		else {
-			numOfDaysWithoutWater = 0;
-			dayCounterThirsty = 0;
+			state.numOfDaysWithoutWater = 0;
+			state.dayCounterThirsty = 0;
 		}
 
 		if (ship.cargo[1].amount_kg <= 0) {
-			numOfDaysWithoutProvisions += travelTimeToAddIfDepleted;
-			CheckToSeeIfCrewWillDieFromStarvation();
+			state.numOfDaysWithoutProvisions += travelTimeToAddIfDepleted;
+			CheckToSeeIfCrewWillDieFromStarvation(state);
 		}
 		else {
-			numOfDaysWithoutProvisions = 0;
-			dayCounterStarving = 0;
+			state.numOfDaysWithoutProvisions = 0;
+			state.dayCounterStarving = 0;
 		}
 	}
 
 
 
-	void CheckToSeeIfCrewWillDieFromStarvation() {
+	void CheckToSeeIfCrewWillDieFromStarvation(GameState state) {
 		//This uses a counter system to determine the number of days in order to make sure the death roll is only rolled
 		//	--ONCE per day, rather than every time the function is called.
 		//Every day without Provisions--the chance of a crew member dying from starvation increases
 		//	--The first day starts at 30%, and every day onward increases it by 10%
-		int numOfDays = Mathf.FloorToInt(numOfDaysWithoutProvisions);
+		int numOfDays = Mathf.FloorToInt(state.numOfDaysWithoutProvisions);
 		//first check to see if we're at atleast one day
 		if (numOfDays >= 1) {
-			dayCounterStarving++;
-			numOfDaysWithoutProvisions = 0;
-			int deathRate = 50 + (dayCounterStarving * 10);
+			state.dayCounterStarving++;
+			state.numOfDaysWithoutProvisions = 0;
+			int deathRate = 50 + (state.dayCounterStarving * 10);
 
 			//If a crewmember dies due to the percentage roll
 			if (Random.Range(0, 100) <= deathRate)
@@ -787,17 +783,17 @@ public class script_player_controls : MonoBehaviour
 
 	}
 
-	void CheckToSeeIfCrewWillDieFromThirst() {
+	void CheckToSeeIfCrewWillDieFromThirst(GameState state) {
 		//This uses a counter system to determine the number of days in order to make sure the death roll is only rolled
 		//	--ONCE per day, rather than every time the function is called.
 		//Every day without Water--the chance of a crew member dying from starvation increases
 		//	--The first day starts at 80%, and every day onward increases it by 10%
-		int numOfDays = Mathf.FloorToInt(numOfDaysWithoutWater);
+		int numOfDays = Mathf.FloorToInt(state.numOfDaysWithoutWater);
 		//first check to see if we're at atleast one day
 		if (numOfDays >= 1) {
-			dayCounterThirsty++;
-			numOfDaysWithoutWater = 0;
-			int deathRate = 50 + (dayCounterThirsty * 10);
+			state.dayCounterThirsty++;
+			state.numOfDaysWithoutWater = 0;
+			int deathRate = 50 + (state.dayCounterThirsty * 10);
 
 			//If a crewmember dies due to the percentage roll
 			if (Random.Range(0, 100) <= deathRate)
