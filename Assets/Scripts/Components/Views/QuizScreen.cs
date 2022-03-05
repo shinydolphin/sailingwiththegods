@@ -29,7 +29,7 @@ public class QuizScreenModel : Model
 	}
 }
 
-public class QuizScreen : ViewBehaviour<QuizScreenModel>
+public class QuizScreen : PopupView<QuizScreenModel>
 {
 	[SerializeField] ImageView Icon = null;
 	[SerializeField] StringView Title = null;

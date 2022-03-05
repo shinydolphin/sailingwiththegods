@@ -41,7 +41,7 @@ public class ShrinesViewModel : Model
 	}
 }
 
-public class ShrinesView : ViewBehaviour<ShrinesViewModel>
+public class ShrinesView : PopupView<ShrinesViewModel>
 {
 	[SerializeField] ShrineListView Options = null;
 
