@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.AI;
 
 public class World : MonoBehaviour
 {
@@ -358,11 +359,22 @@ public class World : MonoBehaviour
 	public static bool IsBelowWaterLevel(Vector3 pos) => !IsAboveWaterLevel(pos);
 	public static bool IsAboveWaterLevel(Vector3 pos) => pos.y > waterLevel;
 
-	public bool IsOnWater(Vector3 pos) => !IsOnLand(pos);
-	public bool IsOnLand(Vector3 pos) {
-		const float radius = 0.5f;
-		return Physics.OverlapCapsule(pos.WithOffset(y: -1), pos + Vector3.up * 2, radius, terrainLayerMask | waterLayerMask)
-			.None(hit => (hit.gameObject.layer & waterLayerMask) > 0);
+	// TODO: These aren't working yet. The math for the overlap check seems wrong. Use IsBelow/AboveWaterLevel instead for now
+	//public bool IsOnWater(Vector3 pos) => !IsOnLand(pos);
+	//public bool IsOnLand(Vector3 pos) {
+	//	const float radius = 0.5f;
+	//	return Physics.OverlapCapsule(pos.WithOffset(y: -1), pos + Vector3.up * 2, radius, terrainLayerMask | waterLayerMask)
+	//		.None(hit => (hit.gameObject.layer & waterLayerMask) > 0);
+	//}
+
+	public Vector3 GetNearestPosInWater(Vector3 pos, float maxDistance = 20) {
+		NavMeshHit hit;
+		if (NavMesh.SamplePosition(pos, out hit, maxDistance, NavMesh.AllAreas)) {
+			return hit.position;
+		}
+
+		// fallback to the pos passed in if we couldn't reach the shore within the distance
+		else return pos;
 	}
 	
 	public Vector3 GetPosOnLand(Vector3 pos) {

@@ -14,6 +14,9 @@ Assets/FallbackAssets/_Generated.meta
 # Ignore the NavMesh because it's over 100 mb. we're storing a zipped version on git and people have to unzip it before running the project after pulling
 Assets/_Scenes/Main Scene/NavMesh.asset
 Assets/_Scenes/Main Scene/NavMesh.asset.meta
+Assets/_Scenes/Additive/World/NavMesh.asset
+Assets/_Scenes/Additive/World/NavMesh.asset.meta
+
 
 # Visual Studio 2015 cache directory
 /.vs/

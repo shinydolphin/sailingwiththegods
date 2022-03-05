@@ -9,8 +9,10 @@ public class CityBuildingSpawner : MonoBehaviour
 	[SerializeField] int NumHouses = 30;
 	[SerializeField] float CityRadius = 1f;
 	[SerializeField] float BuildingRadius = 0.05f;
+	[SerializeField] float DockOffset = -0.3f;
 
 	[SerializeField] GameObject[] HousePrefabs = null;
+	[SerializeField] GameObject DockPrefab = null;
 
 	// fallback to slower FindObjectByType for editor usage
 	World World => Globals.World 
@@ -20,15 +22,7 @@ public class CityBuildingSpawner : MonoBehaviour
     void Start()
     {
 		Regenerate();
-	}
-
-	void SafeDestroy(GameObject obj) {
-		if(Application.isPlaying) {
-			Destroy(obj);
-		}
-		else {
-			DestroyImmediate(obj);
-		}
+		PlaceDock();
 	}
 
 	[Button]
@@ -44,13 +38,27 @@ public class CityBuildingSpawner : MonoBehaviour
 			);
 		}
 
-		foreach(var building in transform.GetChildren().ToList()) {
-			// kill buildings that are in the water. we don't try to replace them since it'd probably make things too dense
+		// kill buildings that are in the water. we don't try to replace them since it'd probably make things too dense
+		foreach (var building in transform.GetChildren().ToList()) {
 			if (World.IsBelowWaterLevel(building.position)) {
 				Debug.LogWarning("Spawned on water");
 				SafeDestroy(building.gameObject);
 			}
 		}
+	}
+
+	[Button]
+	void PlaceDock() {
+		var pos = World.GetNearestPosInWater(transform.position);
+		var diffToWater = pos - transform.position;
+		var dirToWater = diffToWater.normalized;
+		var adjustedPos = pos + dirToWater * DockOffset;
+		GameObject.Instantiate(
+			DockPrefab,
+			adjustedPos,
+			Quaternion.LookRotation(-dirToWater, Vector3.up),
+			transform
+		);
 	}
 
 	Vector3 GetRandomPositionOption() {
@@ -79,6 +87,15 @@ public class CityBuildingSpawner : MonoBehaviour
 	void Clear() {
 		foreach(var child in transform.GetChildren().ToList()) {
 			SafeDestroy(child.gameObject);
+		}
+	}
+
+	void SafeDestroy(GameObject obj) {
+		if (Application.isPlaying) {
+			Destroy(obj);
+		}
+		else {
+			DestroyImmediate(obj);
 		}
 	}
 }

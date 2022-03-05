@@ -49,3 +49,5 @@ MonoBehaviour:
   HousePrefabs:
   - {fileID: 6112617561141462108, guid: 8a62958dfd44efb499bc7a6675af69bd, type: 3}
   - {fileID: 7996919919797747161, guid: e5c330c9d4357064f8fba9be5c2f4791, type: 3}
+  DockPrefab: {fileID: 1093932679839710081, guid: 51f5b5ae1fb2a9c448067fedd1e91b81,
+    type: 3}
