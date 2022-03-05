@@ -5,8 +5,7 @@ using NaughtyAttributes;
 using System.Collections;
 
 
-// TODO: Rename to SettlementComponent or something
-public class script_settlement_functions : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class SettlementComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
 	bool IsTooltipPendingHide;
 

@@ -17,7 +17,7 @@ public class WorldTools : MonoBehaviour
 	[Button("Find Settlement By Name...")]
 	void FindSettlementByName() {
 		Shiny.Editor.TextPromptWindow.Show("Enter Settlement Name", settlementName => {
-			UnityEditor.Selection.activeObject = GameObject.FindObjectsOfType<script_settlement_functions>()
+			UnityEditor.Selection.activeObject = GameObject.FindObjectsOfType<SettlementComponent>()
 			.FirstOrDefault(s => s.thisSettlement?.name.ToLower() == settlementName.ToLower());
 		});
 	}
@@ -25,7 +25,7 @@ public class WorldTools : MonoBehaviour
 	[Button("Find Settlement By Id...")]
 	void FindSettlementById() {
 		Shiny.Editor.TextPromptWindow.Show("Enter Settlement ID", settlementId => {
-			UnityEditor.Selection.activeObject = GameObject.FindObjectsOfType<script_settlement_functions>()
+			UnityEditor.Selection.activeObject = GameObject.FindObjectsOfType<SettlementComponent>()
 			.FirstOrDefault(s => s.thisSettlement?.settlementID == int.Parse(settlementId));
 		});
 	}
@@ -66,7 +66,7 @@ public class WorldTools : MonoBehaviour
 		string writeToFile = "";
 		var settlementParent = _World.settlement_masterList_parent;
 		var sortedChildren = settlementParent.transform.GetChildren()
-			.Select(c => c.GetComponent<script_settlement_functions>())
+			.Select(c => c.GetComponent<SettlementComponent>())
 			.OrderBy(c => c.thisSettlement.settlementID)
 			.ToList();
 

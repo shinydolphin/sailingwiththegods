@@ -204,7 +204,7 @@ public class World : MonoBehaviour
 			currentSettlement.name = settlement.name;
 			currentSettlement.layer = 8;
 			//Debug.Log ("*********************************************  <<>>>" + currentSettlement.name + "   :   " + settlement.settlementID);
-			currentSettlement.GetComponent<script_settlement_functions>().thisSettlement = settlement;
+			currentSettlement.GetComponent<SettlementComponent>().thisSettlement = settlement;
 			currentSettlement.transform.SetParent(settlement_masterList_parent.transform);
 			settlement.theGameObject = currentSettlement;
 		}
@@ -301,7 +301,7 @@ public class World : MonoBehaviour
 
 			// use the center of the collider bounds instead of the position since the models are weirdly offset in many of these
 			currentCityLight.transform.SetParent(cityLightsParent.transform);
-			currentCityLight.transform.position = settlement_masterList_parent.transform.GetChild(i).GetComponent<script_settlement_functions>().anchor.position;
+			currentCityLight.transform.position = settlement_masterList_parent.transform.GetChild(i).GetComponent<SettlementComponent>().anchor.position;
 		}
 	}
 
