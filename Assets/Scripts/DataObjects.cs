@@ -47,6 +47,13 @@ public class GameState
 	// TODO: However, this is still loaded from CSV right now unless LOAD_FROM_JSON is set, so we don't 
 	// TODO: Still loaded from CSV.Review and load from JSON later.
 	public Ship ship;
+
+	public float numOfDaysWithoutProvisions = 0;
+	public float numOfDaysWithoutWater = 0;
+
+	// these need to be saved to the save file too because numOfDays* are reset after every day so are always between 0-1. if you were starving for 2 days, that would be lost info if we didn't save these too
+	public int dayCounterStarving = 0;
+	public int dayCounterThirsty = 0;
 }
 
 [Serializable]
@@ -213,7 +220,7 @@ public class PlayerJourneyLog
 		this.routeLog.Add(routeToAdd);
 		Debug.Log("Add Route getting called 3...." + routeToAdd.theRoute[0].x + "  " + routeToAdd.theRoute[0].z);
 		AddCargoManifest(playerShipVars.ship.cargo);
-		AddOtherAttributes(playerShipVars, captainsLog, routeToAdd);
+		AddOtherAttributes(playerShipVars, captainsLog, routeToAdd, Globals.Game.Session.data.Current);
 	}
 
 	public void AddCargoManifest(Resource[] cargoToAdd) {
@@ -224,7 +231,7 @@ public class PlayerJourneyLog
 		this.cargoLog.Add(CSVstring);
 	}
 
-	public void AddOtherAttributes(script_player_controls playerShipVars, string captainsLog, PlayerRoute currentRoute) {
+	public void AddOtherAttributes(script_player_controls playerShipVars, string captainsLog, PlayerRoute currentRoute, GameState state) {
 		string CSVstring = "";
 		Ship playerShip = playerShipVars.ship;
 		//Add the applicable port docking info
@@ -261,10 +268,13 @@ public class PlayerJourneyLog
 			if (index < playerShip.networks.Count - 1)
 				CSVstring += "_";
 		}
+
+		// NOTE: These are stored here for legacy reasons, but the system is buggy without the additional JSON save data. See comment in GameState.
 		//Add Days Starving
-		CSVstring += "," + playerShipVars.numOfDaysWithoutProvisions;
+		CSVstring += "," + state.numOfDaysWithoutProvisions;
 		//Add Days Thirsty
-		CSVstring += "," + playerShipVars.numOfDaysWithoutWater;
+		CSVstring += "," + state.numOfDaysWithoutWater;
+		
 		//Add currency
 		CSVstring += "," + playerShip.currency;
 		//Add Loan Amount Owed

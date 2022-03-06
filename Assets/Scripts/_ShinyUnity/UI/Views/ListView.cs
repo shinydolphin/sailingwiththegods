@@ -30,9 +30,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class ListView<TModel, TCellModel> : ViewBehaviour<TModel> 
-	where TModel : INotifyCollectionChanged, INotifyPropertyChanged, IEnumerable<TCellModel>
-	where TCellModel : INotifyPropertyChanged
+public abstract class ListView<TModel, TCellModel> : ViewBehaviour<TModel>
+  where TModel : INotifyCollectionChanged, INotifyPropertyChanged, IEnumerable<TCellModel>
+  where TCellModel : INotifyPropertyChanged
 {
 	[SerializeField] private Transform CellParent = null;
 	[SerializeField] private GameObject CellPrefab = null;
@@ -62,8 +62,7 @@ public abstract class ListView<TModel, TCellModel> : ViewBehaviour<TModel>
 
 	}
 
-	void Clear()
-	{
+	void Clear() {
 		PoolExistingObjects();
 
 		foreach (var item in Used) {
@@ -113,21 +112,17 @@ public abstract class ListView<TModel, TCellModel> : ViewBehaviour<TModel>
 		return cell;
 	}
 
-	void Repopulate()
-	{
+	void Repopulate() {
 		Clear();
-		foreach (var cellModel in Model)
-		{
+		foreach (var cellModel in Model) {
 			Insert(cellModel, Used.Count);
 		}
 	}
 
-	public override void Bind(TModel model)
-	{
+	public override void Bind(TModel model) {
 		base.Bind(model);
 
-		if(model == null) 
-		{
+		if (model == null) {
 			Debug.LogWarning("Tried to bind view to a null model on " + name);
 			return;
 		}
@@ -138,17 +133,15 @@ public abstract class ListView<TModel, TCellModel> : ViewBehaviour<TModel>
 		Repopulate();
 	}
 
-	void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-	{
+	void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
 		RefreshCollection(sender, e);
 	}
 
 	protected void RefreshCollection() => Repopulate();
 	protected void RefreshCollection(object sender) => Repopulate();
-	protected void RefreshCollection(object sender, NotifyCollectionChangedEventArgs e)
-	{
+	protected void RefreshCollection(object sender, NotifyCollectionChangedEventArgs e) {
 		// observablecollection never has more than one item in each of its event args
-		switch(e.Action) {
+		switch (e.Action) {
 			case NotifyCollectionChangedAction.Add:
 				Insert((TCellModel)e.NewItems[0], e.NewStartingIndex);
 				break;
@@ -171,8 +164,7 @@ public abstract class ListView<TModel, TCellModel> : ViewBehaviour<TModel>
 		}
 	}
 
-	protected override void Refresh(object sender, string propertyChanged)
-	{
+	protected override void Refresh(object sender, string propertyChanged) {
 		base.Refresh(sender, propertyChanged);
 
 		// deliberately do nothing here. don't react to property changes on the list (such as count changing). we want to handle it efficiently in RefreshCollection

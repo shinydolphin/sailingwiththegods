@@ -73,7 +73,7 @@ public class RepairsViewModel : Model
 
 }
 
-public class RepairsView : ViewBehaviour<RepairsViewModel>
+public class RepairsView : PopupView<RepairsViewModel>
 {
 	GameSession Session => Globals.Game.Session;
 

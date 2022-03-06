@@ -30,9 +30,7 @@ public class SliderView : ViewBehaviour<IValueModel<float>>
 {
 	[SerializeField] Slider Slider = null;
 
-	public override void Bind(IValueModel<float> model) {
-		base.Bind(model);
-
+	private void Awake() {
 		if (Slider == null) {
 			Slider = GetComponent<Slider>();
 		}

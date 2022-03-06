@@ -41,33 +41,55 @@ public abstract class UISystem : MonoBehaviour
 
 	#region Generic cases for any view passed in
 
-	protected void Add<T>(T c) where T : ViewBehaviour 
-	{
+	public void Add<T>(T c) where T : ViewBehaviour {
+		if (_Views.ContainsKey(typeof(T))) {
+			_Views.Remove(typeof(T));
+			Debug.Log("Replacing UI view registration: " + typeof(T));
+		}
+
 		_Views.Add(typeof(T), c);
 	}
 
-	public T Show<T>(T view) where T : ViewBehaviour
-	{
+	public void Remove<T>(T c) where T : ViewBehaviour {
+		Hide<T>();
+		_Views.Remove(typeof(T));
+	}
+
+	public T Show<T>(T view) where T : ViewBehaviour {
 		view?.gameObject.SetActive(true);
+		if (view is ITransitionIn t) {
+			t.TransitionIn();
+		}
 		return view;
 	}
 
 	public T Show<T, TModel>(T view, TModel model)
-		where T : ViewBehaviour<TModel>
-		where TModel : INotifyPropertyChanged 
-	{
+	  where T : ViewBehaviour<TModel>
+	  where TModel : INotifyPropertyChanged {
 		view.Bind(model);
 		Show(view);
 		return view;
 	}
 
-	public void Hide<T>(T view) where T : ViewBehaviour
-	{
-		view?.gameObject.SetActive(false);
+	public void Hide<T>(T view, Action onHidden = null) where T : ViewBehaviour {
+		if (view is ITransitionOut t) {
+			t.TransitionOut(() => {
+				if (view != null && view.gameObject != null) {
+					view.gameObject.SetActive(false);
+				}
+				onHidden?.Invoke();
+			});
+		}
+		else {
+			if (view != null && view.gameObject != null) {
+				view.gameObject.SetActive(false);
+			}
+			onHidden?.Invoke();
+		}
 	}
 
 	public void HideAll() {
-		foreach(var view in _Views) {
+		foreach (var view in _Views) {
 			Hide(view.Value);
 		}
 	}
@@ -82,55 +104,45 @@ public abstract class UISystem : MonoBehaviour
 		.Where(v => v != null && v.gameObject.activeSelf)
 		.ToArray();
 
-	public T Show<T>() where T : ViewBehaviour 
-	{
+	public T Show<T>() where T : ViewBehaviour {
 		var view = Get<T>();
 		if (view == null) Debug.LogError("No view " + typeof(T) + " is registered.");
 		Show(view);
 		return view;
 	}
 
-	public T Show<T, TModel>(TModel model) 
-		where T : ViewBehaviour<TModel>
-		where TModel : INotifyPropertyChanged	
-	{
+	public T Show<T, TModel>(TModel model)
+	  where T : ViewBehaviour<TModel>
+	  where TModel : INotifyPropertyChanged {
 		var view = Get<T>();
 		if (view == null) Debug.LogError("No view " + typeof(T) + " is registered.");
 		Show(view, model);
 		return view;
 	}
 
-	public void Hide<T>() where T : ViewBehaviour
-	{
-		Hide(Get<T>());
+	public void Hide<T>(Action onHidden = null) where T : ViewBehaviour {
+		Hide(Get<T>(), onHidden);
 	}
 
-	public void Toggle<T>() where T : ViewBehaviour
-	{
-		if(IsShown<T>())
-		{
+	public void Toggle<T>() where T : ViewBehaviour {
+		if (IsShown<T>()) {
 			Hide<T>();
 		}
-		else
-		{
+		else {
 			Show<T>();
 		}
 	}
 
-	public bool IsShown<T>() where T : ViewBehaviour
-	{
+	public bool IsShown<T>() where T : ViewBehaviour {
 		var result = Get<T>()?.gameObject.activeSelf;
 		return result.HasValue ? result.Value : false;
 	}
 
-	public T Get<T>() where T : ViewBehaviour
-	{
-		if (_Views.ContainsKey(typeof(T)))
-		{
+	public T Get<T>() where T : ViewBehaviour {
+		if (_Views.ContainsKey(typeof(T))) {
 			return _Views[typeof(T)] as T;
 		}
-		else
-		{
+		else {
 			return null;
 		}
 	}

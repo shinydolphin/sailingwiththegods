@@ -33,31 +33,28 @@ public class DelegateHandle : IDisposable
 
 	bool IsSubscribed;
 
-	public DelegateHandle(Action subscribe, Action unsubscribe) 
-	{
+	public DelegateHandle(Action subscribe, Action unsubscribe, bool enabled) {
 		Subscribe = subscribe;
 		Unsubscribe = unsubscribe;
 
-		Enable();
+		if (enabled) {
+			Enable();
+		}
 	}
 
-	public void Enable() 
-	{
-		if(!IsSubscribed) 
-		{
+	public void Enable() {
+		if (!IsSubscribed) {
 			Subscribe?.Invoke();
 			IsSubscribed = true;
 		}
 	}
 
-	public void Disable() 
-	{
+	public void Disable() {
 		Unsubscribe?.Invoke();
 		IsSubscribed = false;
 	}
 
-	public void Dispose() 
-	{
+	public void Dispose() {
 		Disable();
 	}
 }

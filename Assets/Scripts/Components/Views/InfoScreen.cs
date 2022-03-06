@@ -25,7 +25,7 @@ public class InfoScreenModel : Model
 	public Action OnClose { get => _OnClose; set { _OnClose = value; Notify(); } }
 }
 
-public class InfoScreen : ViewBehaviour<InfoScreenModel>
+public class InfoScreen : PopupView<InfoScreenModel>
 {
 	[SerializeField] ImageView Icon = null;
 	[SerializeField] StringView Title = null;

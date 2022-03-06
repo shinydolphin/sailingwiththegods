@@ -30,7 +30,7 @@ using System.Text;
 /// Takes ownership of unity objects and IDisposables so it can dispose them all at once during Dispose.
 /// Gracefully handles adding and removing twice when adding/removing the same object instance.
 /// </summary>
-public class Owner : IDisposable
+public class Owner : IDisposableOwner, IDisposable
 {
 	HashSet<UnityEngine.Object> OwnedUnityObjs = new HashSet<UnityEngine.Object>();
 	HashSet<IDisposable> OwnedDisposables = new HashSet<IDisposable>();
@@ -38,8 +38,7 @@ public class Owner : IDisposable
 	/// <summary>
 	/// Take ownership of this Unity object. It will be automatically destroyed on Dispose.
 	/// </summary>
-	public UnityEngine.Object Own(UnityEngine.Object obj)
-	{
+	public UnityEngine.Object Own(UnityEngine.Object obj) {
 		OwnedUnityObjs.Add(obj);
 		return obj;
 	}
@@ -47,8 +46,7 @@ public class Owner : IDisposable
 	/// <summary>
 	/// Take ownership of this IDisposable. It will be automatically Disposed on Dispose.
 	/// </summary>
-	public T Own<T>(T obj) where T : IDisposable
-	{
+	public T Own<T>(T obj) where T : IDisposable {
 		OwnedDisposables.Add(obj);
 		return obj;
 	}
@@ -56,8 +54,7 @@ public class Owner : IDisposable
 	/// <summary>
 	/// Transfer ownership of this Unity object to someone else. It will no longer be tracked by this group.
 	/// </summary>
-	public UnityEngine.Object Move(UnityEngine.Object obj)
-	{
+	public UnityEngine.Object Move(UnityEngine.Object obj) {
 		OwnedUnityObjs.Remove(obj);
 		return obj;
 	}
@@ -65,8 +62,7 @@ public class Owner : IDisposable
 	/// <summary>
 	/// Transfer ownership of this IDisposable to someone else. It will no longer be tracked by this group.
 	/// </summary>
-	public T Move<T>(T obj) where T : IDisposable
-	{
+	public T Move<T>(T obj) where T : IDisposable {
 		OwnedDisposables.Remove(obj);
 		return obj;
 	}
@@ -74,18 +70,30 @@ public class Owner : IDisposable
 	/// <summary>
 	/// Dispose every resource owned by this group.
 	/// </summary>
-	public void Dispose()
-	{
-		foreach (var obj in OwnedUnityObjs)
-		{
+	virtual public void Dispose() {
+		foreach (var obj in OwnedUnityObjs) {
 			UnityEngine.Object.Destroy(obj);
 		}
 		OwnedUnityObjs.Clear();
 
-		foreach (var obj in OwnedDisposables)
-		{
+		foreach (var obj in OwnedDisposables) {
 			obj.Dispose();
 		}
 		OwnedDisposables.Clear();
+	}
+}
+
+public interface IDisposableOwner
+{
+	T Own<T>(T obj) where T : IDisposable;
+	T Move<T>(T obj) where T : IDisposable;
+}
+
+public static class DisposableExtensions
+{
+	public static T DisposeWith<T>(this T self, IDisposableOwner owner)
+	  where T : IDisposable {
+		owner?.Own(self);
+		return self;
 	}
 }

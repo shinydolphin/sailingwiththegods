@@ -32,32 +32,31 @@ using UnityEngine.Events;
 /// A MonoBehaviour that manages the lifetime and ownership of resources it allocates and automatically cleans up after itself OnDestroy.
 /// It also cleans up event listeners assigned through its interface, and automatically enables/disables the events in OnEnable/OnDisable.
 /// </summary>
-public abstract class OwnerBehaviour : MonoBehaviour
+public abstract class OwnerBehaviour : MonoBehaviour, IDisposableOwner
 {
 	List<Action> Cleanups = new List<Action>();
+
+	// start events disabled because they'll be turned on by OnEnable() shortly after instantiation
+	EventOwner UnityEventOwner = new EventOwner(enabled: false);
+
 	Owner Owned = new Owner();
-	EventOwner UnityEventOwner = new EventOwner();
 	Registry Registry = new Registry();
 
 	#region Unity Messages
 
-	protected virtual void OnEnable()
-	{
+	protected virtual void OnEnable() {
 		UnityEventOwner.Enable();
 	}
 
-	protected virtual void OnDisable()
-	{
+	protected virtual void OnDisable() {
 		UnityEventOwner.Disable();
 	}
 
-	protected virtual void OnDestroy()
-	{
+	protected virtual void OnDestroy() {
 		Owned.Dispose();
 		UnityEventOwner.Dispose();
 
-		foreach (var todo in Cleanups)
-		{
+		foreach (var todo in Cleanups) {
 			todo();
 		}
 	}
@@ -66,43 +65,35 @@ public abstract class OwnerBehaviour : MonoBehaviour
 
 	#region Events
 
-	protected void Subscribe(UnityEvent e, UnityAction action)
-	{
+	protected void Subscribe(UnityEvent e, UnityAction action) {
 		UnityEventOwner.Subscribe(e, action);
 	}
 
-	protected void Unsubscribe(UnityEvent e, UnityAction action)
-	{
+	protected void Unsubscribe(UnityEvent e, UnityAction action) {
 		UnityEventOwner.Unsubscribe(e, action);
 	}
 
-	protected void Subscribe<T>(UnityEvent<T> e, UnityAction<T> action)
-	{
+	protected void Subscribe<T>(UnityEvent<T> e, UnityAction<T> action) {
 		UnityEventOwner.Subscribe<T>(e, action);
 	}
 
-	protected void Unsubscribe<T>(UnityEvent<T> e, UnityAction<T> action)
-	{
+	protected void Unsubscribe<T>(UnityEvent<T> e, UnityAction<T> action) {
 		UnityEventOwner.Unsubscribe<T>(e, action);
 	}
 
-	protected void Subscribe<T>(Events.EventDelegate<T> del) where T : GameEvent
-	{
+	protected void Subscribe<T>(Events.EventDelegate<T> del) where T : GameEvent {
 		UnityEventOwner.Subscribe(del);
 	}
 
-	protected void Unsubscribe<T>(Events.EventDelegate<T> del) where T : GameEvent
-	{
+	protected void Unsubscribe<T>(Events.EventDelegate<T> del) where T : GameEvent {
 		UnityEventOwner.Unsubscribe(del);
 	}
 
-	protected DelegateHandle Subscribe(Action subscribe, Action unsubscribe) 
-	{
+	protected DelegateHandle Subscribe(Action subscribe, Action unsubscribe) {
 		return UnityEventOwner.Subscribe(subscribe, unsubscribe);
 	}
 
-	public void Unsubscribe(DelegateHandle handle) 
-	{
+	public void Unsubscribe(DelegateHandle handle) {
 		UnityEventOwner.Unsubscribe(handle);
 	}
 
@@ -110,13 +101,11 @@ public abstract class OwnerBehaviour : MonoBehaviour
 
 	#region Generic Cleanup (very similar to C++ destructors)
 
-	protected void DoOnDestroy(Action task)
-	{
+	protected void DoOnDestroy(Action task) {
 		Cleanups.Add(task);
 	}
 
-	protected void SetupAndDoOnDestroy(Action setup, Action onDestroy)
-	{
+	protected void SetupAndDoOnDestroy(Action setup, Action onDestroy) {
 		setup();
 		DoOnDestroy(onDestroy);
 	}
@@ -125,35 +114,39 @@ public abstract class OwnerBehaviour : MonoBehaviour
 
 	#region Object Ownership
 
+	protected IEnumerable<T> Own<T>(IEnumerable<T> list)
+	  where T : UnityEngine.Object {
+		foreach (var item in list) {
+			Owned.Own(item);
+		}
+		return list;
+	}
+
 	/// <summary>
 	/// Take ownership of this Unity object. It will be automatically destroyed with the MonoBehaviour.
 	/// </summary>
-	protected UnityEngine.Object Own(UnityEngine.Object obj)
-	{
+	protected UnityEngine.Object Own(UnityEngine.Object obj) {
 		return Owned.Own(obj);
 	}
 
 	/// <summary>
 	/// Take ownership of this IDisposable. It will be automatically Disposed with the MonoBehaviour.
 	/// </summary>
-	protected T Own<T>(T obj) where T : IDisposable
-	{
+	public T Own<T>(T obj) where T : IDisposable {
 		return Owned.Own(obj);
 	}
 
 	/// <summary>
 	/// Transfer ownership of this Unity object to someone else. It will no longer be tracked by this MonoBehaviour.
 	/// </summary>
-	protected UnityEngine.Object Move(UnityEngine.Object obj)
-	{
+	protected UnityEngine.Object Move(UnityEngine.Object obj) {
 		return Owned.Move(obj);
 	}
 
 	/// <summary>
 	/// Transfer ownership of this IDisposable to someone else. It will no longer be tracked by this MonoBehaviour.
 	/// </summary>
-	protected T Move<T>(T obj) where T : IDisposable
-	{
+	public T Move<T>(T obj) where T : IDisposable {
 		return Owned.Move(obj);
 	}
 
@@ -161,20 +154,20 @@ public abstract class OwnerBehaviour : MonoBehaviour
 
 	#region Registry
 
-	public void Register<T>(T obj)
-	{
+	public void Register<T>(T obj) {
 		Registry.Register(obj);
 	}
 
-	public void Unregister<T>(T obj)
-	{
+	public void Unregister<T>(T obj) {
 		Registry.Unregister(obj);
 	}
 
 	public bool Has<T>() => Registry.Has<T>();
-	public T Get<T>()
-	{
+	public T Get<T>() {
 		return Registry.Get<T>();
+	}
+	public T GetIfHas<T>() {
+		return Registry.GetIfHas<T>();
 	}
 
 	#endregion

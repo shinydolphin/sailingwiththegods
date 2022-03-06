@@ -39,7 +39,16 @@ public class ButtonView : ViewBehaviour<IValueModel<ButtonViewModel>>
 {
 	[SerializeField] StringView Label = null;
 	[SerializeField] Button Button = null;
-	
+
+	private void Awake() {
+		if (Label == null) {
+			Label = GetComponentInChildren<StringView>();
+		}
+		if (Button == null) {
+			Button = GetComponent<Button>();
+		}
+	}
+
 	private void Start() {
 		Subscribe(Button.onClick, OnClick);
 	}
@@ -47,20 +56,12 @@ public class ButtonView : ViewBehaviour<IValueModel<ButtonViewModel>>
 	public override void Bind(IValueModel<ButtonViewModel> model) {
 		base.Bind(model);
 
-		if (Label == null) {
-			Label = GetComponentInChildren<StringView>();
-		}
-		if (Button == null) {
-			Button = GetComponent<Button>();
-		}
-
-		if (model == null) 
-		{
+		if (model == null) {
 			Debug.LogWarning("Tried to bind view to a null model on " + name);
 			return;
 		}
 
-		if(Model.Value.Label != null) {
+		if (Model.Value.Label != null) {
 			Label?.Bind(new BoundModel<string>(Model.Value, nameof(Model.Value.Label)));
 		}
 	}
@@ -69,7 +70,7 @@ public class ButtonView : ViewBehaviour<IValueModel<ButtonViewModel>>
 		base.Refresh(sender, propertyChanged);
 
 		// allow the ButtonViewModel contained in the IValueModel wrapper to be changed to a new instance and have the label update
-		if(sender == Model) {
+		if (sender == Model) {
 			if (Model.Value.Label != null) {
 				Label?.Bind(new BoundModel<string>(Model.Value, nameof(Model.Value.Label)));
 			}

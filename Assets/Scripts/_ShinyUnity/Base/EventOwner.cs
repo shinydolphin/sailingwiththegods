@@ -34,6 +34,11 @@ using UnityEngine.Events;
 /// </summary>
 public class EventOwner : IDisposable
 {
+	bool IsEnabled = true;
+
+	public EventOwner() { }
+	public EventOwner(bool enabled) { IsEnabled = enabled; }
+
 	interface IUnityEventInfo
 	{
 		void Subscribe();
@@ -45,13 +50,11 @@ public class EventOwner : IDisposable
 		public UnityEvent<T> Event;
 		public UnityAction<T> Action;
 
-		public void Subscribe()
-		{
+		public void Subscribe() {
 			Event.AddListener(Action);
 		}
 
-		public void Unsubscribe()
-		{
+		public void Unsubscribe() {
 			Event.RemoveListener(Action);
 		}
 	}
@@ -61,13 +64,11 @@ public class EventOwner : IDisposable
 		public UnityEvent Event;
 		public UnityAction Action;
 
-		public void Subscribe()
-		{
+		public void Subscribe() {
 			Event.AddListener(Action);
 		}
 
-		public void Unsubscribe()
-		{
+		public void Unsubscribe() {
 			Event.RemoveListener(Action);
 		}
 	}
@@ -82,121 +83,107 @@ public class EventOwner : IDisposable
 	Dictionary<System.Delegate, EventInfo> Delegates = new Dictionary<System.Delegate, EventInfo>();
 	HashSet<DelegateHandle> DelegateHandles = new HashSet<DelegateHandle>();
 
-	public void Subscribe<T>(UnityEvent<T> e, UnityAction<T> action)
-	{
+	public void Subscribe<T>(UnityEvent<T> e, UnityAction<T> action) {
 		var info = new UnityEventInfo<T> { Event = e, Action = action };
-		if (!UnityEvents.Contains(info))
-		{
-			e.AddListener(action);
+		if (!UnityEvents.Contains(info)) {
+			if (IsEnabled) {
+				e.AddListener(action);
+			}
 			UnityEvents.Add(info);
 		}
 	}
 
-	public void Unsubscribe<T>(UnityEvent<T> e, UnityAction<T> action)
-	{
+	public void Unsubscribe<T>(UnityEvent<T> e, UnityAction<T> action) {
 		var info = new UnityEventInfo<T> { Event = e, Action = action };
-		if (UnityEvents.Contains(info))
-		{
+		if (UnityEvents.Contains(info)) {
 			e.RemoveListener(action);
 			UnityEvents.Remove(info);
 		}
 	}
 
-	public void Subscribe(UnityEvent e, UnityAction action)
-	{
+	public void Subscribe(UnityEvent e, UnityAction action) {
 		var info = new UnityEventInfo { Event = e, Action = action };
-		if (!UnityEvents.Contains(info))
-		{
-			e.AddListener(action);
+		if (!UnityEvents.Contains(info)) {
+			if (IsEnabled) {
+				e.AddListener(action);
+			}
 			UnityEvents.Add(info);
 		}
 	}
 
-	public void Unsubscribe(UnityEvent e, UnityAction action)
-	{
+	public void Unsubscribe(UnityEvent e, UnityAction action) {
 		var info = new UnityEventInfo { Event = e, Action = action };
-		if (UnityEvents.Contains(info))
-		{
+		if (UnityEvents.Contains(info)) {
 			e.RemoveListener(action);
 			UnityEvents.Remove(info);
 		}
 	}
 
-	public void Subscribe<T>(Events.EventDelegate<T> del) where T : GameEvent
-	{
-		if (!Delegates.ContainsKey(del))
-		{
-			var info = new EventInfo
-			{
+	public void Subscribe<T>(Events.EventDelegate<T> del) where T : GameEvent {
+		if (!Delegates.ContainsKey(del)) {
+			var info = new EventInfo {
 				Type = typeof(T),
 				Delegate = (e) => del((T)e)
 			};
 
 			Delegates.Add(del, info);
-			Events.Instance.AddListener(info.Type, info.Delegate);
+
+			if (IsEnabled) {
+				Events.Instance.AddListener(info.Type, info.Delegate);
+			}
 		}
 	}
 
-	public void Unsubscribe<T>(Events.EventDelegate<T> del) where T : GameEvent
-	{
-		if (Delegates.ContainsKey(del))
-		{
+	public void Unsubscribe<T>(Events.EventDelegate<T> del) where T : GameEvent {
+		if (Delegates.ContainsKey(del)) {
 			var info = Delegates[del];
 			Events.Instance.RemoveListener(info.Type, info.Delegate);
 			Delegates.Remove(del);
 		}
 	}
-	
-	public DelegateHandle Subscribe(Action subscribe, Action unsubscribe)
-	{
-		var handle = new DelegateHandle(subscribe, unsubscribe);
+
+	public DelegateHandle Subscribe(Action subscribe, Action unsubscribe) {
+		var handle = new DelegateHandle(subscribe, unsubscribe, IsEnabled);
 		DelegateHandles.Add(handle);
 		return handle;
 	}
 
-	public void Unsubscribe(DelegateHandle handle) 
-	{
-		if(handle != null) 
-		{
+	public void Unsubscribe(DelegateHandle handle) {
+		if (handle != null) {
 			handle.Dispose();
 			DelegateHandles.Remove(handle);
 		}
 	}
 
-	public void Enable()
-	{
-		foreach (var e in UnityEvents)
-		{
+	public void Enable() {
+		IsEnabled = true;
+
+		foreach (var e in UnityEvents) {
 			e.Subscribe();
 		}
-		foreach (var kvp in Delegates)
-		{
+		foreach (var kvp in Delegates) {
 			Events.Instance.AddListener(kvp.Value.Type, kvp.Value.Delegate);
 		}
-		foreach(var d in DelegateHandles) 
-		{
+		foreach (var d in DelegateHandles) {
 			d.Enable();
 		}
 	}
 
-	public void Disable()
-	{
-		foreach (var e in UnityEvents)
-		{
+	public void Disable() {
+		IsEnabled = false;
+
+		foreach (var e in UnityEvents) {
 			e.Unsubscribe();
 		}
-		foreach (var kvp in Delegates)
-		{
+		foreach (var kvp in Delegates) {
 			Events.Instance.RemoveListener(kvp.Value.Type, kvp.Value.Delegate);
 		}
-		foreach (var d in DelegateHandles) 
-		{
+		foreach (var d in DelegateHandles) {
 			d.Disable();
 		}
 	}
 
-	public void Dispose()
-	{
+	public void Dispose() {
 		Disable();
 		UnityEvents.Clear();
 		Delegates.Clear();

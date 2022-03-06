@@ -76,7 +76,7 @@ public class LoanViewModel : Model
 	}
 }
 
-public class LoanView : ViewBehaviour<LoanViewModel>
+public class LoanView : PopupView<LoanViewModel>
 {
 	// subscreens
 	[SerializeField] CurrentLoanView CurrentLoanView = null;

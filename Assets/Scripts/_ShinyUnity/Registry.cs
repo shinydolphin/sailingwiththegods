@@ -58,5 +58,10 @@ public class Registry
 		}
 		else return default;
 	}
+
+	public T GetIfHas<T>() {
+		if (Has<T>()) return Get<T>();
+		else return default(T);
+	}
 }
 

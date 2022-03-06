@@ -43,9 +43,8 @@ public abstract class ViewBehaviour<TModel> : ViewBehaviour where TModel : INoti
 	public TModel Model { get; private set; }
 	virtual public void Bind(TModel model) {
 		Model = model;
-		
-		if (model == null)
-		{
+
+		if (model == null) {
 			Debug.LogWarning("Tried to bind view to a null model on " + name);
 			return;
 		}
@@ -54,7 +53,7 @@ public abstract class ViewBehaviour<TModel> : ViewBehaviour where TModel : INoti
 		ModelSubscription = Subscribe(() => model.PropertyChanged += OnPropertyChanged, () => model.PropertyChanged -= OnPropertyChanged);
 
 		// wait for the first time we activate if we're disabled on bind. we might be inside something that needs to activate the correct state
-		if(isActiveAndEnabled) {
+		if (isActiveAndEnabled) {
 			Refresh();
 		}
 	}
@@ -62,13 +61,12 @@ public abstract class ViewBehaviour<TModel> : ViewBehaviour where TModel : INoti
 	protected override void OnEnable() {
 		base.OnEnable();
 
-		if(Model != null) {
+		if (Model != null) {
 			Refresh();
 		}
 	}
 
-	void OnPropertyChanged(object sender, PropertyChangedEventArgs e) 
-	{
+	void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
 		Refresh(sender, e?.PropertyName);
 	}
 

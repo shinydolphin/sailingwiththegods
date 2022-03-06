@@ -245,6 +245,7 @@ GameObject:
   - component: {fileID: 171698363502315932}
   - component: {fileID: 3458597904087057461}
   - component: {fileID: 7410504914775313842}
+  - component: {fileID: 7667184857358282913}
   m_Layer: 5
   m_Name: Dialog Box
   m_TagString: Untagged
@@ -313,6 +314,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &7667184857358282913
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666617062456260108}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2206056538488339610
 GameObject:
   m_ObjectHideFlags: 0
@@ -1810,6 +1823,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 75b724bc607649548bbb6b2ee031c5be, type: 3}
+--- !u!224 &3420352298534902104 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1190375701273239632, guid: 75b724bc607649548bbb6b2ee031c5be,
+    type: 3}
+  m_PrefabInstance: {fileID: 4607912698657175816}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &5431532670476670619 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8399835629546385299, guid: 75b724bc607649548bbb6b2ee031c5be,
@@ -1822,9 +1841,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!224 &3420352298534902104 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 1190375701273239632, guid: 75b724bc607649548bbb6b2ee031c5be,
-    type: 3}
-  m_PrefabInstance: {fileID: 4607912698657175816}
-  m_PrefabAsset: {fileID: 0}

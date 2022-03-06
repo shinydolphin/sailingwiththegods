@@ -7,7 +7,7 @@ using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TavernCityView : ViewBehaviour<CityViewModel>
+public class TavernCityView : PopupView<CityViewModel>
 {
 	UISystem UI => Globals.UI;
 

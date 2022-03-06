@@ -140,12 +140,16 @@ public class GameSession
 
 	public void Update() {
 		UpdateCameraRotation();
-		//DebugHotkeys();
+		DebugHotkeys();
 	}
 
 	void DebugHotkeys() {
 		// uncomment to use debug hotkeys
 #if UNITY_EDITOR
+		if(Input.GetKeyUp(KeyCode.E)) {
+			UI.Show<InfoScreen, InfoScreenModel>(new InfoScreenModel { Message = " Panda" });
+		}
+
 		//if(Input.GetKeyUp(KeyCode.E)) {
 		//	var storm = new StormAtSea();
 		//	storm.Init(this, playerShipVariables.ship, new ShipSpeedModifiers(), playerShip.transform, 1);
