@@ -4,7 +4,7 @@ using System.Linq;
 
 public class HeightmapFromTexture
 {
-	[MenuItem("Terrain/Heightmap From Texture")]
+	[MenuItem("SWTG/Terrain/Heightmap From Texture")]
 	public static void ApplyHeightmap() {
 		var terrain = Selection.objects.FirstOrDefault(o => o is TerrainData) as TerrainData;
 		var heightmap = Selection.objects.FirstOrDefault(o => o is Texture2D) as Texture2D;

@@ -9,14 +9,13 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 
+#pragma warning disable 0618 
+
 /// <summary>
 /// Split terrain.
 /// </summary>
 public class SplitTerrain : EditorWindow
 {
-
-	string num = "4";
-
 	List<TerrainData> terrainData = new List<TerrainData>();
 	List<GameObject> terrainGo = new List<GameObject>();
 
@@ -25,7 +24,7 @@ public class SplitTerrain : EditorWindow
 	const int terrainsCount = 4;
 
 	// Add submenu
-	[MenuItem("Dvornik/Terrain/Split Terrain")]
+	[MenuItem("SWTG/Terrain/Split Terrain")]
 	static void Init() {
 
 		// Get existing open window or if none, make a new one:
