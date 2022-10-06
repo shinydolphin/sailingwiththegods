@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 
-#pragma warning disable 0618 
+#pragma warning disable 0618
 
 /// <summary>
 /// Split terrain.
@@ -68,7 +68,7 @@ public class SplitTerrain : EditorWindow
 			return;
 		}
 
-		//Split terrain 
+		//Split terrain
 		for (int i = 0; i < terrainsCount; i++) {
 
 			EditorUtility.DisplayProgressBar("Split terrain", "Process " + i, (float)i / terrainsCount);
@@ -112,10 +112,10 @@ public class SplitTerrain : EditorWindow
 
 			#endregion
 
-			//Start processing it			
+			//Start processing it
 
 			// Translate peace to position
-			#region translate peace to right position 
+			#region translate peace to right position
 
 			Vector3 parentPosition = parentTerrain.GetPosition();
 
@@ -146,7 +146,7 @@ public class SplitTerrain : EditorWindow
 
 			Debug.Log("Split height");
 
-			//Copy heightmap											
+			//Copy heightmap
 			td.heightmapResolution = parentTerrain.terrainData.heightmapResolution / terraPeaces;
 
 			//Keep y same
@@ -241,7 +241,7 @@ public class SplitTerrain : EditorWindow
 			#endregion
 
 			// Split splat map
-			#region split splat map	
+			#region split splat map
 
 			td.alphamapResolution = parentTerrain.terrainData.alphamapResolution / terraPeaces;
 
@@ -328,7 +328,7 @@ public class SplitTerrain : EditorWindow
 			#endregion
 
 			// Split detail map
-			#region split detail map	
+			#region split detail map
 
 			td.SetDetailResolution(parentTerrain.terrainData.detailResolution / terraPeaces, 8);
 
@@ -365,7 +365,7 @@ public class SplitTerrain : EditorWindow
 					endY = parentTerrain.terrainData.detailResolution / terraPeaces;
 				}
 
-				// iterate				
+				// iterate
 				for (int x = startX; x < endX; x++) {
 
 					EditorUtility.DisplayProgressBar("Split terrain", "Split detail", (float)x / (endX - startX));
@@ -419,18 +419,18 @@ public class SplitTerrain : EditorWindow
 
 				EditorUtility.DisplayProgressBar("Split terrain", "Split trees ", (float)t / parentTerrain.terrainData.treeInstances.Length);
 
-				// Get tree instance					
+				// Get tree instance
 				TreeInstance ti = parentTerrain.terrainData.treeInstances[t];
 
-				// First section	
+				// First section
 				if (i == 0 &&
 					 ti.position.x > 0f && ti.position.x < 0.5f &&
 					 ti.position.z > 0f && ti.position.z < 0.5f
 					) {
-					// Recalculate new tree position	
+					// Recalculate new tree position
 					ti.position = new Vector3(ti.position.x * 2f, ti.position.y, ti.position.z * 2f);
 
-					// Add tree instance						
+					// Add tree instance
 					genTer.AddTreeInstance(ti);
 				}
 
@@ -439,10 +439,10 @@ public class SplitTerrain : EditorWindow
 					 ti.position.x > 0.0f && ti.position.x < 0.5f &&
 					 ti.position.z >= 0.5f && ti.position.z <= 1.0f
 					) {
-					// Recalculate new tree position	
+					// Recalculate new tree position
 					ti.position = new Vector3((ti.position.x) * 2f, ti.position.y, (ti.position.z - 0.5f) * 2f);
 
-					// Add tree instance						
+					// Add tree instance
 					genTer.AddTreeInstance(ti);
 				}
 
@@ -451,10 +451,10 @@ public class SplitTerrain : EditorWindow
 					 ti.position.x >= 0.5f && ti.position.x <= 1.0f &&
 					 ti.position.z > 0.0f && ti.position.z < 0.5f
 					) {
-					// Recalculate new tree position	
+					// Recalculate new tree position
 					ti.position = new Vector3((ti.position.x - 0.5f) * 2f, ti.position.y, (ti.position.z) * 2f);
 
-					// Add tree instance						
+					// Add tree instance
 					genTer.AddTreeInstance(ti);
 				}
 
@@ -463,10 +463,10 @@ public class SplitTerrain : EditorWindow
 					 ti.position.x >= 0.5f && ti.position.x <= 1.0f &&
 					 ti.position.z >= 0.5f && ti.position.z <= 1.0f
 					) {
-					// Recalculate new tree position	
+					// Recalculate new tree position
 					ti.position = new Vector3((ti.position.x - 0.5f) * 2f, ti.position.y, (ti.position.z - 0.5f) * 2f);
 
-					// Add tree instance						
+					// Add tree instance
 					genTer.AddTreeInstance(ti);
 				}
 
