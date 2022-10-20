@@ -10,7 +10,7 @@ public class World : MonoBehaviour
 	const int waterLayerMask = 1 << 4;
 
 	// this number is fiddly. i just ran several times until i got results that balanced no trees in water with trees on shoreline
-	const float waterLevel = 0.0029f;
+	const float waterLevel = 0.03f;
 
 
 	Game Game => Globals.Game;

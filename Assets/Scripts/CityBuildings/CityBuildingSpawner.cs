@@ -57,23 +57,18 @@ public class CityBuildingSpawner : MonoBehaviour
 
 	[Button]
 	void PlaceDock() {
-		const int maxTries = 100;
 		var buildingMask = LayerMask.GetMask("cityBuilding");
-		var (basePos, dir) = GetDockPos(transform.position);
+		var (dockPos, dir) = GetDockPos(transform.position);
 
-		Vector3 bestPos = basePos;
-		for (var i = 0; i < maxTries; i++) {
-			var randomPos = Utils.RandomPositionIn(new Bounds(basePos, new Vector3(1, 0, 1)));
-
-			if (!Physics.OverlapSphere(randomPos, BuildingRadius, buildingMask).Any()) {
-				bestPos = randomPos;
-				break;
-			}
+		// destroy any buildings that overlap the dock
+		var buildingsIntersecting = Physics.OverlapSphere(dockPos, BuildingRadius, buildingMask);
+		foreach(var building in buildingsIntersecting) {
+			Destroy(building.gameObject);
 		}
 
 		GameObject.Instantiate(
 			DockPrefab,
-			bestPos,
+			dockPos,
 			Quaternion.LookRotation(dir, Vector3.up),
 			transform
 		);
