@@ -303,6 +303,7 @@ Drinkschaal (kylix/Sianaschaal); symposium scène. Aardewerk, Malibu schilder, A
 
 Elm leaf texture: https://freecutout.com/elm-leaf-texture/
 Elm bark texture: https://www.myfreetextures.com/two-great-elm-tree-bark-textures/  (My Free Textures License: https://www.myfreetextures.com/use-license/)
+Free Double Sided Shaders by Ciconia Studio: https://assetstore.unity.com/packages/vfx/shaders/free-double-sided-shaders-23087 (Standard Unity Asset Store EULA)
 
 
 3rd Party Libraries:
