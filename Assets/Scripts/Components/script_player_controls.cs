@@ -403,7 +403,7 @@ public class script_player_controls : MonoBehaviour
 
 				}
 				else if (hits.Any(h => h.collider.tag == "settlementClick") && 
-						hits.First(h => h.collider.tag == "settlementClick").collider.GetComponentInParent<script_settlement_functions>().thisSettlement == Session.currentSettlement &&
+						hits.First(h => h.collider.tag == "settlementClick").collider.GetComponentInParent<SettlementComponent>().thisSettlement == Session.currentSettlement &&
 						Session.currentSettlement != null) {
 
 					// TODO: should probably change it to some other color or something?
@@ -657,32 +657,32 @@ public class script_player_controls : MonoBehaviour
 		if (trigger.transform.tag == "settlement_dock_area") {
 			//Here we first figure out what kind of 'settlement' we arrive at, e.g. is it just a point of interest or is it a actual dockable settlement
 			//if it's a dockable settlement, then allow the docking menu to be accessed, otherwise run quest functions etc.
-			Debug.Log("Entered docking area for " + trigger.transform.parent.GetComponent<script_settlement_functions>().thisSettlement.name);
-			if (trigger.transform.parent.GetComponent<script_settlement_functions>().thisSettlement.typeOfSettlement == 1) {
+			Debug.Log("Entered docking area for " + trigger.transform.parent.GetComponent<SettlementComponent>().thisSettlement.name);
+			if (trigger.transform.parent.GetComponent<SettlementComponent>().thisSettlement.typeOfSettlement == 1) {
 				getSettlementDockButtonReady = true;
-				Session.currentSettlement = trigger.transform.parent.gameObject.GetComponent<script_settlement_functions>().thisSettlement;
+				Session.currentSettlement = trigger.transform.parent.gameObject.GetComponent<SettlementComponent>().thisSettlement;
 				Session.currentSettlementGameObject = trigger.transform.parent.gameObject;
 				Debug.Log("Adding known city from script_player_controls: " + Session.currentSettlement.name);
 				Session.playerShipVariables.ship.playerJournal.AddNewSettlementToLog(Session.currentSettlement.settlementID);
 				//If it is a point of interest then run quest functions but don't allow settlement resource access
 			}
-			else if (trigger.transform.parent.GetComponent<script_settlement_functions>().thisSettlement.typeOfSettlement == 0) {
+			else if (trigger.transform.parent.GetComponent<SettlementComponent>().thisSettlement.typeOfSettlement == 0) {
 				//change the current settlement to this location (normally this is done by opening the docking menu--but in this case there is no docking menu)
-				Session.currentSettlement = trigger.transform.parent.GetComponent<script_settlement_functions>().thisSettlement;
+				Session.currentSettlement = trigger.transform.parent.GetComponent<SettlementComponent>().thisSettlement;
 				//Check if current Settlement is part of the main quest line
 				Quests.CheckCityTriggers(Session.currentSettlement.settlementID);
 				Session.showNonPortDockButton = true;
 			}
 		}
 		if (trigger.transform.tag == "settlement") {
-			Debug.Log("Entering Area of: " + trigger.GetComponent<script_settlement_functions>().thisSettlement.name + ". And the current status of the ghost route is: " + World.playerGhostRoute.gameObject.activeSelf);
+			Debug.Log("Entering Area of: " + trigger.GetComponent<SettlementComponent>().thisSettlement.name + ". And the current status of the ghost route is: " + World.playerGhostRoute.gameObject.activeSelf);
 			//This zone is the larger zone of influence that triggers city specific messages to pop up in the captains log journal
-			Session.AddEntriesToCurrentLogPool(trigger.GetComponent<script_settlement_functions>().thisSettlement.settlementID);
+			Session.AddEntriesToCurrentLogPool(trigger.GetComponent<SettlementComponent>().thisSettlement.settlementID);
 			//We add the triggered settlement ID to the list of settlements to look for narrative bits from. In the OnTriggerExit() function, we remove them
-			World.activeSettlementInfluenceSphereList.Add(trigger.GetComponent<script_settlement_functions>().thisSettlement.settlementID);
+			World.activeSettlementInfluenceSphereList.Add(trigger.GetComponent<SettlementComponent>().thisSettlement.settlementID);
 			//If the player got lost asea and the memory map ghost route is turned off--check to see if we're enteringg friendly waters
 			if (World.playerGhostRoute.gameObject.activeSelf == false) {
-				CheckIfPlayerFoundKnownSettlementAndTurnGhostTrailBackOn(trigger.GetComponent<script_settlement_functions>().thisSettlement.settlementID);
+				CheckIfPlayerFoundKnownSettlementAndTurnGhostTrailBackOn(trigger.GetComponent<SettlementComponent>().thisSettlement.settlementID);
 			}
 		}
 
@@ -716,9 +716,9 @@ public class script_player_controls : MonoBehaviour
 		}
 		if (trigger.transform.tag == "settlement") {
 			//This zone is the larger zone of influence that triggers city specific messages to pop up in the captains log journal
-			Session.RemoveEntriesFromCurrentLogPool(trigger.GetComponent<script_settlement_functions>().thisSettlement.settlementID);
+			Session.RemoveEntriesFromCurrentLogPool(trigger.GetComponent<SettlementComponent>().thisSettlement.settlementID);
 			//We add the triggered settlement ID to the list of settlements to look for narrative bits from. In the OnTriggerExit() function, we remove them
-			World.activeSettlementInfluenceSphereList.Remove(trigger.GetComponent<script_settlement_functions>().thisSettlement.settlementID);
+			World.activeSettlementInfluenceSphereList.Remove(trigger.GetComponent<SettlementComponent>().thisSettlement.settlementID);
 		}
 
 		if (trigger.transform.tag == "AetolianRegionZone") {
@@ -1460,13 +1460,6 @@ public class script_player_controls : MonoBehaviour
 				break;
 			}
 		}
-	}
-
-	public bool IsOnLand(Vector3 pos) {
-		//set the layer mask to only check for collisions on layer 10 ("terrain")
-		int terrainLayerMask = 1 << 10;
-		const float radius = 0.1f;
-		return Physics.OverlapCapsule(pos, pos + Vector3.up * 10, radius, terrainLayerMask).Any();
 	}
 
 	public void DetectCoastLinesWithRayCasts() {

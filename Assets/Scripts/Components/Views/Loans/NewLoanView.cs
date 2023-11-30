@@ -21,10 +21,6 @@ public class NewLoanView : ViewBehaviour<LoanViewModel>
 		TakeLoanButton.Bind(ValueModel.New(new ButtonViewModel {
 			OnClick = Model.GUI_TakeOutLoan
 		}));
-	}
-
-	protected override void Refresh(object sender, string propertyChanged) {
-		base.Refresh(sender, propertyChanged);
 
 		Amount.Bind(ValueModel.New(Model.NewLoan.amount.ToString()));
 		Due.Bind(ValueModel.New(Model.NewLoan.numOfDaysUntilDue.ToString()));

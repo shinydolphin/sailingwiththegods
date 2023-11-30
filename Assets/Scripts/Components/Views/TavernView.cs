@@ -65,7 +65,7 @@ public class TavernCityViewModel : CityViewModel
 			//change location of beacon
 			Vector3 location = Vector3.zero;
 			for (int x = 0; x < World.settlement_masterList_parent.transform.childCount; x++)
-				if (World.settlement_masterList_parent.transform.GetChild(x).GetComponent<script_settlement_functions>().thisSettlement.settlementID == City.settlementID)
+				if (World.settlement_masterList_parent.transform.GetChild(x).GetComponent<SettlementComponent>().thisSettlement.settlementID == City.settlementID)
 					location = World.settlement_masterList_parent.transform.GetChild(x).position;
 			Session.ActivateNavigatorBeacon(World.navigatorBeacon, location);
 			Session.playerShipVariables.ship.currentNavigatorTarget = City.settlementID;

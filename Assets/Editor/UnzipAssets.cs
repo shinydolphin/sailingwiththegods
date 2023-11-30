@@ -8,7 +8,7 @@ using ICSharpCode.SharpZipLib.Zip;
 public class UnzipAssets : AssetPostprocessor
 {
 	static readonly (string, string, string)[] _knownZips = new[] {
-		("Assets/_Scenes/Main Scene/NavMesh.zip", "Assets/_Scenes/Main Scene/NavMesh.asset", "b0f7be0c2511a2b43967d4790f69b935")
+		("Assets/_Scenes/Additive/World/NavMesh.zip", "Assets/_Scenes/Additive/World/NavMesh.asset", "b0f7be0c2511a2b43967d4790f69b935")
 	};
 
 	[MenuItem("SWTG/Unzip Assets")]
