@@ -21,15 +21,11 @@ public static class RemoveUnderwaterTrees
 		// create a list to store the modified information
 		var newTreeInstances = new List<TreeInstance>();
 
-		// calculate the normalized Water Level
-		// this number is fiddly. i just ran several times until i got results that balanced no trees in water with trees on shoreline
-		var normalizedWaterLevel = 0.0029f;
-
 		// cycle through each tree
 		for (var t = 0; t < treeInstances.Length; t++ )
              {
 			// check if the tree Y is lower than the water level
-			if (treeInstances[t].position.y > normalizedWaterLevel) {
+			if (World.IsAboveWaterLevel(treeInstances[t].position)) {
 				// if not, add tree to newTreeInstances List
 				newTreeInstances.Add(treeInstances[t]);
 			}

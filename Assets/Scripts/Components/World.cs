@@ -1,9 +1,18 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.AI;
 
 public class World : MonoBehaviour
 {
+	//set the layer mask to only check for collisions on layer 10 ("terrain")
+	const int terrainLayerMask = 1 << 10;
+	const int waterLayerMask = 1 << 4;
+
+	// this number is fiddly. i just ran several times until i got results that balanced no trees in water with trees on shoreline
+	const float waterLevel = 0.03f;
+
+
 	Game Game => Globals.Game;
 	Notifications Notifications => Globals.Notifications;
 	Database Database => Globals.Database;
@@ -195,7 +204,7 @@ public class World : MonoBehaviour
 			currentSettlement.name = settlement.name;
 			currentSettlement.layer = 8;
 			//Debug.Log ("*********************************************  <<>>>" + currentSettlement.name + "   :   " + settlement.settlementID);
-			currentSettlement.GetComponent<script_settlement_functions>().thisSettlement = settlement;
+			currentSettlement.GetComponent<SettlementComponent>().thisSettlement = settlement;
 			currentSettlement.transform.SetParent(settlement_masterList_parent.transform);
 			settlement.theGameObject = currentSettlement;
 		}
@@ -292,7 +301,7 @@ public class World : MonoBehaviour
 
 			// use the center of the collider bounds instead of the position since the models are weirdly offset in many of these
 			currentCityLight.transform.SetParent(cityLightsParent.transform);
-			currentCityLight.transform.position = settlement_masterList_parent.transform.GetChild(i).GetComponent<script_settlement_functions>().anchor.position;
+			currentCityLight.transform.position = settlement_masterList_parent.transform.GetChild(i).GetComponent<SettlementComponent>().anchor.position;
 		}
 	}
 
@@ -344,6 +353,41 @@ public class World : MonoBehaviour
 			//else currentZoneParent.transform.GetChild (currentZone).GetChild(0).gameObject.SetActive(true);
 			//Debug.Log ("Turning water on?");
 		}
+
+	}
+
+	public static bool IsBelowWaterLevel(Vector3 pos) => !IsAboveWaterLevel(pos);
+	public static bool IsAboveWaterLevel(Vector3 pos) => pos.y > waterLevel;
+
+	// TODO: These aren't working yet. The math for the overlap check seems wrong. Use IsBelow/AboveWaterLevel instead for now
+	//public bool IsOnWater(Vector3 pos) => !IsOnLand(pos);
+	//public bool IsOnLand(Vector3 pos) {
+	//	const float radius = 0.5f;
+	//	return Physics.OverlapCapsule(pos.WithOffset(y: -1), pos + Vector3.up * 2, radius, terrainLayerMask | waterLayerMask)
+	//		.None(hit => (hit.gameObject.layer & waterLayerMask) > 0);
+	//}
+
+	public Vector3 GetNearestPosInWater(Vector3 pos, float maxDistance = 20) {
+		NavMeshHit hit;
+		if (NavMesh.SamplePosition(pos, out hit, maxDistance, NavMesh.AllAreas)) {
+			return hit.position;
+		}
+
+		// fallback to the pos passed in if we couldn't reach the shore within the distance
+		else return pos;
+	}
+	
+	public Vector3 GetPosOnLand(Vector3 pos) {
+
+		// include a small buffer of 0.5 on either side to cover both points too low and too high
+		const float maxDistance = 5;
+		var results = Physics.RaycastAll(new Ray(pos.WithOffset(y: maxDistance / 2), Vector3.down), maxDistance, terrainLayerMask);
+
+		// fall back to the given position if we can't find land
+		if (results.Any()) {
+			return results.First().point;
+		}
+		else return pos;
 
 	}
 

@@ -51,9 +51,44 @@ Olivia Te Kolste - SIRE student and 3D modeler, Emory University (2020-)
 Olivia Te Kolste is an undergraduate at Emory University, working on the Sailing with the Gods project through Emory's SIRE program for 2020-2021. Olivia will be working on developing historically informed 3D models of environments and mythical elements for the game.
 
 
-Josh Bowdoin – Game Design and Programming, Kennesaw State University (2021-)
+Josh Bowdoin – Game Design and Programming, Kennesaw State University (2021-2023)
 
 Josh Bowdoin is a student at Kennesaw State University (2021). He is programming the second version of the Greek singing contest Taverna game, which will be playable in port (version 5.6+). You can find out more about him and his work on his portfolio site: https://joshuabowdoin.com/.
+
+
+Aiden Gohlke – VR Kottabos, Game Design and Programming, Kennesaw State University (2022-2023)
+
+Aiden Gohlke is a student at Kennesaw State University, who worked on VR Kottabos, an independent mini-game related to Sailing with the Gods for fall 2022. He is continuing to work on the game.
+
+
+Donovan Lott – VR Kottabos, Game Design and Programming, Kennesaw State University (2022-2023)
+
+Donovan Lott is a student at Kennesaw State University, graduating spring 2023, who worked on VR Kottabos, an independent mini-game related to Sailing with the Gods for fall 2022. He is continuing to work on the game.
+
+
+Jake Lewis – VR Kottabos, Game Design and Programming, Kennesaw State University (2022)
+
+Jake Lewis is a student at Kennesaw State University, who worked on VR Kottabos, an independent mini-game related to Sailing with the Gods for fall 2022.
+
+
+Sasha Valeria – Game Design and Programming, Kennesaw State University (2022)
+
+Sasha Valeria is a student at Kennesaw State University, who worked on Sailing with the Gods for spring 2022. His work focused on an interactive pirate mini-game, and integrating the code of the team into a single build and bug testing. Sasha is a video game developer and writer.
+
+
+Noah Nixon – Game Design and Programming, Kennesaw State University (2022)
+
+Noah Nixon is a student at Kennesaw State University, graduating spring 2022, who worked on Sailing with the Gods for spring 2022. His work focused on an interactive pirate mini-game, and integrating the mini-games into the larger game system. 
+
+
+Tabitha Reynolds – Game Design and Programming, Kennesaw State University (2022)
+
+Tabitha Reynolds is a student at Kennesaw State University, who worked on Sailing with the Gods for spring 2022. Her work focused on an interactive dolphin mini-game.
+
+
+Ronnie Jones – Game Design and Programming, Kennesaw State University (2022)
+
+Ronnie Jones is a student at Kennesaw State University, who worked on Sailing with the Gods for spring 2022. His work focused on an interactive pirate mini-game.
 
 
 Benjamin Rigg – Game Design and Programming, Kennesaw State University (2021)
@@ -190,6 +225,13 @@ The following illustrations are Copyright Emory University  Samothracian Network
 		Eloisa Gallegos illustrated: Aethalides, Egyptian Sailor, Eukleides son of Antigonos, Idas, Idmon, and Lysias son of Lysias.
 		Erica Sause illustrated: Ancaeus, Billaros son of Hermios, Etruscan Warrior, Iphiclus, and Theodoros son of Pilodoxos.
 		Ren Nesper illustrated: Periclymenus, Rhodian Sailor, Theodotos son of Badromios, Tiphys, and Eurydamas.
+    Game illustrations by Craig Brasco:
+                The game illustration "Port Good Icon" for "Livestock", seen in versions Alpha 5.8+.
+                The icon for the Royal Game of Ur, independent mini-game.
+                Achievement icons for the Royal Game of Ur, independent mini-game.
+                Illustration of player option "Enmerkar" for the Royal Game of Ur, independent mini-game.
+                Illustration of player option "Wenamun" for the Royal Game of Ur, independent mini-game.
+                Weapon illustrations for the upcoming Pirate mini-game (not yet released).
     The game illustrations created by Phoebe Han:
                 The game illustration “Telones the Tax Collector” in all guises and expressions. Telones will be seen in versions Alpha 5.4 and later versions of the game.
                 The pirate illustrations: Kourete, Eurybotas, and Brotachus of Gortyn. These Cretan pirates will be seen in versions Alpha 5.3 and later versions of the game.
@@ -255,6 +297,13 @@ Kottabos Element of a Dancing Satyr (470-450 BC) - CC0
 Lekane with Lid. Museo Archeologico di Aidone, Aidone, Sicily, Italy. Catalogue Number: 61-704 / EN10575. Citation: The data for this project were originally collected as a joint effort between the University of Catania and CVAST at the University of South Florida (USF), with the collaboration of the Fondazione Bruno Kessler (FBK). Dr. Mariarita Sgarlata and Dr. Herbert Maschner, Principal Investigators. We gratefully acknowledge the participation of the administrators of the Villa Romana del Casale and the Museo Archeologico di Aidone. The data have been transferred to Global Digital Heritage (GDH) for processing and analysis. Funding for this project, both at USF and at GDH, has been provided by the Hitz Foundation, Herbert Maschner, Principal Investigator - CC-BY-NC
 Lion keychain 3D Print (Used in the Kottabos game in the Taverna table leg). Created by AMJ3D - CC-BY
 Drinkschaal (kylix/Sianaschaal); symposium scène. Aardewerk, Malibu schilder, Athene (Griekenland), 575-550 v. Chr. [inv. APM13802]. scanned by: 4Dresearchlab in 2019 - CC-BY.
+
+
+3rd Party Textures and Shaders:
+
+Elm leaf texture: https://freecutout.com/elm-leaf-texture/
+Elm bark texture: https://www.myfreetextures.com/two-great-elm-tree-bark-textures/  (My Free Textures License: https://www.myfreetextures.com/use-license/)
+Free Double Sided Shaders by Ciconia Studio: https://assetstore.unity.com/packages/vfx/shaders/free-double-sided-shaders-23087 (Standard Unity Asset Store EULA)
 
 
 3rd Party Libraries:
